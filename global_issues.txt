@@ -1,0 +1,10 @@
+
+
+
+
+1) do we ingtegrate GPs? probably yes.
+
+2) create timetable schedule. 
+copy from optim-ML
+
+3) look at susanne / flo's fairness material. 
