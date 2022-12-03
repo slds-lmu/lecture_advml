@@ -85,7 +85,7 @@
     \end{table}
     
 	\begin{itemize}
-        \item In binary classification (i.e., $\Yspace =\{-1,+1\}$) the minority class is usually the positive class ($y=+1$), while the majority class is the negative ($y=-1$). 
+        \item In binary classification, the minority class is usually the positive class, while the majority class is the negative. 
         \item The positive class is oftentimes the more important one in real-world applications.
         \item Recall that imbalanced data sets can also be a source of bias related to the concept of fairness in ML, e.g.\ more data on white recidivism outcomes than for blacks.
 	\end{itemize}
@@ -93,13 +93,13 @@
 \end{vbframe}
 
 \frame{
-\frametitle{Issues with Classical Classifiers}
+\frametitle{Issues with Evaluating Classifiers}
 
 \begin{itemize}
     \item Ideal case: correctly classify as many instances as possible \\ $\Rightarrow$ High accuracy,	preferably $100\%$.
     \vspace{10pt}
     
-	\item We often obtain on imbalanced data sets:
+	\item In practice, we often obtain on imbalanced data sets:
 	\begin{itemize}
 		\small	
 		\item a \textbf{good} accuracy on the \textbf{majority} class(es),		
@@ -110,73 +110,16 @@
 	\item Reason: the classifier is biased towards the \textbf{majority} class(es), as predicting the majority class pays off in terms of accuracy.
     \vspace{10pt}
 
-	\item This problem can be illustrated by means of the \textbf{accuracy paradox}.
+	\item Focusing only on the overall accuracy can have serious consequences. 
     \vspace{10pt}
 
 \end{itemize}
 %
 }
- 
 
-\begin{vbframe}{Accuracy Paradox: Example}
-%
-	\footnotesize
-	\begin{itemize}
-		%	
-		\item Consider the following setting:
-%		
-
-		\begin{minipage}{0.55\textwidth}    
-%			
-		\begin{itemize}
-			\scriptsize
-%			
-			\item $p(\xv ~| -1) \sim \normal_2\left( 
-			\begin{pmatrix}
-				0 \\ 0
-			\end{pmatrix}  , 
-			\begin{pmatrix}
-			1  & 0 \\ 0 & 1
-			\end{pmatrix}   \right) $
-%		 
-			\item  $p(\xv ~| ~ +1) \sim \normal_2\left( 
-			\begin{pmatrix}
-				0 \\ -2
-			\end{pmatrix}  , 
-			\begin{pmatrix}
-				0.1  & 0 \\ 0 & 0.1
-			\end{pmatrix}   \right)  $
-%		
-			\item $n_+ = 25$ and $n_- = 1000$
-%		
-		\end{itemize}
-		\end{minipage}
-		\begin{minipage}{0.35\textwidth}    
-		\begin{center}
-			%    	 
-			\includegraphics[width=0.8\textwidth]{figure_man/accuracy_paradox}
-			%    	
-		\end{center}
-		\end{minipage}
-%	
-	\item We compare two models $f_1(\xv) \equiv -1$ and $f_2(\xv) = 2 \cdot \mathds{1}_{[ \xv \in [-0.66,0.47]\times [-2.74,-1.12] ]} -1.$
-%	
-	\item $f_1$ has an overall accuracy of $\approx 0.976,$ while $f_2$ has an overall accuracy of $\approx 0.951.$
-%	
-	\item However, $f_1$ has not a single correct classification for the positive class, i.e., an accuracy of $0$ for the positive class, while $f_2$ classifies \textbf{all} positives correctly, i.e., an accuracy of $1$ for the positive class.
-%	
-		%
-	\end{itemize}
-	%	
-\end{vbframe} 
-
-
-
-\begin{vbframe}{Accuracy Paradox: Consequences}
+\begin{vbframe}{Issues with Evaluating Classifiers}
 	%
 	\begin{itemize}
-		\item Focusing only on the overall accuracy can have serious consequences. 
-        \vspace{20pt}
         
         \item Example:
 		\begin{itemize}
@@ -187,12 +130,21 @@
 		\end{itemize}
         \vspace{20pt}
         
-		\item Ideal performance measure: the learning is \emph{properly} biased towards the minority class(es).	
+		\item Ideal performance metric: the learning is \emph{properly} biased towards the minority class(es).	
+        \vspace{20pt}
+
+        \item Imbalance-aware performance metrics:
+        \begin{itemize}
+            \item G-score
+            \item Balanced accuracy
+            \item Matthews Correlation Coefficient
+            \item Weighted macro $F_1$ score
+        \end{itemize}
 	\end{itemize}
 \end{vbframe} 
 
 
-\begin{vbframe}{Dealing with Imbalanced Data Sets}
+\begin{vbframe}{Training Classifiers on Imbalanced Datasets}
 \small
 \begin{table}[h]
     \centering
@@ -202,9 +154,9 @@
         \hline
         Algorithm-level & Bias classifiers towards minority & Special knowledge about classifiers is needed \\ [5pt]
         \hline
-        Data-level & Re-balance the classes by resampling & No modification of classifiers is needed \\ [5pt]
+        Data-level & Re-balance the classes by resamping & No modification of classifiers is needed \\ [5pt]
         \hline
-        Cost-sensitive Learning & Introduce different costs for misclassification when learning & Between algorithm- and data-level approaches\\ [15pt]
+        Cost-sensitive Learning & Introduce different costs for misclassification when learning & Between algorithm- and data-level approaches \\ [15pt]
         \hline
         Ensemble-based & Ensemble learning plus one of three techniques above & - \\ [5pt]
         \bottomrule
