@@ -1,0 +1,44 @@
+Intro
+
+Definitions of Bias
+Sources of Bias
+    Historical bias
+    Representation bias
+    ...
+    
+Auditing for Bias
+    Bias Definitions
+        Individual
+        Statistical
+            Outcome based
+            Error based
+        Causal
+    Fairness Tensor
+    Incompatibility of Fairness Metrics
+
+    Causal Fairness Notions
+        Counterfactual Fairness
+        Path specific fairness
+        
+
+Preventing & Mitigating Harms
+    Documentation
+    Bias Mitigation
+        Reweighing
+        Equalized Odds
+    Recourse, Accountability & Interpretability
+
+
+A broader perspective
+    Intersectionality
+    Interact with Stakeholders
+    Decison Space: Are there fairer interventions?
+    Long Term perspective
+    Use- & miss-use of models
+
+
+
+Important Ressources
+- https://docs.google.com/presentation/d/14Vse6gkQ6PaVPsCr_rQXXBlN21Yu8tVDmU7v-YLoqQQ/edit#slide=id.gce02f219f5_0_161
+- https://fairlearn.org/main/contributor_guide/how_to_talk_about_fairness.html
+- https://fairmlbook.org/

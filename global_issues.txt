@@ -7,4 +7,6 @@
 2) create timetable schedule. 
 copy from optim-ML
 
-3) look at susanne / flo's fairness material. 
+3) look at susanne / flo's fairness material.
+
+4) move imbalanced-learning/performance-metrics into i2ml.

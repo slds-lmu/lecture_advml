@@ -1,0 +1,427 @@
+<<setup-child, include = FALSE>>=
+library(knitr)
+library(gridExtra)
+set_parent("../style/preamble.Rnw")
+@
+
+\lecturechapter{99}{Algorithmic Fairness}
+\lecture{Fortgeschrittene Computerintensive Methoden}
+
+\input{../../latex-math/basic-math}
+\input{../../latex-math/basic-ml}
+\newcommand{\dv}{\mathbf{d}} % vector d (bold)
+\newcommand{\av}{\mathbf{a}} % vector a (bold)
+\newcommand{\Dspace}{\delta} % Decision space d
+\newcommand{\Aspace}{\mathcal{A}} % Protected attribute space A
+
+%% Google Slides source of figures: 
+%%  https://docs.google.com/presentation/d/14Vse6gkQ6PaVPsCr_rQXXBlN21Yu8tVDmU7v-YLoqQQ/edit?usp=sharing
+
+\begin{vbframe}{ALGORITHMIC FAIRNESS}
+ \begin{center}
+ \vspace{-0.5cm}
+ \includegraphics[width=0.62\textwidth]{figures/scale.png}
+ \end{center}
+
+ \begin{itemize}
+  \item Machine learning (ML) based systems increasingly permeate society
+  \item Models can replicate existing injustices or introduce new ones
+  \item Automated decisions can disproportionately harm vulnerable individuals
+ \end{itemize}
+\end{vbframe}
+
+
+\begin{vbframe}{ALGORITHMIC FAIRNESS}
+\begin{columns}
+\begin{column}{0.5\textwidth}
+\begin{center}
+ \vspace{-0.5cm}
+
+ \textbf{Medicine}
+
+ \includegraphics[height=0.2\textheight]{figures/gender_imbalance.png}
+ \tiny{www.pnas.org/content/117/23/12592}
+
+ \vspace{1.5cm}
+
+ \textbf{Hiring}
+
+ \includegraphics[height=0.2\textheight]{figures/hiring.png}
+ \tiny{https://interaktiv.br.de/ki-bewerbung/en/}
+
+\end{center}
+\end{column}
+\begin{column}{0.5\textwidth}
+\begin{center}
+ \vspace{-0.5cm}
+
+ \textbf{Criminal Justice}
+
+ \includegraphics[height=0.2\textheight]{figures/compas.png}
+ \tiny{{https://www.propublica.org/article/machine-bias-risk-assessments-in-criminal-sentencing}}
+
+ \vspace{1.5cm}
+
+ \textbf{Search Results}
+
+ \includegraphics[height=0.2\textheight]{figures/black_girls.png}
+ \tiny{https://time.com/5209144/google-search-engine-algorithm-bias-racism/}
+\end{center}
+\end{column}
+\end{columns}
+\end{vbframe}
+
+
+% %% Possibly skip this slide
+% \begin{vbframe}{What is Bias?}
+% \begin{center}
+% \vspace{1.5cm}
+% \enquote{Bias as a systematic error or an unexpected tendency to favor one outcome over another}
+% (Mehrabi et al., 2019)
+% \vspace{1.5cm}
+% \enquote{Fairness is the “absence of any prejudice or favoritism towards an individual or a group based on their intrinsic or acquired traits in the context of decision-making}
+% (Mehrabi et al., 2019)
+% \end{center}
+% \end{vbframe}
+
+
+\begin{vbframe}{Sources of Bias}
+\begin{center}
+\includegraphics[scale=1]{figures/bias_overview.pdf}
+\end{center}
+\tiny{Adapted from S. Mitchell et al., Algorithmic fairness: Choices, assumptions, and definitions, 2021}
+\end{vbframe}
+
+\begin{vbframe}{Historical Bias}
+  \begin{itemize}
+  \item Historical data often contains biases, e.g. under-representation of minority groups
+  \item Models can pick up existing biases
+  \item As a result, biases are perpetuated into the future
+  \end{itemize}
+  \vspace{1cm}
+\begin{center}
+\includegraphics[width=0.8\textwidth]{figures/historical_bias.png}
+
+\tiny{Twitter: \@math\_rachel 01.05.2019}
+\end{center}
+\end{vbframe}
+
+\begin{vbframe}{Representation Bias}
+ \vspace{-0.25cm}
+  \begin{itemize}
+  \item Over- or under-representation of specific sub-population can lead to models that only predict well for majority groups
+  \item Models need to be evaluated across a representative sample of the target population
+  \item Example: We can only know if a person paid back a loan if we gave out a loan in the first place
+  \end{itemize}
+\begin{center}
+\includegraphics[width=0.6\textwidth]{figures/gendershades.jpeg}
+
+\tiny{gendershades.org}
+\end{center}
+\end{vbframe}
+
+\begin{vbframe}{Other Sources of Bias}
+
+  \begin{itemize}
+  \item \textbf{Measurement Bias} Difference in how a given variable is measured in different sub-populations
+    \begin{itemize}
+      \begin{footnotesize}
+      \item Increased policing in some post codes lead to more prior arrests
+      \item Better data quality between different hospitals
+      \end{footnotesize}
+    \end{itemize}
+  \item \textbf{Model Bias} Biases introduced during modelling, e.g. due to under-specified models
+      \begin{itemize}
+      \begin{footnotesize}
+      \item Models make more errors for darker skin tones due to insufficient data
+      \item Models pick up spurious correlations in the data
+      \end{footnotesize}
+      \end{itemize}
+  \item \textbf{Feedback Loops} Model decisions shape data collected in the future
+      \begin{itemize}
+      \begin{footnotesize}
+      \item Lead to representation bias if e.g. sub-populations are systematically excluded
+      \item People and ML systems 'pick up' miss-representation from search engines. 
+      \end{footnotesize}
+\end{itemize}
+\end{itemize}
+
+\vfill
+\tiny{Mehrabi et al., A Survey on Bias and Fairness in Machine Learning, 2020}
+\end{vbframe}
+
+\begin{vbframe}{Types of Harms}
+  If not accounted for, \textit{biases} can lead to several \textbf{harms}
+  \begin{itemize}
+  \begin{small}
+  \item \textbf{Allocation}: A ressource is allocated unevenly across individuals
+  \item \textbf{Quality-of-service}: Systems fail disproportionately for certain groups of individuals.
+  \item \textbf{Stereotyping}: Systems re-inforce existing stereotypes
+  \item \textbf{Denigration}: Systems are offensive towards individuals
+  \item \textbf{Representation}: Under- or overrepresentation of certain groups
+  \end{small}
+  \end{itemize}
+
+\begin{columns} 
+\begin{column}{0.5\textwidth}
+\begin{center}
+\vfill
+ \includegraphics[height=0.25\textheight]{figures/gorilla.png}
+ \tiny{Twitter: \@jackyalcine 29.06.2015}
+ \vfill
+\end{center}
+\end{column}
+\begin{column}{0.5\textwidth}
+\begin{center}
+ \vspace{-0.5cm}
+ \includegraphics[height=0.3\textheight]{figures/doctor.png}
+ \tiny{google.com search for doctor (May, 2021)}
+\end{center}
+\end{column}
+\end{columns}
+\vfill
+\tiny{H. Weerts, An introduction to algorithmic fairness, 2021}
+\end{vbframe}
+
+
+
+\begin{vbframe}{Auditing Models for Potential Harms}
+  Models Biases in data can have \textbf{ethical}, \textbf{legal} and \textbf{regulatory} consequences \\
+  For a more formal treatment, we introduce additional notation:
+  \begin{itemize}
+    \item \textbf{Protected attribute} Fairness definitions often require a protected \emph{class} or attribute w.r.t which models should be fair.
+    We denote this protected attribute $A$ with $\av$. For simplicity, we assume that $\av^{(i)} \in \Aspace = \{0,1\}$ is a binary variable
+    \item \textbf{Decision space} In order to make the difference between a model's prediction $\fxh$ and a decision derived from this prediction explicit,
+    we denote the decision  with $\dv$. For simplicity, we again assume binary decisions $\dv^{(i)} \in \Dspace = \{0, 1\}$
+  \end{itemize}
+
+This notation can be extended to allow for multi-class or regression outcomes as well as more complex protected attributes,
+that e.g. allow accounting for non-binary protected classes or \emph{intersectional notions}, e.g. race $\land$ gender.
+\end{vbframe}
+
+\begin{vbframe}{Mathematical Notions of Bias - Overview}
+\begin{center}
+  \vspace{.5cm}
+  \includegraphics[width=\textwidth]{figures/fairness_definitions.png}
+\end{center}
+\end{vbframe}
+
+\begin{vbframe}{No fairness through unawareness}
+  A naive proposal to reduce harms from ML models is to simply remove the protected attribute.
+  \textbf{But:} It's not that simple - models can pick up the information through other variables!
+  \vspace{-.4cm}
+  \begin{columns} 
+    \begin{column}{0.5\textwidth}
+    \begin{center}
+    \textbf{Direct Discrimination}
+    \vspace{.2cm}
+    \begin{tikzpicture}
+      % x node set with absolute coordinates
+      \node[state] (a) at (0,0) {$Race$};
+      \node[state] (x1) [right =of a] {$ZIP$};
+      \node[state] (x2) [right =of x1] {$Income$};
+      \node[state] (y) [below =of x1] {$Credit$};
+      % Directed edge
+      \draw [->, red] (a) -- (y);
+      \draw [->] (x1) -- (y);
+      \draw [->] (x2) -- (y);
+    \end{tikzpicture}
+    \end{center}
+    \vfill
+    $\rightarrow$ The model directly uses race as a feature.
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{center}
+        \textbf{Indirect Discrimination}
+        \vspace{.2cm}
+        \begin{tikzpicture}
+          % x node set with absolute coordinates
+          \node[state] (a) at (0,0) {$Race$};
+          \node[state] (x1) [right =of a] {$ZIP$};
+          \node[state] (x2) [right =of x1] {$Income$};
+          \node[state] (y) [below =of x1] {$Credit$};
+          % Directed edge
+          \draw [->, red] (a) -- (x1);
+          \draw [->] (x1) -- (y);
+          \draw [->] (x2) -- (y);
+        \end{tikzpicture}
+        \end{center}
+    \vfill
+    $\rightarrow$ The model picks up information about the race through the proxy-variable ZIP-code.
+    \end{column}
+    \end{columns}
+  \vfill
+\end{vbframe}
+
+\begin{vbframe}{Group fairness definitions}
+  Several fairness definitions based on differences between protected groups have been proposed.
+  \begin{itemize}
+    \item \textbf{Statistical Parity}: The chance to get the favourable outcome is equal across two groups. This is also 
+          called \textit{demographic parity}.
+          \[
+          P(\hat{Y} = 1 | A = 0) = P(\hat{Y} = 1 | A = 1)   
+          \]
+    \item \textbf{Equalized Opportunity}: The chance to \emph{correctly} be assigned the favourable outcome is independent of 
+          the protected attribute. 
+          \[
+            P(\hat{Y} = 1 | A = 0, Y = 1) = P(\hat{Y} = 1 | A = 1, Y = 1)   
+          \]
+
+    \item \textbf{Accuracy Parity}: The accuracy is equal in both groups.
+    
+    \[ \begin{aligned}
+    & P(\hat{Y} = 1 | A = 0, Y = 1) + P(\hat{Y} = 0 | A = 0, Y = 0) = \\
+    & P(\hat{Y} = 1 | A = 1, Y = 1) + P(\hat{Y} = 0 | A = 1, Y = 0)
+    \end{aligned} \]
+  \end{itemize}
+\end{vbframe}
+
+\begin{vbframe}{Perspective: Based on predicted outcome}
+    \textbf{}
+    \begin{itemize}
+      \item Statistical parity requires equality in the predicted outcome.\\
+      E.g. hire candidates \textbf{independent} of qualification.
+      \item If the underlying qualifications are not distributed equally across groups, we need to sacrifice \emph{utility} to achieve statistical parity.
+    \end{itemize}
+    \begin{center}
+      \includegraphics[]{figures/statistical_parity}
+    \end{center}
+    $\rightarrow$ Enforcing equal positive rates might require hiring unqualified candidates.\\
+    \textbf{Danger:} If the bias comes from the real world (e.g. societal bias), enforcing statistical parity can also lead to adverse effects in the long term.
+\end{vbframe}
+
+\begin{vbframe}{Perspective: Based on true \& predicted outcome}
+  \textbf{}
+  \begin{itemize}
+    \item Other fairness notions require equality of some error notions, e.g. false positive rates.\\
+    E.g. hire \emph{qualified} candidates at equal rates across groups.
+    \item Error based notions are often more intuitive and easy to communicate.
+    \item Can help to idenitify representation or model bias
+    \item Error based notions do not account for systemic injustices in the world -- if e.g. labels are biased, we can still be \emph{fair} according to error-based notions. 
+  \end{itemize}
+\end{vbframe}
+
+\begin{vbframe}{Reminder: Confusion Matrix}
+  The confusion matrix is a $2 \times 2$ contingency table of predictions $\hat{y}$ and true labels $y$.
+  Several evaluation metrics can be derived from a confusion matrix:
+  \vfill
+  \begin{center}
+  \includegraphics[width=0.8\textwidth]{figures/roc-confusion_matrix.png}
+  \end{center}
+  $\rightarrow$ Many fairness metrics can be expressed as entries of the confusion matrix
+\end{vbframe}
+   
+\begin{vbframe}{Fairness Tensor}
+  We can represent labels \& predictions as a \emph{fairness tensor} (Kim et al., 2020).
+  Fairness tensors are 3-dimensional, stacked confusion matrices:
+
+  \[
+  Z = \left[
+    \begin{bmatrix}
+    TP_1  & FP_1 \\
+    FN_1  & TN_1
+    \end{bmatrix} ^{A=1}
+    ,
+    \begin{bmatrix}
+      TP_0  & FP_0 \\
+      FN_0  & TN_0
+    \end{bmatrix} ^{A=0} 
+    \right]
+  \]
+  \vspace{.2cm}
+  For $z = (TP_1,FN_1,FP_1,TN_1,TP_0,FN_0,FP_0,TN_0)^T / N$, we can express a large variety of fairness metrics as 
+  linear $\phi(x) = A \cdot z$ or quadratic functions $\phi(x) = z^T \cdot B \cdot z$ by choosing an appropriate matrix $A$ or $B$. \\
+  \vspace{.2cm}
+  \textbf{Example:} \\ We choose $A = (N_1, 0, N_1, 0, N_0, 0, N_0, 0) / N$, where N_{a} is the sum of entries in the confusion matrix for protected grou $a$.
+  We can now express \textbf{statistical parity} as $A \cdot z = 0$.
+\end{vbframe}
+\begin{vbframe}{Incompatibility of Fairness Metrics}
+
+  Some fairness metrics can not be jointly satisfied, except for trivial settings.
+  As a result, we can not build a universal fairness metric that satisfies all fairness requirements.
+  This has been shown for several combinations of fairness metrics, e.g. equal true positive, false positive and false negative rates.\\
+  \vspace{.2cm}
+  We can formally show this using the fairness tensor $z$ and matrices $A_{TPR}, A_{FPR}, A_{FNR}$ encoding the fairness metrics.
+  Showing that fairness metrics are compatible now requires showing that the system of equations 
+  \[ \begin{bmatrix} A_{TPR} \\ A_{FPR} \\ A_{FNR} \end{bmatrix} \cdot z  = \begin{bmatrix} 0 \\ 0 \\ 0 \end{bmatrix} \]
+  has a solution. If no solution $z$ exists, the metrics are incompatible.
+
+\end{vbframe}
+
+\begin{vbframe}{Fairness Metrics - Closing Thoughts}
+  \begin{itemize}
+    \item Statistical group fairnes metrics require translating ethical considerations of what is \emph{fair} into mathematical formulas.
+    \item To draw meaningful conclusions, we need to evaluate fairness metrics on a \textbf{representative} data set. 
+    \item Fairness metrics reduce a wide variety of important considerations into a single number -- they are not designed to guarantee that a system is fair.
+    \item Incompatibility between fairness metrics implies that we might need trade-offs between fairness metrics.
+  \end{itemize}
+\end{vbframe}
+
+\begin{vbframe}{Preventing \& Mitigating Harms - Documentation}
+    Harm from machine learning models can often be prevented by improving documentation of existing datasets \& models.
+    To provide an example, usage of datasets or models outside of their intended use can often lead to harm, even if the models are carefully validated.
+    \begin{itemize}
+      \item \textbf{Dataset documentation} Includes information on the dataset, sampling mechanisms and intended use.
+      Can inform model developers on possible representation biases or other problems with the data. \\
+      \textbf{Example:} Datasheets for datasets
+      \item \textbf{Model documentation} Includes information about the model, used data and hyperparameters. 
+      Can inform users on the relevant performance metrics, intended use of a given model. \\
+      \textbf{Example:} Modelcards for ML models
+      \item \textbf{Fairness reports} Include information about performed fairness audits.
+    \end{itemize}
+\end{vbframe}
+
+\begin{vbframe}{Preventing \& Mitigating Harms - Bias Mitigation}
+  Several \emph{bias mitigation techniques} have been proposed:
+  \begin{itemize}
+    \item \textbf{Pre-processing}: Transform data to make subsequently trained models fairer.
+    \item \textbf{In-processing}: Learn a model that directly incorporates fairness constraints.
+    \item \textbf{Post-processing}: Adapt model predictions to satisfy fairness constraints.
+  \end{itemize}
+  \textbf{Example:}\\
+  Re-weighing (Kamiran, 2012) proposes to use sample weights that are inverse to the frequency of labels and predictions in the data.
+\end{vbframe}
+
+\begin{vbframe}{Preventing \& Mitigating Harms - Recourse}
+  Fair treatment of individuals subject to a decision making systems decisions can often not only be achieved solely through algorithmic means
+  but requires recourse, accountability \& interpretability.
+  \begin{itemize}
+    \item \textbf{Accountability}: Automated systems will make errors - developers need to ensure that humans responsible for addressing such errors exist and have the means to address such errors.
+    \item \textbf{Interpretability}: Interpretability techniques can help to identify possible problems in the data or the model, e.g. spurious correlations picked up by the model.
+    \item \textbf{Recourse}: Individuals subject to automated decisions should have access to an explanation on how the decision was made and what steps can be taken to address unfavourable predictions.
+  \end{itemize} 
+\end{vbframe}
+
+
+\begin{vbframe}{Further considerations}
+  \begin{itemize}
+    \item \textbf{Intersectionality}: Fairness considerations should often hold across intersectional groups, e.g. $race \land gender$.
+    \item \textbf{Intervention design}: Instead of ensuring a given intervention is fair, it can often be helpful to consider the intervention we wish to deploy. \\
+    \textbf{Example:} Instead of penalizing defendants for not showing up to court, provide them with means of transportation.
+    \item \textbf{Stakeholder participation:} Developing ML models should take the perspective of all stakeholders such as the individuals affected by the intervention and advocacy groups.
+    \item \textbf{Long-term perspective:} Existing metrics only consider the short-term and do not take its long-term impact into account. This might lead to adverse effects in the long-term.
+  \end{itemize}
+\end{vbframe}
+
+\begin{vbframe}{Resources}
+\begin{itemize}
+\item Fairness and Machine Learning - Limitations and Opportunities, Barocas et al., 2019
+\item Algorithmic Fairness: Choices, Assumptions, and Definitions, Mitchell et al., 2021
+\item A Survey on Bias and Fairness in Machine Learning, Mehrabi et al., 2020
+\item An Introduction to Algorithmic Fairness, H.J.P Weerts, 2021
+\item FACT: A Diagnostic for Group Fairness Trade-offs, Kim et al., 2020
+\item Data preprocessing techniques for classification without discrimination, Kamiran et al., 2012
+\item Fairness Through Awareness, Dwork et al., 2012
+\end{itemize}
+\end{vbframe}
+
+\begin{vbframe}{Software}
+  \begin{itemize}
+  \item \texttt{fairlearn} (Python)
+  \item \texttt{aif360} (Python)
+  \item \texttt{fairmodels} (R)
+  \item \texttt{mlr3fairness} (R)
+  \end{itemize}
+  \end{vbframe}
+
+\endlecture

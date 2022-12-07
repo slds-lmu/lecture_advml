@@ -1,0 +1,42 @@
+\tikzset{%
+  % Specifications for style of nodes:
+    base/.style = {rectangle,  draw=black,
+                   minimum width=2cm, minimum height=.3cm,
+                   text centered, solid, fill=white, font=\sffamily},
+    note/.style = {rectangle, fill=none, font=\tiny},
+    field/.style = {rectangle, rounded corners, draw=black,
+                   minimum width=2cm, minimum height=1cm,
+                   text centered, solid, fill=white, font=\sffamily},
+    add/.style = {rectangle, font=\tiny, fill=none, text=darkgray},
+}
+\begin{tikzpicture}[node distance=1.5cm, auto, align=center]
+    \filldraw [fill=white, draw=black, thick, centered] (0.0,  0.0) rectangle (9.0,-6.0);
+    \filldraw [fill=white, draw=black, thick, centered] (0.2, -0.8) rectangle (8.8,-5.8);
+    \filldraw [fill=white, draw=black, thick, centered] (0.4, -1.6) rectangle (8.6,-5.6);
+    % \filldraw [fill=white, draw=black, thick, centered] (0.6, -2.4) rectangle (8.4,-5.4);
+
+    \node[base] (s1) at (4.5, 0.0) {World as it should be};
+    \node[base] (s2) at (4.5,-0.8) {World as it is};
+    \node[base] (s3) at (4.5,-1.6) {Modeled world};
+    
+    \draw[<->, dashed] (7, 0) -- (7, -.8);
+    \draw[<->, dashed] (6.5, -.8) -- (6.5, -1.6);
+    
+    \node[note] (n1) at (8,-.4)    {Societal Bias};
+    \node[note] (n2) at (7.5,-1.2) {Statistical Bias};
+    
+    \node[field] (data)     at (2, -4) {Data};
+    \node[field] (model)    at (7, -4) {Model};
+    % \node[field] (decision) at (7.25, -4) {Decision};
+    
+    \draw[<->, dashed] (s2.west) -- (data.north);
+    \node[note] (n3) at (1.75,-2.5) {Measurement \\ Bias};
+    \draw [decorate, decoration = {calligraphic brace}, thick]  (2.75,-2) -- (2.75,-3);
+    \node[add, anchor=west] (n3) at (3,-2.5) {Measurement Error \\ Non-representative sample};
+    
+    \draw[<->, dashed] (data) -- (model);
+    \node[note] (n3) at (4.5,-3.8) {Learning Bias};
+    \draw [decorate, decoration = {calligraphic brace, mirror}, thick]  (3.4,-4.2) -- (5.6,-4.2);
+    \node[add, anchor=south] (n4) at (4.5,-5) {Model Bias \\ Selected Variables};
+    
+\end{tikzpicture}
