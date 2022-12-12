@@ -42,28 +42,35 @@
 \sloppy
 
 \begin{vbframe}{Imbalanced Data Sets}
-%
-\small{
-  \begin{itemize}
-%  	
-	\begin{minipage}{0.45\textwidth}
 %		    
-		    \item Class imbalance: the occurrences of the classes are significantly different. 
-%		     
-		    \item Consequence: undesirable predictive behavior.
-	\end{minipage}
-	\begin{minipage}{0.45\textwidth}    
-		\begin{center}
-			%    	
-			\includegraphics[width=0.5\textwidth]{figure_man/balanced_data_plot}
-			\includegraphics[width=0.5\textwidth]{figure_man/imbalanced_data_plot}
-			%    	
-		\end{center}
-	\end{minipage}
-
+            \begin{itemize}
+		        \item Class imbalance: the occurrences of the classes are significantly different. 		     
+		        \item Consequence: undesirable predictive behavior.	    
+		        \item 	Example:
+		        \begin{itemize}
+                \small    
+		            \item Sampling from two Gaussian distributions 
+		        \end{itemize}		    
+		    \end{itemize}
+		   
+			\begin{figure}
+				\centering
+				\includegraphics[width=0.7\linewidth]{figure_man/combined_data_plots.jpg}
+			\end{figure}
 %
+\end{vbframe}
 
-  \end{itemize}}
+\begin{vbframe}{Imbalanced Data Sets: Benchmark}
+%
+			\begin{figure}
+				\centering
+				\includegraphics[width=0.7\linewidth]{figure_man/benchmark_plots.png}
+			\end{figure}
+			
+			\begin{itemize}
+                \item Train classifiers on four datasets with threefold cv. Hold the negative class constant at 10000 examples. For the positive class, consider class         sizes of 10000, 1000, 100 and 50. 			
+			\end{itemize}
+
 %
 \end{vbframe}
 
