@@ -31,13 +31,13 @@ ns_pos = c(10000, 1000, 100, 50)
 tasks = lapply(ns_pos, function(n) create_task(n_neg = 10000, n_pos = n, p = 2))
 
 learners = lrns(c("classif.log_reg", "classif.svm", "classif.rpart"))
-resa = rsmp("cv", folds = 3L)
+resa = rsmp("cv", folds = 10L)
 
 design = benchmark_grid(tasks, learners, resa)
 bmr = benchmark(design)
  
-mm = list(msr("classif.acc"), msr("classif.tpr"),
-          msr("classif.ppv"), msr("classif.fbeta"))
+mm = msrs(c("classif.acc", "classif.tpr", "classif.ppv", "classif.fbeta"),
+               average = "micro")
 
 aggr = bmr$aggregate(measures = mm)
 
@@ -61,29 +61,33 @@ x_labels = c("10000/10000", "1000/10000", "100/10000", "50/10000")
 plot_acc = ggplot(table, aes(x=factor(Task, level = x_labels), y=Accuracy, group = Learner)) +
   geom_line(aes(color=Learner)) +
   xlab("Positive/Negative Ratio") +
-  geom_point()
+  geom_point() +
+  theme(text = element_text(size = 16))
 
 plot_tpr = ggplot(table, aes(x=factor(Task, level = x_labels), y=TPR, group = Learner)) +
   geom_line(aes(color=Learner)) +
   geom_point() +
   xlab("Positive/Negative Ratio") +
-  ylab("TPR") 
+  ylab("TPR") +
+  theme(text = element_text(size = 16))
 
 plot_ppv = ggplot(table, aes(x=factor(Task, level = x_labels), y=PPV, group = Learner)) +
   geom_line(aes(color=Learner)) +
   geom_point() +
   xlab("Positive/Negative Ratio") +
-  ylab("PPV")
+  ylab("PPV") +
+  theme(text = element_text(size = 16))
 
 plot_f1 = ggplot(table, aes(x=factor(Task, level = x_labels), y=F1_Score, group = Learner)) +
   geom_line(aes(color=Learner)) +
   geom_point() +
   xlab("Positive/Negative Ratio") +
-  ylab("F1 Score")
+  ylab("F1 Score") +
+  theme(text = element_text(size = 16))
+
 
 # Combine plots
 
 grid.arrange(plot_acc, plot_tpr, plot_ppv, plot_f1, ncol = 2, nrow = 2)
-
 
 
