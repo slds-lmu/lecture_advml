@@ -83,8 +83,8 @@
 	
 	\begin{minipage}[c]{0.5\textwidth}
 		\footnotesize
-		$F_1$ score for different combinations of $\rho_{PPV}$ \& $\rho_{TPR}$. \\
-		$\rightarrow$ Tends more towards the \textbf{lower} of the two combined values.
+		$F_1$ is the \textbf{harmonic mean} of $\rho_{PPV}$ \& $\rho_{TPR}$. \\
+		$\rightarrow$ Property of harmonic mean: tends more towards the \textbf{lower} of the two combined values.
 	\end{minipage}%
 	\begin{minipage}[c]{0.5\textwidth}
 		\centering
@@ -108,6 +108,37 @@
 	
 \end{vbframe}
 
+\begin{vbframe}{$F_\beta$ in Binary classification}
+    \footnotesize
+	
+	\begin{minipage}[c]{0.5\textwidth}
+		\footnotesize
+        \begin{itemize}
+            \item $F_1$ puts equal weights to $\frac{1}{\rho_{PPV}}$ \& $\frac{1}{\rho_{TPR}}$ because $F_1 = \frac{2}{\frac{1}{\rho_{PPV}} + \frac{1}{\rho_{TPR}}}$.
+            \item $F_\beta$ puts $\beta^2$ times of weight to $\frac{1}{\rho_{TPR}}$:
+                \begin{equation*}
+                    \begin{aligned}
+                        F_\beta &= \frac{1}{\frac{\beta^2}{1 + \beta^2} \cdot \frac{1}{\rho_{TPR}} + \frac{1}{1 + \beta^2} \cdot \frac{1}{\rho_{PPV}}} \\
+                        &= (1 + \beta^2) \cdot \frac{\rho_{PPV} \cdot \rho_{TPR}}{\beta^2 \rho_{PPV} + \rho_{TPR}}
+                    \end{aligned}
+                \end{equation*}
+        \end{itemize}
+	\end{minipage}%
+	\begin{minipage}[c]{0.5\textwidth}
+		\centering
+		\includegraphics[width=0.8\textwidth]{figure/f1_score_plot.pdf}
+	\end{minipage}
+	
+	\begin{itemize}
+		\item $\beta \gg 1 \ \leadsto \ F_\beta \approx \rho_{TPR}$;
+        \item $\beta \ll 1 \ \leadsto \ F_\beta \approx \rho_{PPV}$.
+  
+	\end{itemize}
+
+    
+    
+\end{vbframe}
+
 
 \begin{vbframe}{G Score and G Mean}
 	\footnotesize
@@ -119,7 +150,8 @@
 		%	
 		$$\rho_{G} = \sqrt{\rho_{PPV} \cdot \rho_{TPR}}$$
 		%	
-		\item It tends more towards the \textbf{lower} of the two combined values.
+		\item Geometric mean tends more towards the \textbf{lower} of the two combined values.
+        \item Geometric mean is \textbf{larger} than harmonic mean.
 		%	
 	\end{itemize}
 \end{minipage}%
@@ -178,10 +210,12 @@
 	\footnotesize{
 	\begin{itemize}
 		%
-		\item MCC (aka Phi coefficient) is a measure for the correlation between two binary random variables. 
+        \item Recall: Pearson correlation coefficient (PCC): 
+            $$\corr(X, Y) = \frac{\cov(X, Y)}{\sigma_{X} \sigma_{Y}}$$
+		\item We can view the ``predicted'' classes and the ``true'' classes as two binary random variables.
         \vspace{20pt}
   
-        \item In classification, the ``predicted'' classes and the ``true'' classes are the two discrete random variables:
+        \item Using the entries in confusion matrix to estimate the PCC, we obtain MCC:
 	
 		$$   \rho_{MCC} = \frac{TP\cdot TN - FP \cdot FN}{\sqrt{(TP+FN)(TP+FP)(TN+FN)(TN+FP)}}$$
         \vspace{20pt}
@@ -203,7 +237,7 @@
         $$   \rho_{MCC} = \frac{TP\cdot TN - FP \cdot FN}{\sqrt{(TP+FN)(TP+FP)(TN+FN)(TN+FP)}}$$
 
         \begin{itemize}
-            \item $\rho_{MCC} \approx 1$ $\leadsto$ good classification, i.e., strong correlation between predicted and true classes.
+            \item $\rho_{MCC} \approx 1$ $\leadsto$ nearly zero error $\leadsto$ good classification, i.e., strong correlation between predicted and true classes.
             \vspace{10pt}
     	
             \item $\rho_{MCC} \approx 0$ $\leadsto$ no correlation, i.e., the classification is no better than random guessing.
