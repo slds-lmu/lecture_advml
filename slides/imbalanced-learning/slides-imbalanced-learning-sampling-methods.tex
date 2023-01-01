@@ -65,6 +65,9 @@
 					\item Oversampling --- Adding/Creating new instances of the minority class(es) to the original data set.
                     \vspace{10pt}
 
+                    \item Oversampling is slower than undersampling, but oversampling usually works better.
+                    \vspace{10pt}
+
 					\item Hybrid approaches --- Combining undersampling and oversampling.
                     \vspace{10pt}
 			
@@ -303,9 +306,9 @@
 
 				\item Find its $k$ nearest minority neighbors.
 		
-				\item Randomly select $j$ of these neighbors.
+				\item Randomly select \textbf{one} of these neighbors.
 		
-				\item Randomly generate new instances along the lines connecting the minority example and its $j$ selected neighbors.
+				\item Randomly generate new instances along the lines connecting the minority example and its selected neighbor.
 		
 			\end{itemize}
 

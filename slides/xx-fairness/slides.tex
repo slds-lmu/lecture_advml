@@ -338,7 +338,7 @@ that e.g. allow accounting for non-binary protected classes or \emph{intersectio
   For $z = (TP_1,FN_1,FP_1,TN_1,TP_0,FN_0,FP_0,TN_0)^T / N$, we can express a large variety of fairness metrics as 
   linear $\phi(x) = A \cdot z$ or quadratic functions $\phi(x) = z^T \cdot B \cdot z$ by choosing an appropriate matrix $A$ or $B$. \\
   \vspace{.2cm}
-  \textbf{Example:} \\ We choose $A = (N_1, 0, N_1, 0, N_0, 0, N_0, 0) / N$, where N_{a} is the sum of entries in the confusion matrix for protected grou $a$.
+  \textbf{Example:} \\ We choose $A = (N_1, 0, N_1, 0, N_0, 0, N_0, 0) / N$, where $N_{a}$ is the sum of entries in the confusion matrix for protected grou $a$.
   We can now express \textbf{statistical parity} as $A \cdot z = 0$.
 \end{vbframe}
 \begin{vbframe}{Incompatibility of Fairness Metrics}
