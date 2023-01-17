@@ -22,6 +22,8 @@
 \newcommand{\fap}{\# \text{FP}} % false pos (fp taken for partial derivs)
 \newcommand{\tn}{\# \text{TN}} % true neg
 \newcommand{\fan}{\# \text{FN}} % false neg
+\newcommand{\qv}{\mathbf{q}}  % vector q (bold)
+\newcommand{\cv}{\mathbf{c}}    % vector c (bold)
 
 \usepackage{multicol}
 
@@ -58,12 +60,6 @@
                 \scriptsize
                 \item Different (mis-)classification costs are taken into consideration.
                 \item The learner seeks to minimize the total costs in expectation.
-            \end{itemize}
-%
-		\item Difference to the ``classical'' cost-insensitive learning: 
-            \begin{itemize}
-                \scriptsize
-                \item Cost-sensitive learning deals differently with misclassifications.
                 \item Classical learning assumes that the data sets are balanced, and all errors have the same cost.
             \end{itemize}
 		
@@ -86,7 +82,8 @@
 %			
 		\end{itemize}
 %	
-		\item In all these examples, \textbf{the costs of a false negative is much higher than the costs of a false positive}.
+		\item In these examples, \textbf{the costs of a false negative is much higher than the costs of a false positive}.
+        \item In some applications, the costs are \textbf{unknown} $\leadsto$ need to be specified by experts, or be learnt.
 %
 		\end{itemize}
 		
@@ -124,7 +121,7 @@
 		\item $C(i,j)$ is the cost of classifying $j$ as $i,$ which in the cost-insensitive learning case is simply $C(i,j) = \mathds{1}_{[ i \neq j ]},$ i.e., each misclassification has the same cost of 1.
 		\vspace{10pt}
 		
-		\item Cost matrix is usually designed by using a heuristic or by learning a proper cost matrix from the training data.
+		\item Cost matrix is usually designed by experts with domain knowledge.
         \vspace{10pt}
 		\begin{enumerate}
 			\scriptsize	
@@ -219,8 +216,8 @@
 \begin{vbframe}{Minimum expected cost principle}
     \footnotesize
     \begin{itemize}
-        \item Thus, if we have a classifier $f$ which uses a probabilistic score function $\pi:\Xspace \to [0,1]^g$ with $\pi(\xv) = (\pi(\xv)_1,\ldots,\pi(\xv)_g)^\top$ and $\sum_{j=1}^g \pi(\xv)_j = 1$ for the classification, then one can easily modify $f$ to take the expected costs into account:
-		$$  \tilde f (\xv) = \argmin_{i=1,\ldots,g} \sum_{j=1}^g 	\pi(\xv)_j C(i,j). $$
+        \item Thus, if we have a classifier $f$ which uses a probabilistic score function $\pi:\Xspace \to [0,1]^g$ with $\pi(\xv) = (\pi(\xv)_1,\ldots,\pi(\xv)_g)^\top$ and $\sum_{j=1}^g \pi(\xv)_j = 1$ for the classification, then one can easily modify $h$ to take the expected costs into account:
+		$$  \tilde h(\xv) = \argmin_{i=1,\ldots,g} \sum_{j=1}^g 	\pi(\xv)_j C(i,j). $$
         \vspace{10pt}
 
         \item For $\xv$, making prediction $i$ means \textbf{acting as if $i$ is the true class of $\xv$.}
@@ -288,9 +285,9 @@
                 p(1 ~|~ \xv) \geq \frac{C(1, -1)}{C(-1, 1) + C(1, -1)} = c^{*}
             \end{align*}	
             
-            \item This yields the optimal threshold value $c^*$ for probabilistic score classifiers, so that any probabilistic classifier $f$ using a probabilistic score $\pi:\Xspace \to [0,1]$ can be modified to 
+            \item This yields the optimal threshold value $c^*$ for probabilistic score classifiers, so that any probabilistic classifier $h$ using a probabilistic score $\pi:\Xspace \to [0,1]$ can be modified to 
             
-            $$   \tilde f(\xv) = 2 \cdot \mathds{1}_{[ \pi(\xv) \geq c^*]} -1. $$
+            $$   \tilde h(\xv) = 2 \cdot \mathds{1}_{[ \pi(\xv) \geq c^*]} -1. $$
 							
 		\end{itemize}
 	}
@@ -300,7 +297,7 @@
     \footnotesize 
     \begin{itemize}
         \footnotesize
-        \item Motivation: The threshold provided by Minimum Expected Cost is sensitive to the choice of $\mathbf{C}$ $\leadsto$ Not always the truly optimal.
+        \item Motivation: The threshold provided by Minimum Expected Cost is not always the truly optimal due to e.g. wrong model class, finite data, etc.
         \item Key idea: model the mis-classification cost $M_C$ as a function $M_C = g(T)$ of \textbf{probability threshold} $T \in [0, 1]$.
         \item By adjusting $T$, we can plot a curve of $M_C$ versus $T$ as the following figure (copied from Fig.1 in \href{https://www.aaai.org/Library/AAAI/2006/aaai06-076.php}{\beamergotobutton{Sheng et al. 2006}}):
         \begin{figure}[h]
@@ -434,6 +431,82 @@
 
 
 %%%
+% reference: https://www.csie.ntu.edu.tw/~htlin/talk/doc/csovo.acml14.handout.pdf
+
+\begin{vbframe}{CSOVO with instance-specific costs}
+    \footnotesize
+    \begin{itemize}
+        \footnotesize
+        \item $\Dn = \{(\xv_i, y_i, \cv_i)\}_i^n$, where $(\xv_i, y_i, \cv_i) \in \mathbb{R}^d \times \{1, 2, \ldots, g\} \times \mathbb{R}^g$.
+        \vspace{5pt}
+        
+        \item Previous discussed cost-sensitive learning is a special case: $\cv_i$ same for all $\xv_i$.
+        \vspace{5pt}
+        
+        \item Cost vector: $\cv_i[y_i] = 0$, i.e. zero-cost for correct prediction. Example:
+        \begin{equation*}
+            \begin{aligned}
+                \mat{
+                    \xv_1 & 1 & \mat{0 & 2 & 3 & 1} \\
+                    \xv_2 & 2 & \mat{1 & 0 & 1 & 2} \\
+                    \xv_3 & 4 & \mat{2 & 1 & 1 & 0} \\
+                }
+            \end{aligned}
+        \end{equation*}
+        \vspace{5pt}
+        \item Now: How to perform cost-sensitive learning when $g > 2$?
+        \vspace{5pt}
+        
+        \item Idea: we have learnt cost-sensitive learning for the binary case. $\leadsto$ Convert the problem to one-versus-one (OVO).
+        \vspace{5pt}
+        
+        \item But for class $j$ vs. $k$, consider two problems:
+        \begin{itemize}
+            \footnotesize
+            \item How to deal with the label $y_i$? $y_i$ can be neither $j$ nor $k$.
+            \vspace{5pt}
+            
+            \item How to deal with the costs $\cv_i[j]$ and $\cv_i[k]$?
+        \end{itemize}
+            
+    \end{itemize}
+\end{vbframe}
+
+\begin{vbframe}{CSOVO with instance-specific costs}
+    \footnotesize
+    \begin{itemize}
+        \item When training a binary classifier $f^{(j, k)}$ for class $j$ vs. $k$,
+        \begin{itemize}
+            \footnotesize
+            \item It is natural to select $\argmin_{l \in \{j, k\}} \cv_i[l]$ as the ground truth class.
+            \vspace{5pt}
+            
+            \item The costs $\cv_i[j]$ and $\cv_i[k]$ can be transformed to a \textbf{sample-wise} weight $|\cv_i[j] - \cv_i[k]|$. Please refer to \href{https://proceedings.mlr.press/v39/lin14.pdf}{\beamergotobutton{Lin et al. 2014}} for details.
+            \vspace{5pt}
+
+            \item After cost transformation, the misclassification costs across classes are equal to 1. $\leadsto$ Sample-wise weighted binary classification problem.
+            \vspace{5pt}
+        \end{itemize}
+
+    \item Wrap everything up:
+    \begin{enumerate}
+        \footnotesize
+        \item For class $j$ vs. $k$, transform all $(\xv_i, y_i, \cv_i)$ to $(\xv_i, \argmin_{l \in \{j, k\}} \cv_i[l])$ with sample-wise weight $|\cv_i[j] - \cv_i[k]|$.
+        \vspace{5pt}
+        
+        \item Train a binary classifier $f^{(j, k)}$ using the transformed samples.
+        \vspace{5pt}
+        
+        \item Repeat step 1 and 2 for different $(i, j)$.
+        \vspace{5pt}
+        
+        \item Predict using the votes from all $f^{(i, j)}$.
+    \end{enumerate}
+    \vspace{5pt}
+
+    \item Theoretical guarantee: test of final classifier $\leq 2\sum_{j < k}$ test cost of $f^{(i, j)}$. 
+    \end{itemize}
+\end{vbframe}
 
 
 %\begin{vbframe}{MetaCost: Example}
