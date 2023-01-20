@@ -1,0 +1,1818 @@
+<<setup-child, include = FALSE>>=
+library(knitr)
+library(qrmix)
+library(mlr)
+set_parent("../style/preamble.Rnw")
+@
+
+\lecturechapter{10}{Model-based / Bayesian optimization}
+\lecture{Fortgeschrittene Computerintensive Methoden}
+
+\input{../../latex-math/basic-math}
+\input{../../latex-math/basic-ml}
+\input{../../latex-math/ml-mbo}
+
+\begin{vbframe}{Introduction to Model based optimization}
+Consider a function $f: \Xspace \to \R$ where $\Xspace \subseteq \R^{p}$ is the bounded domain of input parameters with the minimum
+$$
+\xb^{\star} = \argmin_{\xb \in \Xspace} f(\xb)
+$$
+
+\begin{columns}
+\begin{column}{0.39\textwidth}
+\begin{center}
+\includegraphics[height = 4cm]{figure_man/Multimodal-example1.png}
+\end{center}
+\end{column}
+\begin{column}{0.60\textwidth}
+\vspace{+1.3cm}
+\begin{itemize}
+\item{$y = f(\xb)$}, target value
+\item{Overall function is known} \\(relation between $x_1,...,x_d$ and $y$)
+\item To determine the minimum $\xb^{\star}$ we can use \enquote{straight forward} optimization methods
+\end{itemize}
+\end{column}
+\end{columns}
+\framebreak
+
+Consider a function $f: \Xspace \to \R$ where $\Xspace \subseteq \R^{p}$ is the bounded domain of input parameters with the minimum
+$$
+\xb^{\star} = \argmin_{\xb \in \Xspace} f(\xb)
+$$
+
+\begin{columns}
+\begin{column}{0.39\textwidth}
+\begin{center}
+
+\input{gear.tex}
+%http://tex.stackexchange.com/questions/6135/how-to-make-beamer-overlays-with-tikz-node
+
+\tikzset{
+  %Style of the black box
+  bbox/.style={draw, fill=black, minimum size=3cm,
+  label={[white, yshift=-1.3em]above:$in$},
+  label={[white, yshift=1.3em]below:$out$},
+  label={[rotate = 90, xshift=1em, yshift=0.5em]left:Black-Box}
+  },
+  multiple/.style={double copy shadow={shadow xshift=1.5ex,shadow
+  yshift=-0.5ex,draw=black!30,fill=white}}
+}
+
+\begin{tikzpicture}[>=triangle 45, semithick]
+\node[bbox] (a) {};
+\draw[thick, shift=({-0.4cm,0.2cm}), draw = white](a.center) \gear{18}{0.5cm}{0.6cm}{10}{2};
+\draw[thick, shift=({0.4cm,-0.3cm}), draw = white](a.center) \gear{14}{0.3cm}{0.4cm}{10}{2};
+{
+  \draw[<-] (a.120) --++(90:2em) node [above] {$x_1$};
+  \draw[<-] (a.100) --++(90:2em) node [above] {$x_2$};
+  \draw[<-] (a.80) --++(90:2em) node [above] {$\ldots$};
+  \draw[<-] (a.60) --++(90:2em) node [above] {$x_d$};
+}
+{
+  \draw[->] (a.270) --++(90:-2em) node [below] {$y$};
+}
+\end{tikzpicture}
+
+\end{center}
+\end{column}
+\begin{column}{0.60\textwidth}
+\vspace{+1.3cm}
+\begin{itemize}
+    \item{$y = f(\xb)$}, target value
+    \item{Overall function is unknown} (relation between $x_1,...,x_d$ and $y$)
+    \item{Goal:} Find optimum $\xb^{\star}$
+\end{itemize}
+
+\end{column}
+\end{columns}
+\framebreak
+
+Our aim is to turn
+$$
+\text{Solution = data + manual exploration + computation}
+$$
+into
+$$
+\text{Solution = data + computation(x100)}
+$$
+
+\end{vbframe}
+
+
+\begin{vbframe}{Examples for model based optimization} 
+\begin{enumerate}
+\item Simulation/optimization of physical systems
+\medskip
+
+\begin{center}
+\includegraphics[width = 8 cm]{figure_man/04_example_windtunnel.jpg}\\
+\tiny{\url{https://www.24h.de/exa-cfdsoftware-fuer-die-formel-1_6732806_4431708.html}}
+\end{center}
+\begin{itemize}
+\item Optimization of wind resistance in the design process of a car.
+\end{itemize}
+
+
+\item Optimization of websites with A/B testing
+\medskip
+
+\begin{center}
+\includegraphics[width = 8 cm]{figure_man/05_example_abtesting.png}\\
+\tiny{\url{https://www.booking.com/}}
+\end{center}
+\begin{itemize}
+\item Optimize the web design to maximize sign-ups, downloads, purchases...
+\end{itemize}
+
+
+
+\item Optimization of parameters in machine learning context
+\medskip
+
+\begin{center}
+\includegraphics[width = 7 cm, height = 5 cm]{figure_man/mlrMBO1.pdf}
+\end{center}
+\begin{itemize}
+\item Find \enquote{optimal} set of parameters to enhance the model performance.
+\end{itemize}
+\end{enumerate}
+\end{vbframe}
+
+\begin{vbframe}{Model parameter tuning}
+\begin{center}
+\textit{A model hyperparameter is external to the model and thus its value cannot be estimated from data leaving the user with manual configuration}
+\end{center}
+\medskip
+
+We can distinguish hyperparameters by their \textbf{application}
+\begin{enumerate}
+\item Regularization-parameters
+\begin{itemize}
+\item The \textbf{parameter C} in SVM which controls for the tolerance towards missclassification.
+\end{itemize}
+
+\item Optimization-parameters
+\begin{itemize}
+\item The \textbf{learning rate} $\bm{\lambda}$
+\end{itemize}
+
+\item model-parameters
+\begin{itemize}
+\item The \textbf{parameter k} in a KNN algorithm
+\end{itemize}
+\end{enumerate}
+\framebreak
+
+We can also distinguish hyperparameters by their \textbf{type}
+\begin{enumerate}
+\item Numerical parameters
+\begin{itemize}
+\item Number of variables randomly sampled as candidates at each split in Random Forest.
+\item Neighborhood size $k$ for KNN.
+\end{itemize}
+
+\item Categorical parameters
+\begin{itemize}
+\item Split criterion used in classification trees.
+\item Distance measure to use in KNN.
+\end{itemize}
+
+\item Ordinal parameters
+\begin{itemize}
+\item $\{low, medium, high\}$
+\end{itemize}
+
+\item Dependent parameters
+\begin{itemize}
+\item Width to use for Gaussian kernel in SVM.
+\end{itemize}
+\end{enumerate}
+\end{vbframe}
+
+\begin{vbframe}{Components of a tuning problem}
+Which topics do we need to consider for proper hyperparameter tuning?
+
+\begin{itemize}
+\item The \textbf{learner}
+\item The \textbf{performance measure}
+\begin{itemize}
+\item Is determined by the application of the model.
+\item Not necessarily identical to the loss function that the learner tries to minimize.
+\item We can be interested in multiple measures simultaneously.
+\end{itemize}
+\item The \textbf{resampling procedure}
+\begin{itemize}
+\item Necessary to evaluate the predictive performance of the model.
+\end{itemize}
+\item The \textbf{learner's hyperparameters and their regions of interest} over which we optimize
+\end{itemize}
+\framebreak
+
+Tuner proposes configuration, eval by resampling, tuner receives performance, iterate
+\vspace{+2cm}
+
+\centering
+\includegraphics[width = 10cm]{figure_man/automl1.png}
+
+\end{vbframe}
+
+\begin{vbframe}{Naive Approaches}
+\begin{enumerate}
+\item Empirical Knowledge
+\begin{itemize}
+\item Select parameters based on \enquote{expert} knowledge of individual
+\item Can lead to fairly good outcome for known problems
+\item But chosen solution can also be far away from global optimum
+\end{itemize}
+\newpage
+\item Grid Search
+\begin{itemize}
+\item Search the entire space of parameter combinations
+\item Very expensive approach in terms of computational effort and time
+\item Often coarse grid leads to less computational effort but often fails to identify an improved model configuration
+\end{itemize}
+\hspace{+1.5cm}
+\includegraphics[width = 5.1cm]{figure_man/01_GridSearch.png}
+\newpage
+\item Random Search
+\begin{itemize}
+\item Use random combinations of hyperparameter values
+\item Combinations might be concentrated in regions that completely omit the most effective values of one or more parameters
+\end{itemize}
+\hspace{+1.5cm}
+\includegraphics[width = 5.1cm]{figure_man/02_RandomSearch.png}
+\newpage
+\item Latin Hypercube Sampling
+\begin{itemize}
+\item Similar to random search
+\item Samples are exactly uniform across each parameter but random in combinations
+\item Procedure attempts to ensure that points are approximately equidistant from each other
+\end{itemize}
+\hspace{+1.5cm}
+\includegraphics[width = 5.1cm]{figure_man/03_LatHypercube.png}
+\end{enumerate}
+\end{vbframe}
+
+\begin{vbframe}{Black-Box Optimization via Surrogate Modeling}
+
+\textbf{Starting point:}
+\begin{itemize}
+\item We do not know the exact relationship between the input parameters $x_{1},...,x_{n} \in \Xspace$ and the output $y$.
+\item We can evaluate the function at several points and observe the outcome.
+\end{itemize}
+
+\textbf{Objective:}
+\begin{itemize}
+\item Use the data $\D = (x_{i}, f(x_{i}))_{i=1,...,n}$ to derive properties about the unknown function $f$.
+\end{itemize}
+\framebreak
+\textbf{Problem:}
+\begin{itemize}
+\item To predict an outcome of the model at a given point $x$ we need to construct an estimator $\hat{f}$ of $f$ from the data $\D$.
+\end{itemize}
+\medskip
+
+We call such a model a \textbf{surrogate model} since $\hat{f}$ is a model of the model $f$ itself (as $y$ cannot be observed directly).
+
+\begin{center}
+\includegraphics[width = 9 cm, height = 2.5 cm]{figure_man/06_SurrogateModel.png}
+\end{center}
+\framebreak
+
+When we approximate the function $f$ we search for an generic function 
+$$\hat{f} = h(\cdot; \theta)$$ 
+where\\
+\begin{itemize}
+\item $\theta \in \R^{i}$ vector of parameters to be estimated from $\D$.
+\end{itemize}
+\end{vbframe}
+\framebreak
+
+\begin{vbframe}{Gaussian Process Surrogate Modeling}
+\textbf{Idea:}
+\begin{itemize}
+\item Infer properties of $f: \Xspace \to \R$ by pointwise evaluation.
+\end{itemize}
+\textbf{Framework:}
+\begin{itemize}
+\item We use a statistical model of the observations, together with a probability model for the parameter of the statisitcal model.
+\item At the beginning we assume a \textbf{prior distribution} which discribes the uncertainity about $\theta$ \textbf{before} an observsation is made.
+\item Combining prior distribution and additional observations we can make an update leading to the \textbf{posterior distribution}.
+\end{itemize}
+\framebreak
+
+
+To describe the function $f$ we use a stochastic process $\zeta$.
+\begin{itemize}
+\item Let $(\Omega, F, P)$ be a probability space, $T$ be an index set. We can define a \textbf{stochastic process} $\{\zeta(t,\omega): t \in T\}$ as a collection of random variables.
+\item Let $\{\zeta(t,\omega): t \in T\}$ be a stochastic process then the single outcome $\omega \in \Omega$ of such a process is called \textbf{sample path} and is formally defined as the mapping $X(\cdot, \omega): T \to \R$
+\end{itemize}
+
+\framebreak
+\begin{itemize}
+\item We can then see $f$ as an sample path of $\zeta$
+\item $\zeta$ contains the knowledge about $f$ before any evaluation has been made.
+\item The distribution $\Pi = P^{\zeta}$ is a prior about $f$.
+\end{itemize}
+\begin{center}
+\includegraphics[width = 6 cm, height = 3.5 cm]{figure_man/07_PriorFunSpace.png}
+\end{center}
+\begin{itemize}
+\item \textbf{Choose a prior distribution for} $\bm{\theta}$\\
+Fixing $\omega$ in the sample path corresponds to selecting a value of the random vector $\theta$
+\end{itemize}
+\framebreak
+
+<<gp-sample-prior, echo = FALSE, fig.height = 5.5, warnings =FALSE, message = FALSE>>=
+library(mvtnorm)
+library(reshape2)
+library(gridExtra)
+library(scales)
+set.seed(131317)
+squared.exp = function(x1, x2, l = 1) {
+  
+  D = as.matrix(dist(c(x1, x2), method = "euclidean"))
+  
+  K = exp(-1 / 2 * D^2 / l^2)
+  
+  return(K)
+}
+myplotgauss = function(nmax = 1){
+n = 100
+x = seq(-2, 2, length.out = n)
+x.obs = c(-1.5, 1/3, 4/3, -0.5)
+y.obs = c(0, 1, 2, 1.5)
+
+K = squared.exp(x, x.obs)
+K.xx = K[(n + 1):nrow(K), (n + 1):nrow(K)]
+K.xxs = K[1:n, (n + 1):nrow(K)]
+K.xsxs = K[1:n, 1:n]
+
+df = data.frame(x = x)
+
+# Drawing from Gaussian process Prior
+nmax = nmax
+for (i in 1:nmax) {
+  df[, i + 1] = as.vector(mvtnorm::rmvnorm(1, sigma = K.xsxs))
+}
+
+df.hist = data.frame(index = mapply(function(x) which.min(df[,x]), x = seq(2, nmax +1, by = 1)))
+df.hist = cbind.data.frame(df.hist, min = df[df.hist$index, 1])
+df.plot = melt(df, id.vars = "x")
+
+
+p1 = ggplot(data = df.plot, aes(x = x, y = value, colour = variable)) + geom_line() + theme_bw()
+p1 = p1 + xlab("x") + ylab("f(x)") + ylim(c(-3, 3))
+p1 = p1 + theme(legend.position = "none") + ggtitle(paste("Example - sample paths drawn from a Gaussian process prior n = ", nmax))
+
+p2 = ggplot(data = df.hist, aes(x = min)) + geom_histogram(binwidth = 0.05) + theme_bw()
+p2 = p2 + scale_x_continuous(limits = c(base::min(df[,1]), base::max(df[,1])))
+p2 = p2 + scale_y_continuous(labels = scales::number_format(accuracy = 0.1))
+
+grid.arrange(p1, p2, ncol = 1, nrow = 2)
+}
+
+myplotgauss(nmax = 1)
+myplotgauss(nmax = 2)
+myplotgauss(nmax = 5)
+myplotgauss(nmax = 30)
+myplotgauss(nmax = 100)
+@
+\end{vbframe}
+
+\begin{vbframe}{Posterior of a quantity of interest}
+Combining the prior distribution with our observations made, we can derive a posterior distribution of $\zeta$ to evaluate
+\begin{itemize}
+\item plausible values for $\zeta$ at a given point $x$
+\item plausible values for the Minimum $M = \min_{x}\zeta(x)$
+\item the minimizer $x^{\star} = \argmin_{x} \zeta(x)$
+\item the probability that $\zeta(x)$ exceeds a certain threshold.
+\end{itemize}
+
+
+
+ <<gp-sample-post, fig.height = 5.5, warnings =FALSE, message = FALSE>>=
+p.list = list()
+h.list = list()
+set.seed(131317)
+n = 200
+x = seq(-2, 2, length.out = n)
+x.obs = c(1.5, .8, -1.4)
+y.obs = c(-.7, -1, -1.0)
+K = squared.exp(x, x.obs)
+K.xx = K[(n + 1):nrow(K), (n + 1):nrow(K)]
+K.xxs = K[1:n, (n + 1):nrow(K)]
+K.xsxs = K[1:n, 1:n]
+
+for (j in 1:length(x.obs)) {
+  # Update of posterior
+  m.post = K.xxs[, 1:j] %*% solve(K.xx[1:j, 1:j]) %*% y.obs[1:j]
+  K.post = K.xsxs - K.xxs[ ,1:j] %*% solve(K.xx[1:j, 1:j]) %*% t(K.xxs[, 1:j])
+
+  df = data.frame(x = x)
+
+  for (i in 1:n) {
+    df[, i + 1] = as.vector(mvtnorm::rmvnorm(1, m.post, sigma = K.post))
+  }
+  df.hist = data.frame(index = mapply(function(x) which.min(df[,x]), x = seq(2, n +1, by = 1)))
+  df.hist = cbind.data.frame(df.hist, min = df[df.hist$index, 1])
+  df.plot = melt(df, id.vars = "x")
+  
+
+  p.list[[j]] = ggplot() + geom_line(data = df.plot, aes(x = x, y = value, colour = variable))
+  p.list[[j]] = p.list[[j]] + geom_point(data = data.frame(x = x.obs[1:j], y = y.obs[1:j]), aes(x = x, y = y), size = 2)
+  p.list[[j]] = p.list[[j]] + xlab("x") + ylab("f(x)") + ylim(c(-3, 3))
+  p.list[[j]] = p.list[[j]] + theme_bw() + theme(legend.position = "none") +
+    ggtitle(paste0("Posterior process after ", j, " observation", ifelse(j == 1, "", "s"), " with n = ", n))
+  
+  h.list[[j]] = ggplot(data = df.hist, aes(x = min)) + geom_histogram(binwidth = 0.1) + theme_bw()
+  h.list[[j]] = h.list[[j]] + scale_x_continuous(limits = c(base::min(df[,1]), base::max(df[,1])))
+  h.list[[j]] = h.list[[j]] + scale_y_continuous(labels = scales::number_format(accuracy = 0.1))
+}
+for(i in 1: length(p.list)){
+  grid.arrange(p.list[[i]], h.list[[i]], ncol = 1, nrow = 2)
+}
+ @
+
+\end{vbframe}
+
+
+\section{Infill Criteria}
+\begin{vbframe}{Infill Criteria}
+\begin{algorithm}[H]
+  \caption{Generic MBO Pseudo Code}
+  \begin{algorithmic}[1]
+  \State Create initial space filling design and evaluate with $f$
+  \For {iteration $j = 1 \text{ to } n$}
+    \State{Fit regression model on all evaluated points to predict $\fxh$ and uncertainty $\hat{s}(\xb)$}
+    \State Propose point via infill criterion
+            $$
+              \operatorname{EI}(\xb)\uparrow \;\Longleftrightarrow\; \fxh \downarrow \; \wedge \; \hat{s}(\xb) \uparrow
+            $$
+    \State Evaluate proposed point and add to design
+  \EndFor
+  \end{algorithmic}
+\end{algorithm}
+
+EGO proposes kriging (aka Gaussian Process) and expected improvement (EI) (Jones, Efficient Global Opt. of Exp. Black-Box Functions, 1998).
+\framebreak
+
+\begin{itemize}
+\item Infill Criteria help us to make a decision where to evaluate the test function $\hat{f} (\xb)$ of the surrogate model next.
+\item Infill Criteria describe the tradeoff between \textbf{exploration} (adresses variance) and \textbf{exploitation} (adresses mean) which guides the optimization procedure.
+\item This is achieved by combining the posterior mean $\hat{\mu}(\xb)$ and the posterior standard deviation $\hat{s}(\xb)$.
+\item $\hat{\mu}(\xb)$ and $\hat{s}(\xb)$ are estimated by the surrogate model $\hat{f}$.
+\end{itemize}
+\framebreak
+
+To distinguish the different effects, we first have a look at the effect of the posterior mean $\hat{\mu}(\xb)$ and the posterior standard deviation $\hat{s}(\xb)$ as seperate infill criteria.
+\begin{enumerate}
+\item \textbf{Mean Response}
+\begin{itemize}
+\item If we only use the 
+\item Evaluate function next where the posterior mean is \textbf{lowest}.
+\end{itemize}
+
+\framebreak
+ <<infill-mean, echo = FALSE, results = FALSE, fig.height = 5.5>>=
+library(mlrMBO)
+library(smoof)
+library(BBmisc)
+library(DiceKriging)
+set.seed(4)
+
+lrn.km = makeLearner("regr.km")
+ctrl.mean = makeMBOControl()
+ctrl.mean = setMBOControlTermination(ctrl.mean, iters = 4L)
+ctrl.mean = setMBOControlInfill(ctrl.mean, crit = makeMBOInfillCritMeanResponse())
+
+test.fun = makeSingleObjectiveFunction(
+ fn = function(x) x * sin(14 * x),
+ par.set = makeNumericParamSet(lower = 0, upper = 1, len = 1L)
+)
+design = generateDesign(4L, getParamSet(test.fun), fun = lhs::maximinLHS)
+run.mean = exampleRun(test.fun, design = design, learner = lrn.km, control = ctrl.mean, show.info = FALSE)
+p1 = p.list[[1]]
+iter = c(seq(1,4,1))
+p.list = lapply(iter, renderExampleRunPlot, object = run.mean )
+p.list
+# grid.arrange(grobs=lapply(list(p.list[[1]], p.list[[2]], p.list[[3]], p.list[[4]]), grobTree), ncol = 2, nrow = 2)
+
+ @
+\framebreak
+
+\item{Standard Error}
+\begin{itemize}
+\item Evaluate function next where the standard deviation is \textbf{highest}.
+\end{itemize}
+\framebreak
+
+ <<infill-std, echo = FALSE, results = FALSE, fig.height = 5.5>>=
+library(mlrMBO)
+library(DiceKriging)
+set.seed(4)
+test.fun = makeSingleObjectiveFunction(
+ fn = function(x) x * sin(14 * x),
+ par.set = makeNumericParamSet(lower = 0, upper = 1, len = 1L)
+)
+
+lrn.km = makeLearner("regr.km", predict.type = "se")
+ctrl.std = makeMBOControl()
+ctrl.std = setMBOControlTermination(ctrl.std, iters = 4L)
+ctrl.std = setMBOControlInfill(ctrl.std, crit = makeMBOInfillCritStandardError())
+
+design = generateDesign(4L, getParamSet(test.fun), fun = lhs::maximinLHS)
+run.std = exampleRun(test.fun, design = design, learner = lrn.km, control = ctrl.std, show.info = FALSE)
+
+iter = c(seq(1,4,1))
+p.list = lapply(iter, renderExampleRunPlot, object = run.std )
+p.list
+# grid.arrange(grobs=lapply(list(p.list[[1]], p.list[[2]], p.list[[3]], p.list[[4]]), grobTree), ncol = 2, nrow = 2)
+
+ @
+
+
+\framebreak
+... let's turn our attention now on combinations of both criteria which we usually explore as infill criterion. 
+\framebreak
+\item \textbf{Probability of Improvement}
+$$
+PI(\xb) = \Phi\Big(\frac{y_{min} -  \hat{\mu}(\xb) }{\hat{s}(\xb)} \Big)
+$$
+where
+\begin{itemize}
+\small{
+\item $y_{min}$ currently best observed function value
+\item $\Phi(\cdot)$ cdf of normal distribution
+\item $\hat{\mu}(\xb)$ mean of posterior distribution
+\item $\hat{s}(\xb)$ standard deviation of posterior distribution}
+\end{itemize}
+\medskip
+
+PI maximizes the probability of improving over the current best value $y_{min}$.
+
+\framebreak
+ <<infill-probability-improvement, echo = FALSE, results = FALSE, fig.height = 5.5>>=
+library(mlrMBO)
+library(DiceKriging)
+set.seed(4)
+
+#generate own infill criterion since Probability Of Improvement not implemented
+makeMBOInfillCritPI = function(se.threshold = 1e-6) {
+  assertNumber(se.threshold, lower = 1e-20)
+  force(se.threshold)
+  makeMBOInfillCrit(
+    fun = function(points, models, control, par.set, designs, iter, progress, attributes = FALSE) {
+      model = models[[1L]]
+      design = designs[[1]]
+      maximize.mult = if (control$minimize) 1 else -1
+      assertString(control$y.name)
+      y = maximize.mult * design[, control$y.name]
+      assertNumeric(y, any.missing = FALSE)
+      p = predict(model, newdata = points)$data
+      p.mu = maximize.mult * p$response
+      p.se = p$se
+      y.min = min(y)
+      d = y.min - p.mu
+      xcr = d / p.se
+      xcr.prob = pnorm(xcr)
+     
+      pi = xcr.prob
+      
+      res = ifelse(p.se < se.threshold, 0, -pi)
+      if (attributes) {
+        res = setAttribute(res, "crit.components", data.frame(se = p$se, mean = p$response))
+      }
+      return(res)
+    },
+    name = "Probability Of Improvement",
+    id = "pi",
+    components = c("se", "mean"),
+    params = list(se.threshold = se.threshold),
+    opt.direction = "maximize",
+    requires.se = TRUE
+  )
+}
+
+lrn.km = makeLearner("regr.km", predict.type = "se")
+ctrl.pi = makeMBOControl()
+ctrl.pi = setMBOControlTermination(ctrl.pi, iters = 4L)
+ctrl.pi = setMBOControlInfill(ctrl.pi, crit = makeMBOInfillCritPI())
+
+test.fun = makeSingleObjectiveFunction(
+ fn = function(x) x * sin(14 * x),
+ par.set = makeNumericParamSet(lower = 0, upper = 1, len = 1L)
+)
+design = generateDesign(4L, getParamSet(test.fun), fun = lhs::maximinLHS)
+run.pi = exampleRun(test.fun, design = design, learner = lrn.km, control = ctrl.pi, show.info = FALSE)
+
+iter = c(seq(1,4,1))
+p.list = lapply(iter, renderExampleRunPlot, object = run.pi)
+p.list
+# grid.arrange(grobs=lapply(list(p.list[[1]], p.list[[2]], p.list[[3]], p.list[[4]]), grobTree), ncol = 2, nrow = 2)
+
+ @
+
+
+\item \textbf{Expected Improvement}
+$$
+  EI(\xb) = \E(\max\{y_{min} -Y(\xb), 0\})
+$$
+where
+\begin{itemize}
+\small{
+    \item $y_{min}$ currently best observed function value
+    \item $Y(\xb)$ random variable expressing the posterior at $\xb$ estimated via $\hat{f}$}
+\end{itemize}
+\vspace{+.9cm}
+
+For a Gaussian Process $Y(\xb) \sim N(\hat{\mu}(\xb), \hat{s}^{2}(\xb))$. Under this assumption we can express $EI(\xb)$ as:
+\small
+$$
+EI(\xb) = (y_{min}-\hat{\mu}(\xb)) \Phi \Big(\frac{y_{min} - \hat{\mu}(\xb)}{\hat{s}(\xb)}\Big) + 
+\hat{s}(\xb) \phi\Big(\frac{y_{min}-\hat{\mu}(\xb)}{\hat{s}(\xb)}\Big)
+$$
+where
+\begin{itemize}
+\small{
+    \item $\Phi(\cdot)$ cdf of normal distribution
+    \item $\phi(\cdot)$ density of normal distribution}
+\end{itemize}
+\framebreak
+
+ <<infill-expected-improvement, echo = FALSE, results = FALSE, fig.height = 5.5>>=
+library(mlrMBO)
+library(DiceKriging)
+set.seed(4)
+
+lrn.km = makeLearner("regr.km", predict.type = "se")
+ctrl.ei = makeMBOControl()
+ctrl.ei = setMBOControlTermination(ctrl.ei, iters = 4L)
+ctrl.ei = setMBOControlInfill(ctrl.ei, crit = makeMBOInfillCritEI())
+
+test.fun = makeSingleObjectiveFunction(
+ fn = function(x) x * sin(14 * x),
+ par.set = makeNumericParamSet(lower = 0, upper = 1, len = 1L)
+)
+design = generateDesign(4L, getParamSet(test.fun), fun = lhs::maximinLHS)
+run.ei = exampleRun(test.fun, design = design, learner = lrn.km, control = ctrl.ei, show.info = FALSE)
+p1 = p.list[[1]]
+iter = c(seq(1,4,1))
+p.list = lapply(iter, renderExampleRunPlot, object = run.ei )
+p.list
+# grid.arrange(grobs=lapply(list(p.list[[1]], p.list[[2]], p.list[[3]], p.list[[4]]), grobTree), ncol = 2, nrow = 2)
+
+ @
+
+\item \textbf{Augmented Expected Improvement}
+$$
+AEI(\xb) = EI_{T}(\xb) \Bigg(1- \frac{\tau}{\sqrt{s_{n}^2(\xb)+ \tau^{2}}}\Bigg)
+$$
+where
+\begin{itemize}
+\small{
+    \item $\tau$ penalty (with $\tau = 0 \Rightarrow EI =AEI$)
+    \item $s_{n}^{2}(\xb)$ prediction variance
+    \item $T$ kriging mean value at design point with lower $\beta$-quantile, where $\Phi(\beta) = \alpha$ ($\alpha = 1$ suggested )}
+\end{itemize}
+\medskip
+
+Since we calulcate the EI as if the next evaluation would be deterministic, a problem arises from the neglection of the noise of future observations.\\
+\medskip
+
+The AEI adresses this issue by adding a multiplicative term to the EI.
+
+\framebreak
+
+<<infill-augmented-expected-improvement, echo = FALSE, results = FALSE, fig.height = 5.5>>=
+library(mlrMBO)
+library(DiceKriging)
+set.seed(4)
+
+lrn.km = makeLearner("regr.km", predict.type = "se")
+ctrl.aei = makeMBOControl()
+ctrl.aei = setMBOControlTermination(ctrl.aei, iters = 4L)
+ctrl.aei = setMBOControlInfill(ctrl.aei, crit = makeMBOInfillCritAEI())
+
+test.fun = makeSingleObjectiveFunction(
+ fn = function(x) x * sin(14 * x),
+ par.set = makeNumericParamSet(lower = 0, upper = 1, len = 1L)
+)
+design = generateDesign(4L, getParamSet(test.fun), fun = lhs::maximinLHS)
+run.aei = exampleRun(test.fun, design = design, learner = lrn.km, control = ctrl.aei, show.info = FALSE)
+p1 = p.list[[1]]
+iter = c(seq(1,4,1))
+p.list = lapply(iter, renderExampleRunPlot, object = run.aei )
+p.list
+# grid.arrange(grobs=lapply(list(p.list[[1]], p.list[[2]], p.list[[3]], p.list[[4]]), grobTree), ncol = 2, nrow = 2)
+
+ @
+
+\item \textbf{Reinterpolation Procedure (RP)}
+\begin{itemize}
+\item Another method (besides $AEI$) to handle the case of noisy observations is the reinterpolation procedure.
+\item RP is designed to clean noise from the model first to ensure the proper application of general infill criteria ($EI, PI,...$)
+\item The RP suggests to \textbf{use simultaneously} a \textbf{kriging with noisy observations} (regressing model) and an \textbf{interpolating kriging}.
+\end{itemize}
+
+\begin{algorithm}[H]
+\footnotesize
+  \caption{RP interpolating kriging Pseudo Code}
+  \begin{algorithmic}[1]
+  \State{Build a kriging based on noisy observations $\tilde{\bm{y}^{(n)}}$}
+  \State{Compute the kriging predictor at the DOE* points $m_n(\xb^{(1)}),..., m_n(\xb^{(1)})$}
+  \State{Build an interpolating kriging model using $\bm{X}^{(n)}$ and $\bm{y}^{(n)} = [m_n(\xb^{(1)}),..., m_n(\xb^{(1)})]^{\top}$}
+  \State{Solve $\xb^\star = \argmax{EI}(\xb)$ using the interpolating model}
+  \end{algorithmic}
+\end{algorithm}
+
+\vspace{-.2cm}
+\footnotesize
+* Design of Experiments. The kriging mean predictions of the regressing kriging at the DOE points are used as observation vector.
+
+
+
+\framebreak
+
+
+\item \textbf{Lower Confidence Bound}
+$$
+LCB(\xb, \lambda) = \hat{\mu}(\xb) - \lambda \hat{s}(\xb)
+$$
+where
+\begin{itemize}
+\small{
+  \item $\lambda$ constant which controls for the \enquote{mean vs. uncertainty} tradeoff
+  \item $\hat{\mu}(\xb)$ mean of posterior distribution
+  \item $\hat{s}(\xb)$ standard deviation of posterior distribution}
+\end{itemize}
+\medskip
+
+Simple approach compared to other methods.
+\end{enumerate}
+\framebreak
+ <<infill-lower-confbound, echo = FALSE, results = FALSE, fig.height = 5.5>>=
+library(mlrMBO)
+library(DiceKriging)
+set.seed(4)
+
+lrn.km = makeLearner("regr.km", predict.type = "se")
+ctrl.ei = makeMBOControl()
+ctrl.ei = setMBOControlTermination(ctrl.ei, iters = 4L)
+ctrl.ei = setMBOControlInfill(ctrl.ei, crit = makeMBOInfillCritCB(cb.lambda = 2))
+
+test.fun = makeSingleObjectiveFunction(
+ fn = function(x) x * sin(14 * x),
+ par.set = makeNumericParamSet(lower = 0, upper = 1, len = 1L)
+)
+design = generateDesign(4L, getParamSet(test.fun), fun = lhs::maximinLHS)
+run.ei = exampleRun(test.fun, design = design, learner = lrn.km, control = ctrl.ei, show.info = FALSE)
+p1 = p.list[[1]]
+iter = c(seq(1,4,1))
+p.list = lapply(iter, renderExampleRunPlot, object = run.ei )
+# grid.arrange(grobs=lapply(list(p.list[[1]], p.list[[2]], p.list[[3]], p.list[[4]]), grobTree), ncol = 2, nrow = 2)
+ @
+
+\end{vbframe}
+
+\section{Stacking}
+\begin{vbframe}{Ensemble Learning}
+\begin{center}
+\textit{\textbf{Ensemble methods} use multiple learning algorithms to obtain better predictive performance}
+\end{center}
+\medskip
+
+\begin{itemize}
+\item Ensemlbes perform better than the single algorithms of the ensemble on a individual basis.
+\item If our set of base learners does not contain the true prediction function, ensembles can give a good approximation to it.
+\item Many popular machine learning algorithms are ensembles (e.g. Random Forest, GBM).
+\end{itemize}
+\end{vbframe}
+
+\begin{vbframe}{Super Learnering algorithm}
+\begin{center}
+\textit{The \textbf{super learning algorithm} is a loss-based supervised learning algorithm which searches the optimal combination of a collection of prediction algorithms}
+\medskip
+
+\includegraphics[width = 5cm]{figure_man/super_learner.png}
+\end{center}
+
+\begin{itemize}
+\item Super learning is also known as \textbf{stacking}.
+\item The task involves training a \enquote{second-level} metalearner to find the optimal combination of base learners (\enquote{first-level} metalearners). 
+\item An important concept of stacking is \textbf{cross-validation} to define the \enquote{level-one} data, i.e. the data that the metalearner is trained on.
+\end{itemize}
+\end{vbframe}
+
+\begin{vbframe}{k-fold Cross Validation}
+\begin{center}
+\textit{\textbf{Cross Validation} is used to evaluate a (prediction) model's performance internally without loosing a validation split}
+
+\vspace{+.4cm}
+\includegraphics[width = 6cm]{figure_man/08_CrossValidation.png}
+\end{center}
+
+\begin{itemize}
+\item We need to make sure that the holdout set for each of the $k$ models is \enquote{good}.
+\item If we assume iid data a random split is sufficient.
+\item Frequently used values of $k$ are between $5$ to $10$.
+\end{itemize}
+\end{vbframe}
+
+
+
+\begin{vbframe}{Stacking Algorithm}
+
+
+\begin{algorithm}[H]
+\footnotesize
+  \caption{Stacking Pseudo Code}
+  \begin{algorithmic}[1]
+  \State{\textbf{Set up ensemble}}\\
+    \hspace{+.5cm}{Define list of $L$ base learning algorithms $\psi_1,...,\psi_L$}\\
+    \hspace{+.5cm}{Specify a metalearning algorithm}
+  \State{\textbf{Train the ensemble}}
+  \For {iteration $j = 1 \text{ to } L$}
+    \State{Train $\psi_j$ on the training set}
+    \State{Perform $k$-fold-cross-validation on the learner $\psi_j$}
+    \State{Collect the cross-validated predicted values for learner $\psi_j$ in a $N\times 1$ vector*}
+  \EndFor\\
+   \hspace{+.5cm}{Combine the cross-validation prediction of all learners to a $NxL$ matrix**}\\
+    \hspace{+.5cm}{Train metalearning algorithm on level-one data.}
+  \State{\textbf{Enselmble predictions on new data}}\\
+  \hspace{+.5cm}{Generate predictions from the base learners}\\
+  \hspace{+.5cm}{Feed those predictions to the metalearner to generate ensemble predictions}\\
+  \end{algorithmic}
+\end{algorithm}
+
+\vspace{-.3cm}
+\footnotesize
+* N corresponds to the number of rows in the training set.\\
+** This matrix together with the original response vector is called \enquote{level-one} data.
+\end{vbframe}
+
+\begin{vbframe}{Stacking Example}
+ <<plot-superlearn-performance-benchmark, echo = FALSE, results = FALSE, fig.height = 5.5>>=
+library(e1071)
+library(mlrMBO)
+library(mlr)
+library(mlbench)
+library(randomForest)
+data(iris)
+
+
+
+iris.task = makeClassifTask(data = iris, target = "Species")
+ring.task = convertMLBenchObjToTask("mlbench.ringnorm", n = 600)
+wave.task = convertMLBenchObjToTask("mlbench.waveform", n = 600)
+tasks = list(pid.task, ring.task, wave.task)
+
+base = c("classif.rpart", "classif.naiveBayes", "classif.multinom")
+lrns = lapply(base, makeLearner)
+lrns = lapply(lrns, setPredictType, "prob")
+superlrn = makeStackedLearner(base.learners = lrns, 
+                        predict.type = "prob", method = "hill.climb")
+
+rdesc = makeResampleDesc("RepCV", folds = 10, reps = 3)
+meas = list(mmce, timetrain)
+bmr1 = benchmark(lrns, tasks, rdesc, meas, show.info = FALSE)
+bmr2 = benchmark(superlrn, tasks, rdesc, meas, show.info = FALSE )
+bmr = mergeBenchmarkResults(list(bmr1, bmr2))
+
+p = plotBMRBoxplots(bmr, measure = mmce)
+p = p + theme_bw()
+p
+@
+
+
+
+\end{vbframe}
+
+
+
+\section{Hyperband}
+\begin{vbframe}{Learning curves}
+\begin{itemize}
+    \item It is extremely expensive to train complex models such as deep neural networks on large datasets.
+    \item In such a scenario, evaluating even a single hyperparameter configuration can take many hours/days.
+    \item For many configurations, it might be clear early on that further training is not likely to significantly improve the performance.
+    \item More importantly, the relative ordering of configurations (for a given set) can also become evident early on.
+    \item Therefore, fully training every single configuration can be quite wasteful.
+\end{itemize}
+\framebreak
+
+\begin{figure}
+    \centering
+      \scalebox{1}{\includegraphics{figure_man/iteration.png}}
+      \tiny{\\source: Ameet Talwalkar}
+  \end{figure}
+    
+    \textbf{Main idea} : Terminate training for configurations that aren't promising and instead allocate more resources to training configurations that are likely to perform better.
+\end{vbframe}
+
+\begin{vbframe} {Successive-Halving}
+  \begin{itemize}
+    \item To \enquote{weed out} poor configurations during training, one simple approach is \textbf{Successive-Halving}.
+    \item Given an initial set of configurations to evaluate :
+      \begin{itemize}
+        \item Train all configurations for a small initial budget.
+        \item Remove the half that performed worst and then double the budget.
+        \item Continue training the remaining configurations until this new budget is exhausted.
+        \item Again, remove the half that performed worst and double the budget.
+        \item Repeat until only a single configuration remains...
+      \end{itemize}
+  \end{itemize}
+  
+  \framebreak
+  \begin{figure}
+    \centering
+      \scalebox{1}{\includegraphics{figure_man/hyperband3.png}}
+      \tiny{\\source: automl.org}
+      \caption{\footnotesize{Illustration of successive halving for eight algorithms/configurations. After evaluating all algorithms on 1/8 of the total budget, half of them are dropped and the budget given to the remaining algorithms is doubled.}}
+  \end{figure}
+\end{vbframe}
+
+\begin{vbframe} {The $n$ versus $B/n$ problem}
+  \begin{itemize}
+    \item A major drawback of Successive-Halving is that the user has to specify the number of configurations, $n$, beforehand.
+    \item Ideally, we would like to explore the configuration space and evaluate a large number of configurations.
+    \item However, for a fixed budget, as $n$ increases, the budget $B/n$ that can be spent on any single one of those configurations decreases.
+    \item Therefore, the user can either :
+      \begin{itemize}
+        \item train a large number of configuration for a small number of iterations, or,
+        \item train a small number of configurations for a large number of iterations.
+      \end{itemize}
+    \item As $B/n$ decreases, it becomes harder to "pick out" the most promising configurations from a limited number of training iterations.
+  \end{itemize}
+\framebreak
+
+In general, the relative ordering (in terms of validation loss) of two arbitrary neural networks can vary during training:
+  \begin{figure}
+    \centering
+      \scalebox{0.8}{\includegraphics{figure_man/val_err.png}}
+  \end{figure}
+  
+In the early stages of training, Model B looks more promising than Model A even though the latter ultimately performs better. Therefore, we must be careful not to prematurely terminate training for Model A.
+\end{vbframe}
+
+\begin{vbframe} {Hyperband}
+  \begin{itemize}
+    \item Hyperband tries to tackle the $n$ versus $B/n$ problem by considering \textbf{several} values of $n$ for a fixed $B$.
+    \item Each distinct $n$ corresponds to a different "bracket".
+    \item In every bracket, a new set of $n$ random configurations is sampled and then solved by a mutation of the Successive Halving algorithm.
+    \item Therefore, it represents a "hedging strategy" which tries to \textit{simultaneously} minimize the risks of under-exploration (small $n$) and premature elimination (small $B/n$).
+    \item In simple terms, it is a clever way to "have your cake and eat it too".
+  \end{itemize}
+\framebreak
+
+  \begin{itemize}
+    \item Hyperband requires the user to specify two parameters :
+      \begin{itemize}
+        \item $R$ corresponds to the maximum budget that can be spent on any specific configuration.
+        \item $\eta$ corresponds to the proportion of configurations that are discarded in each round of Successive Halving.
+      \end{itemize}
+    \item For example, if $\eta$ = 3, then only a third of the configurations survive a given round.
+    \item Based on these two parameters, the number of brackets that are tried is $s_{\text{max}} + 1$, where, $s_{\text{max}} = \lfloor \log_{\eta}R \rfloor$.
+  \end{itemize}
+\framebreak
+
+
+\end{vbframe}
+
+\begin{vbframe} {Hyperband - Example}
+Hyperband for $R = 81$ and $\eta = 3$
+  \begin{figure}
+    \centering
+      \scalebox{0.6}{\includegraphics{figure_man/hyperband2.png}}
+  \end{figure}
+  
+  \begin{itemize}
+    \item $n_i$ and $r_i$ are the number of configurations and the budget-per-configuration, respectively.
+    \item The bracket corresponding to $s = 4$ is designed to maximize exploration. 
+  \end{itemize}
+\framebreak
+
+Hyperband for $R = 81$ and $\eta = 3$
+  \begin{figure}
+    \centering
+      \scalebox{0.6}{\includegraphics{figure_man/hyperband2.png}}
+  \end{figure}
+  \begin{itemize}
+    \item Within each bracket, Successive Halving is performed on a randomly sampled set of $n$ configurations.
+    \item Note : Each bracket uses approximately the same amount of resources.
+  \end{itemize}
+  \framebreak
+
+\begin{algorithm}[H]
+  \caption{Hyperband Algorithm Pseudo Code}
+  \begin{algorithmic}[1]
+  \State \textbf{Input:} $R, \eta$ (default $\eta = 3$)
+  \State \textbf{Initialization:} $s_{max} = \lfloor log_{\eta}(R)\rfloor, B = (s_{max} +1)R$
+  \For {$s \in \{s_{max}, s_{max}-1,...,0\}$}
+    \State{$n = \lceil \frac{B}{R} \frac{\eta^{s}}{(s+1)} \rceil, r = R\eta^{-s}$}
+    \State{$T = \text{get\_hyperparameter\_configuration}(n) $}
+    \For {$i \in \{0,...,s\}}$
+      \State $n_i = \lfloor n\eta^{-1}\rfloor$
+      \State $r_i = r\eta^{i}$
+      \State $L = \{ \text{run\_then\_return\_value\_loss}(t, r_i): t \in T\}$
+      \State $T = top\_k(T, L, \lfloor \frac{n_i}{\eta}\rfloor)$
+    \EndFor
+  \EndFor
+  \State \textbf{return} configuration with smallest intermediate loss.
+  \end{algorithmic}
+\end{algorithm}
+\end{vbframe}
+
+\section{Sequential model-based optimization}
+
+
+
+
+
+
+
+
+
+\begin{frame}{Expensive Black-Box Optimization}
+
+
+\lz
+
+{\footnotesize \emph{Note: the notation of this chapter may differ slightly from preceding chapters.}}
+
+ \end{frame}
+
+\begin{vbframe}{Sequential model-based optimization}
+  \begin{block}{}
+    \begin{itemize}
+      \item Setting: Expensive black-box poblem $f: x \rightarrow \mathbb{R} = min!$
+      \item Classical problem: Computer simulation with a bunch of control parameters and
+        performance output; or algorithmic performance on 1 or more problem instances;
+        we often optimize ML pipelines
+      \item Idea: Let's approximate $f$ via regression!
+    \end{itemize}
+  \end{block}
+\end{vbframe}
+
+\begin{frame}{Latin Hypercube Designs}
+\begin{figure}
+\centering
+\includegraphics[height = 4cm]{figure_man/initdes.png}
+\end{figure}
+\begin{itemize}
+\item Initial design to train first regression model
+\item Not too small, not too large
+\item Latin hypercube sampling (LHS) / maximin designs: Min dist between points is maximized
+\item But: Type of design usually has not the largest effect on MBO, and unequal distances between points
+  could even be beneficial
+\end{itemize}
+\end{frame}
+
+
+
+\begin{vbframe}{Gaussian process}
+
+A Gaussian process (GP) is a collection of random variables, indexed by a set $T$, 
+$(Y_t)_{t \in T}$, so that every finite marginal distribution is a multivariate Gaussian.
+
+So, for any finite set S with $|S| = n$, we marginalize the GP on S to obtain the n-dim. random vector 
+$(Y_t)_{t \in S} \sim N(\mu_n(S), \Sigma_n(S))$.
+
+\lz
+
+% \emph{More formal:} For any set S, a GP on S is a set of RV's $(Z_t, t \in S)$
+% s.t. $\forall n \in \N, \forall t_1, \ldots, t_n \in S, (Z_{t_1}, \ldots, Z_{t_n}) \sim MVN(\mu_n, \Sigma_n)$.
+
+As we will use GPs for (spatial) regression, we will use $T = \R^p$. 
+So with $S = (x_1, \ldots,  x_n)$, $(Y_t)_{t \in S} = Y_S = (Y_{x_1} \ldots, Y_{x_n})$.
+
+Then, a GP is fully specified by its mean function $m: \R^p \rightarrow R$ and 
+its covariance kernel $k: \R^p \times \R^p \rightarrow \R$.
+
+The mean vector of $Y_S$ is simply $\mu_n(S) = (m(x_1), \ldots m(x_n))$ and the covariance matrix
+of $Y_S$ is $\Sigma_n(S) = (k(x_i, x_j))_{x_i, x_j \in S}$.
+
+
+\lz
+
+And, yes, there is indeed a tight connection between SVMs and GPs.
+
+\framebreak
+
+Prediction with a GP now amounts to calculating the conditional distribution, given a training data
+set $D = \Dset$ and the new position we would like to predict at, $x_*$.
+
+\lz
+
+So we calculate $Y(x_*) | \D$. This conditional distribution is also Gaussian with $N(\mu_*, \sigma_*^2)$.
+
+\lz
+
+NB: The previous explanation of GPs is MUCH too short, and rather incomplete! 
+
+\end{vbframe}
+
+\begin{vbframe}{Kriging / local uncertainty prediction}
+
+Model: Zero-mean GP $Y(x)$ with const. trend and cov. kernel $k_\theta(x, \tilde{x})$.
+\begin{footnotesize}
+\begin{itemize}
+\item $\ydat = \yvec$, $\matK = (k(\xi, \xi[j])_{i,j=1,\ldots,n}$
+\item $\kstarx = (k(\xi[1], x), \ldots, k(\xi[n], x))^T$
+\item $\hat{\mu} = \one^T \matK^{-1} \ydat / \one^T \matK^{-1} \one$ (BLUE)
+\item Prediction: $ \fxh = E[ Y(x) | Y(\xi) = \yi, i=1, \ldots, n ] = $ \\
+$\hat{\mu} + \mathbf{k}_n(x)^T K^{-1} (\mathbf{y} - \hat{\mu} \one)$
+\item Uncertainty: $\vxh = Var[ Y(x) | Y(\xi) = \yi, i=1, \ldots, n ] = $\\
+$ \sigma^{2} - \mathbf{k}^T_n(x) K^{-1} \mathbf{k}_n(x) + \frac{(1 - \one^T K^{-1} \mathbf{k}^T_n(x))^2}{\one^T K^{-1} \one}$
+\end{itemize}
+\end{footnotesize}
+
+\begin{figure}
+\centering
+\includegraphics[width = 7.5cm, height = 3cm]{figure_man/Grafik2}
+\end{figure}
+
+\end{vbframe}
+
+\begin{frame}{Kriging / GP is a spatial model}
+  \begin{itemize}
+    \item Correlation between outcomes $(\yi[1], \yi[2])$ depends on dist of $\xi[1], \xi[2]$\\
+      E.g. Gaussian covar kernel $k(\xi[1], \xi[2]) = exp(\frac{-||\xi[1]-\xi[2]||}{2\sigma})$
+    \item Useful smoothness assumption for optimization
+    \item Posterior uncertainty at new $x$ increases with dist to design points
+    \item Allows to enforce exploration
+  \end{itemize}
+  \begin{figure}
+    \centering
+    \includegraphics[height = 5cm]{figure_man/gp.png}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{Infill Criteria: Expected Improvement}
+%\begin{block}{}
+\begin{itemize}
+\item Define improvement at $x$ over best visited point
+      with $y=f_{min}$  as random variable
+      $I(x) = |f_{min} - Y(x)|^+ $
+\item For kriging $Y(x) \sim N(\fxh, \vxh)$ (given $x=x$)
+\item Now define $EI(x) = E[ I(x)| x = x ]$
+\item Expectation is integral over normal density starting at $f_{min}$
+\item Alternative: Lower confidence bound (LCB) $\fxh - \lambda\sxh$
+\end{itemize}
+Result: $ EI(x) = \left( f_{min} - \fxh \right) \Phi \left( \frac{f_{min} - \fxh)}{\sxh} \right) +
+         \sxh \phi \left( \frac{f_{min} - \fxh}{\sxh} \right) $
+%\[
+%EI(\hat{y}, \hat{s}, f_{min}) = \int^{\infty}_{-\infty} I(y, f_{min})\underbrace{\Phi_{(\hat{y},\hat{s})}(y)}_{PDF(y)} dy = 				\int^{\int_{min}}_{-\infty} (f_{min} - y)\Phi_{(\hat{y},\hat{s})}(y) dy
+%\]
+\begin{figure}[b]
+\includegraphics[width = \textwidth, height = 3.5cm]{figure_man/Grafik3}
+\end{figure}
+%\end{block}
+\end{frame}
+
+\begin{frame}{Focussearch}
+    \begin{itemize}
+      \item EI optimization is multimodal and not that simple
+      \item But objective is now cheap to evaluate
+      \item Many different algorithms exist, from gradient-based methods with restarts to
+        evolutionary algorithms
+      \item In mlrMBO we use an iterated, focusing random search coined \enquote{focus search}
+      \item In each iteration a random search is performed
+      \item We then shrink the constraints of the feasible region towards the best point in the current
+        iteration (focusing) and iterate, to enforce local convergence
+      \item Whole process is restarted a few times
+      \item Works also for categorical and hierarchical params
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \begin{figure}[H]
+  \centering %page 1,10
+  \only<1>{\includegraphics[page=1, width=\linewidth]{figure_man/mbo-example0-1.pdf}}
+  \only<2>{\includegraphics[page=1, width=\linewidth]{figure_man/mbo-example1-1.pdf}}
+  \only<3>{\includegraphics[page=1, width=\linewidth]{figure_man/mbo-example2-1.pdf}}
+  \only<4>{\includegraphics[page=1, width=\linewidth]{figure_man/mbo-example3-1.pdf}}
+  \only<5>{\includegraphics[page=1, width=\linewidth]{figure_man/mbo-example4-1.pdf}}
+  \only<6>{\includegraphics[page=1, width=\linewidth]{figure_man/mbo-example20-1.pdf}}
+ \end{figure}
+\end{frame}
+
+
+
+\begin{frame}{mlrMBO: Model-Based Optimization Toolbox}
+\begin{minipage}{0.45\linewidth}
+    \begin{itemize}
+      \item Any regression from mlr
+      \item Arbtritrary infill
+      \item Single - or multi-crit
+      \item Multi-point proposal
+      \item Via parallelMap and batchtools
+        runs on many parallel backends and clusters
+      \item Algorithm configuration
+      \item Active research
+    \end{itemize}
+
+\end{minipage}
+\begin{minipage}{0.4\linewidth}
+    \includegraphics[width = \textwidth]{figure_man/mlrMBO1.pdf}
+\end{minipage}
+\begin{center}
+    \begin{itemize}
+      \item Release on CRAN. Code, tutorial, more stuff:\\
+        \url{https://github.com/berndbischl/mlrMBO}
+      \item Paper on arXiv (under review)
+        \url{https://arxiv.org/abs/1703.03373}
+    \end{itemize}
+\end{center}
+\end{frame}
+
+\begin{frame}{When to use mlrMBO?}
+\setlength\tabcolsep{1pt}
+\begin{columns}
+\begin{column}{0.6\textwidth}
+\begin{tabular}{rl}
+% & \texttt{optim(par, $f(x)$)} is not enough! \\
+Answer: When & $\fx$ is \emph{expensive}. \\
+%& \light{($\rightarrow$ that's why GAs won't work!)} \\
+& $\fx$ is not convex. \\
+& $\fx$ is noisy. \\
+& $x$ is not only numeric.
+\end{tabular} \\
+\vspace{1.5cm}
+\begin{tabular}{ll}
+\color{red} - & space filling search methods \\
+\color{red} - & quasi-newton algorithms \\
+\color{red} - & evolutionary  algorithms \\
+\color{green} + & model-based optimization (mlrMBO)
+\end{tabular}
+\end{column}
+\begin{column}{0.39\textwidth}
+%\begin{figure}
+\centering %page 1,10
+\includegraphics[page=1, width=0.75\linewidth, trim =5.5cm 2cm 4cm 1cm]{figure_man/plot_when_to_use_mbo-1.pdf} \\
+\includegraphics[page=1, width=0.75\linewidth, trim =5.5cm 2cm 4cm 1cm]{figure_man/plot_when_to_use_mbo-2.pdf}
+%\end{figure}
+\end{column}
+\end{columns}
+
+\end{frame}
+
+\begin{frame}{Benchmark MBO on artificial test functions}
+\begin{itemize}
+\item Comparison of mlrMBO on multiple different test functions
+\begin{itemize}
+\item Multimodal
+\item Smooth
+\item Fully numeric
+\item \textit{Well known}
+\end{itemize}
+\item We use GPs with
+\begin{itemize}
+\item LCB with $\lambda = 1$
+\item Focussearch
+\item 200 iterations
+\item 25 point initial design, created by LHS sampling
+\end{itemize}
+\item Comparison with
+\begin{itemize}
+\item Random search
+\item CMAES
+\item other MBO implementations in R
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{MBO GP vs. CMAES on 5D Rosenbrock}
+\begin{center}
+  \includegraphics[width = \textwidth]{figure_man/cmaes.png}
+\end{center}
+\end{frame}
+
+\begin{frame}{MBO GP vs. competitors in 5D}
+\begin{center}
+  \includegraphics[width = 0.7\textwidth]{figure_man/mbo_y_single-1.pdf}
+\end{center}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Parallel batch proposals}
+
+\begin{frame}{Motivation for batch proposal}
+
+\begin{itemize}
+\item Function evaluations expensive
+\item Often many cores available on a cluster
+\item Underlying $f$ can in many cases not be easily parallelized
+\item Natural to consider batch proposal
+\item Parallel MBO: suggest $q$ promising points to evaluate: $\xpi[1], \ldots, \xpi[q]$
+% \item Also beneficial for real, staged experiments instead of computer experiments
+\item We need to balance exploration and exploitation
+\item Non-trivial to construct infill criterion for this
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Review of parallel MBO strategies}
+
+\vspace{0.2cm}
+
+\begin{itemize}
+\item \textbf{Constant liar}: (Ginsbourger et al., 2010)
+
+\begin{itemize}
+\item Fit kriging model based on real data and find $\xpi[1]$ according to EI-criterion.
+\item \enquote{Guess} $f(\xpi[i-1])$,  update the model and find $\xpi$, $i=2,...,q$
+\item Use $f_{min}$ for \enquote{guessing}
+\end{itemize}
+
+\vspace{0.2cm}
+
+\item \textbf{$q$-LCB}: (Hutter et al., 2012)
+\begin{itemize}
+\item $q$ times: sample $\lambda$ from $Exp(1)$ and optimize single LCB criterion
+\item %\begin{equation*}
+$\xpi=\argmin_{x \in \mathcal{X}} \text{LCB}(x)=\argmin_{x \in \mathcal{X}}~\fxh - \lambda \sxh$.
+%\end{equation*}
+\end{itemize}
+
+%\vspace{0.2cm}
+
+% \item \textbf{$q$-EI}: (Chevalier and Ginsbourger, 2013)
+
+% \begin{itemize}
+% \item Analytic approach to efficiently compute $q$-EI for moderate values of $q \leq 10$
+% \item Code is not available
+% \end{itemize}
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Multiobjectivization and proposed idea}
+
+\begin{itemize}
+\item \textbf{Multiobjectivization}
+
+\begin{itemize}
+\item Originates from multi-modal optimization
+\item Add distance to neighbors for current set as artificial objective
+\item Use multiobjective optimization
+\item Select by hypervolume or first objective or $\ldots$
+\end{itemize}
+
+\item \textbf{Our approach}
+\begin{itemize}
+\item Decouple $\fxh$ and $\sxh$ as objectives -- instead of EI -- to have different exploration / exploitation trade-offs
+\item Consider distance measure as potential extra objective
+\item Run multiobjective EA to select $q$ well-performing, diverse points
+\item Distance is possible alternative if no or bad $\sxh$ estimator
+\item Decoupling $y(x)$, $\sxh$ potential alternative when $EI$ derivation does not hold for other model classes
+\end{itemize}
+
+Bischl, Wessing et al: \textit{MOI-MBO: Multiobjective infill for parallel model-based optimization}, LION 2014
+
+\end{itemize}
+\end{frame}
+
+% \begin{frame}
+% \begin{algorithm}[H]
+% \begin{footnotesize}
+% \caption{Evolutionary optimization of multiobjective infill criteria}
+% Generate an initial population $\Pop=\lbrace x_1,\ldots,x_{q}\rbrace  \subset \mathcal{X}$\;
+% Evaluate $\Pop$\;
+% \While{number of iterations is not exceeded}{
+%   Sample two individuals (parents): $x_{p1} \in \Pop$ and $x_{p2} \in \Pop$\;
+%   Generate a new individual (child): $x_{ch} = \mathit{crossover}(x_{p1},x_{p2},\parSet,\eta_c, p_c)$\;
+%   Mutate the new individual: $x_{ch} := \mathit{mutate}(x_{ch},\parSet,\eta_m, p_m)$\;
+%   Evaluate selected infill criteria (except distance) for $x_{ch}$\;
+%   Update the current population: $\Pop := \Pop \cup \{x_{ch}\}$\;
+%     \For{$\vec{x} \in \mathcal{P}$}{
+%      Calculate $\mathit{dist}(\vec{x}, \mathcal{P})$ and append to objective values\;
+%     }
+%     Compute non-dominated fronts $\mathcal{F}_1, \dots, \mathcal{F}_k$ of \Pop\;
+%     Sort $\mathcal{F}_k$ by a selection criterion\;
+%     $x_{worst}$ = last element of $\mathcal{F}_k$\;
+%   Update the current population: $\Pop := \Pop \setminus \{x_{worst}\}$\;
+% } % end while
+% \Return $\Pop$\;
+% \end{footnotesize}
+% \end{algorithm}
+% \end{frame}
+
+% \begin{frame}
+
+% \begin{figure}[t]
+  % \centering
+  % \includegraphics[width=0.9\textwidth]{moi_example.png}
+% \end{figure}
+% \end{frame}
+
+\begin{frame}{Experimental setup}
+   \textbf{Problem Instances}
+   \begin {itemize}
+
+     % \textbf{Experiments}: 17 approaches applied on $480 = 2 \times 24 \times 10$ problem instances
+% (dimension $\times$ test function $\times$ replication)
+     \item All 24 test functions of the black-box optimization benchmark (BBOB) noise-free test suite
+     \item Dimensions $d \in \{5, 10\}$
+   \end {itemize}
+   \vspace{0.2cm}
+   \textbf{Budget}
+   \begin {itemize}
+     \item For every function 10 initial designs of size $5 \cdot d$\\
+     $\Rightarrow$ 10 statistical replications for each problem instance
+     \item $40 \cdot d$ function evaluations on top of the initial design
+     \item Parallel optimization: batches of size $q=5$
+   \end {itemize}
+   \vspace{0.2cm}
+
+   \textbf{Visualization}: Preference relation graph
+\begin{itemize}
+\item Each node represents an approach (mean rank in braces)
+\item Two nodes are connected with an edge if one approach (the upper)
+is significantly better than the other (the lower) according to the sign test
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Result Graphs}
+
+\begin{center}
+  \includegraphics[width=0.75\textwidth]{figure_man/plot_rel_1} \\
+  \includegraphics[width=0.8\textwidth]{figure_man/plot_rel_leg}
+\end{center}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Multicriteria SMBO}
+
+\begin{frame}{Model-based multi-objective optimization}
+\begin{columns}
+\begin{column}{0.39\textwidth}
+\begin{center}
+
+\input{gear.tex}
+%http://tex.stackexchange.com/questions/6135/how-to-make-beamer-overlays-with-tikz-node
+
+\tikzset{
+  %Style of the black box
+  bbox/.style={draw, fill=black, minimum size=3cm,
+  label={[white, yshift=-1.3em]above:$in$},
+  label={[white, yshift=1.3em]below:$out$},
+  label={[rotate = 90, xshift=1em, yshift=0.5em]left:Black-Box}
+  },
+  multiple/.style={double copy shadow={shadow xshift=1.5ex,shadow
+  yshift=-0.5ex,draw=black!30,fill=white}}
+}
+
+\begin{tikzpicture}[>=triangle 45, semithick]
+\node[bbox] (a) {};
+\draw[thick, shift=({-0.4cm,0.2cm}), draw = white](a.center) \gear{18}{0.5cm}{0.6cm}{10}{2};
+\draw[thick, shift=({0.4cm,-0.3cm}), draw = white](a.center) \gear{14}{0.3cm}{0.4cm}{10}{2};
+{
+  \draw[<-] (a.120) --++(90:2em) node [above] {$x_1$};
+  \draw[<-] (a.100) --++(90:2em) node [above] {$x_2$};
+  \draw[<-] (a.80) --++(90:2em) node [above] {$\ldots$};
+  \draw[<-] (a.60) --++(90:2em) node [above] {$x_d$};
+}
+{
+  \draw[->] (a.250) --++(90:-2em) node [below] {$y_1$};
+  \draw[->] (a.280) --++(90:-2em) node [below] {$y_2$};
+}
+\end{tikzpicture}
+
+\end{center}
+\end{column}
+
+\begin{column}{0.60\textwidth}
+  \begin{align}
+\min \limits_{x \in \Xspace} \mathbf f(x) &= \yv = (y_1, ..., y_m) \text{ with } \mathbf f:  \R^d \rightarrow \R^m
+\end{align}
+\vspace{-1cm}
+\begin{itemize}
+\item $\yv$ \textit{dominates} $\tilde{\yv}$ if
+\begin{align}
+\forall i \in \{1, ..., m\}: & y_i \leq \tilde{y}_i\\
+\text{and } \exists i \in \{1, ..., m\}: & y_i < \tilde{y}_i
+\end{align}
+\item Set of non-dominated solutions:
+  \begin{small}
+  \begin{align*}
+\Xspace^* := \{ x \in \Xspace | \nexists \tilde{x} \in \Xspace: \mathbf f (\tilde{x}) \text{ dominates } \mathbf f(x) \}
+\end{align*}
+\end{small}
+\item Pareto set $\Xspace^*$, Pareto front $\mathbf f(\Xspace^*)$
+\item{Goal:} Find $\hat{\Xspace}^*$ of non-dominated points that estimates the true set $\Xspace^*$
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Model-based multi-objective optimization}
+\addtocounter{framenumber}{-1}
+\begin{columns}
+\begin{column}{0.39\textwidth}
+\begin{center}
+\includegraphics[width=\linewidth]{figure_man/mc_plot.pdf}
+\end{center}
+\end{column}
+\begin{column}{0.60\textwidth}
+  \begin{align}
+\min \limits_{x \in \Xspace} \mathbf f(x) &= \yv = (y_1, ..., y_m) \text{ with } \mathbf f:  \R^n \rightarrow \R^m
+\end{align}
+\vspace{-1cm}
+\begin{itemize}
+\item $\yv$ \textit{dominates} $\tilde{\yv}$ if
+\begin{align}
+\forall i \in \{1, ..., m\}: & y_i \leq \tilde{y}_i\\
+\text{and } \exists i \in \{1, ..., m\}: & y_i < \tilde{y}_i
+\end{align}
+\item Set of non-dominated solutions:
+  \begin{small}
+  \begin{align*}
+\Xspace^* := \{x \in \Xspace | \nexists \tilde{x} \in \Xspace: \mathbf f (\tilde{x}) \text{ dominates } \mathbf f(x) \}
+\end{align*}
+\end{small}
+\item Pareto set $\Xspace^*$, Pareto front $\mathbf f(\Xspace^*)$
+\item{Goal:} Find $\hat{\Xspace}^*$ of non-dominated points that estimates the true set $\Xspace^*$
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Taxonomy}
+\begin{figure}[t]
+\centering
+\vspace{-0.2cm}
+\includegraphics[width = 0.6\textwidth]{figure_man/FlowchartMBMO}
+% \vspace{-0.2cm}
+\end{figure}
+  Horn, Wagner, Bischl et al: Model-based multi-objective optimization: Taxonomy, multi-point proposal, toolbox and benchmark, EMO 2014.
+\end{frame}
+
+\begin{frame}{Batch Proposal}
+\begin{itemize}
+\item Most MBMO lack way to propose $N>1$ points (batch evaluation)
+\item Batch evaluations are essential for distributed computing
+\item We integrated such mechanism(s) for arbitrary MBMO
+\item Replaced single phases of the taxonomy
+\end{itemize}
+\end{frame}
+
+\begin{frame}{ParEGO}
+
+\begin{enumerate}
+\item Scalarize objectives using the augmented Tchebycheff norm
+	\begin{equation*}
+	\label{eq:tcheby}
+	 \max\limits_{i = 1, ..., d} \left[w_i f_i(\mathbf{x}) \right]+ \rho \sum\limits_{i = 1}^d w_i f_i(x)
+	\end{equation*}
+	with uniformly distributed weight vector $\mathbf{w}\,(\sum 	w_i = 1)$ and fit surrogate model to the respective scalarization.
+\item Single-objective optimization of EI (or LCB?)
+\end{enumerate}
+
+Batch proposal: \textbf{Increase the number and diversity of randomly drawn weight vectors.}
+\begin{itemize}
+\item If $N$ points are desired, $cN$ $(c>1)$ weight vectors are considered
+\item Greedily reduce set of weight vectors by excluding one vector of the pair with minimum distance
+\item Scalarizations implied by each weight vector are computed
+\item Fit and optimize models for each scalarization
+\item Optima of each model build the batch to be evaluated
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Animation of ParEGO}
+\begin{center}
+    \includegraphics[width = 0.95\textwidth, page = 1]{figure_man/parego_animation.pdf}<1>
+    \includegraphics[width = 0.95\textwidth, page = 2]{figure_man/parego_animation.pdf}<2>
+    \includegraphics[width = 0.95\textwidth, page = 3]{figure_man/parego_animation.pdf}<3>
+    \includegraphics[width = 0.95\textwidth, page = 4]{figure_man/parego_animation.pdf}<4>
+    \includegraphics[width = 0.95\textwidth, page = 5]{figure_man/parego_animation.pdf}<5>
+    \includegraphics[width = 0.95\textwidth, page = 6]{figure_man/parego_animation.pdf}<6>
+    \includegraphics[width = 0.95\textwidth, page = 7]{figure_man/parego_animation.pdf}<7>
+    \includegraphics[width = 0.95\textwidth, page = 8]{figure_man/parego_animation.pdf}<8>
+    \includegraphics[width = 0.95\textwidth, page = 9]{figure_man/parego_animation.pdf}<9>
+    \includegraphics[width = 0.95\textwidth, page = 10]{figure_man/parego_animation.pdf}<10>
+\end{center}
+\end{frame}
+
+\begin{frame}{SMS-EGO}
+
+\begin{itemize}
+\item Individual models for each objective
+\item Single-objective optimization of aggregating infill criterion: \\
+  Calculate contribution of the confidence bound of representative solution to the  current front approximation
+\end{itemize}
+
+\begin{columns}
+
+\begin{column}{0.55\textwidth}
+\begin{itemize}
+  \item Calculate LCB for each objective
+  \item Measure contribution with regard to the hypervolume indicator
+  \item For $\varepsilon$-dominated ($\preceq_{\varepsilon}$) solutions, a penalty $\Psi(\mathbf {x}) = -1+\prod_{j = 1}^m \left ( 1+(l(\mathbf{x})-y_j^{(i)})\right )$ is added\\
+    (Actually not needed for Focussearch.)
+\end{itemize}
+\vfill
+\end{column}
+
+\begin{column}{0.45\textwidth}
+
+\includegraphics[page = 1]{figure_man/hv_plot.pdf}<1>
+\includegraphics[page = 1]{figure_man/hv_contr_plot.pdf}<2>
+\includegraphics[page = 1]{figure_man/sms_plot.pdf}<3>
+
+\end{column}
+
+\end{columns}
+
+\end{frame}
+
+\begin{frame}{SMS-EGO: Batch proposal}
+Modification of phase candidate generation: \textbf{Use simulated evaluations for candidate generation}.
+\begin{itemize}
+\item The proposed point $\vec x^*$ is not directly evaluated, but the LCB $l(\vec x^*)$ is added to the current approximation without refitting the model
+\item Repeat until $N$ points for a batch evaluation have been found
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Approximative RBF-SVM Training Algorithms}
+
+\begin{table}[t]
+\centering
+\begin{tabular}{ll}
+\hline
+  SVM~solver  & Description \\
+\hline
+  Pegasos     & Stochastic Gradient Descent \\
+  BSGD        & Budgeted Stochastic Gradient Descent  \\
+  LLSVM       & Low-rank kernel approximation + linear solver \\
+  \textcolor{red}{LIBSVM}      & \textcolor{red}{``Exact'' SMO solver} \\
+  LASVM       & Online variant of SMO solver \\
+  LIBBVM/CVM  & Minimum Enclosing Ball (only squared hinge loss) \\
+  SVMperf     & Cutting Plane Algorithm \\
+\hline
+\end{tabular}
+\label{table:Overview_of_the_algorithms}
+\end{table}
+
+\begin{itemize}
+\item What is the trade-off between training time and prediction error?
+\item Most solvers have 2 additional parameters on top of C and $\gamma$
+% \item Solve the multi-criteria optimization problem with respect to the two objectives error and training time by varying the parameter \\
+\item Optimizing 2 expensive objectives in a 4-dim parameter space.
+%Estimate the error with a $50/25/25$ train/test/validation data split.
+\item Replace grid search with more sophisticated PAREGO-algorithm.
+%The frequently used grid search is painfully slow and not accurate enough. We are using a method from model-based multicriteria Optimization - the PAREGO - algorithm.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Approximative SVM Training Algorithms}
+\begin{itemize}
+\item \textbf{We expect:} Every solver has a trade-off between training time and prediction error: Given more time a solver (should) reach a better solution.
+\item \textbf{Our goal:} Analyze this trade-off! Solve the multi-criteria optimization problem with respect to the two objectives error and training time by varying the parameters. \\
+\item \textbf{The challenge:} Optimizing 2 expensive objectives in a 4-dimensional parameter space.
+%Estimate the error with a $50/25/25$ train/test/validation data split.
+\item \textbf{Our approach:} Replace standard grid search with more sophisticated PAREGO-algorithm.
+%The frequently used grid search is painfully slow and not accurate enough. We are using a method from model-based multicriteria Optimization - the PAREGO - algorithm.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Approximative SVM Training Algorithms}
+\begin{table}[t]
+The parameters $(C, \gamma)$ of the SVM itself were optimized over $2^{[-15, 15]}$ respectively.
+Every solver has further approximation parameters:
+\vspace{0.3cm}
+
+\begin{tabular}{@{}lcc@{}}
+\hline
+  SVM~solver  &  Parameters & Optimization Space  \\
+\hline
+  Pegasos  &  $\#$Epochs      & $2^{[0, 7]}$          \\
+  BGSD        &  Budget~size, $\#$Epochs & $2^{[4, 11]}$, $2^{[0, 7]}$      \\
+  LLSVM       &  Matrix~rank                    & $2^{[4, 11]}$   \\
+  \textcolor{red}{LIBSVM}      &  \textcolor{red}{$\epsilon$ (Accuracy)}      &    $2^{[-13, -1]}$  \\
+  LASVM       &  $\epsilon$ (Accuracy), $\#$Epochs & $2^{[-13, -1]}$, $2^{[0, 7]}$             \\
+  LIBBVM/CVM  &  $\epsilon$ (Accuracy)     &  $2^{[-19, -1]}$    \\
+  SVMperf     &  $\epsilon$ (Accuracy), $\#$Cutting planes   & $2^{[-13, -1]}$, $2^{[4, 11]}$ \\
+\hline
+\end{tabular}
+%\caption{SVM solvers with loss type and parameters that were subject to tuning.}
+\label{table:Overview_of_the_parameters.}
+\end{table}
+Additional parameters set to default values.
+
+\end{frame}
+
+\begin{frame}{Datasets}
+ \begin{table}[t]
+ \begin{tabular}{@{}lrrrrrr@{}}
+  \hline
+   data set  &  $\#$ points  &  $\#$ features  &  class ratio  &  sparsity  \\
+  \hline
+   wXa  &  34\,780  &  300    &  34.45  &  95.19 \% \\
+   aXa  &  36\,974  &  123    &  3.17  &  88.72 \% \\
+   \textcolor{red}{protein}  &  42\,153  &  357    &  1.16  &  71.46 \% \\
+   mnist  &  70\,000  &  780    &  0.96  &  80.76 \% \\
+   vehicle  &  98\,528  &  100    &  1.00  &  0 \% \\
+   shuttle  &  101\,500  &  9    &  0.27  &  0.23 \% \\
+   spektren  &  175\,090  &  22    &  0.80  &  0 \% \\
+   \textcolor{red}{ijcnn1}  &  176\,691  &  22    &  9.41  &  40.91 \% \\
+   arthrosis  &  262\,142  &  178    &  1.19  &  0.01 \% \\
+   cod-rna  &  488\,565  &  8    &  2.00  &  0.02 \% \\
+   covtype  &  581\,012  &  54    &  1.05  &  78 \% \\
+   \textcolor{red}{poker}  &  1\,025\,010  &  10    &  1.00  &  0 \% \\
+  \hline
+ \end{tabular}
+ \caption{Overview of the data sets.}
+ \end{table}
+\end{frame}
+
+\begin{frame}{Test error landscape (LIBSVM)}
+\begin{columns}
+  \begin{column}{.50 \textwidth}
+    \includegraphics[width=1.075\textwidth]{figure_man/libSVMErrorLandscape.pdf}
+  \end{column}
+  \begin{column}{.50 \textwidth}
+    \includegraphics[width=1.075\textwidth]{figure_man/libSVMExectimeLandscape.pdf}
+  \end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{All Pareto fronts for ijcnn1 dataset}
+ \begin{columns}
+
+   \begin{column}{.6 \textwidth}
+
+   	\includegraphics{figure_man/pareto1.pdf}
+
+   \end{column}
+
+   \begin{column}{.4 \textwidth}
+  	 \begin{small}
+  	 	\begin{itemize}
+  	 	\item
+  	 		176\,691 samples \\ 22 features \\ 9.41 class ratio
+  	 		\item Wee see: \\
+  	 		LIBSVM: exact but slow \\
+  	 		LIBBVM/CVM: good front - speed increase with small accuracy loss
+  	 		SVMperf / LLSVM / BSGD: can be really fast, but higher accuracy loss \\
+  	 		LASVM / Pegasos: less exact and even slower as LIBSVM \\
+  	 	\end{itemize}
+  	 \end{small}
+   \end{column}
+ \end{columns}
+ \end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Interesting Challenges}
+
+\begin{frame}{Challenge: The correct surrogate?}
+    \begin{itemize}
+      \item GPs are very much tailored to what we want to do, due to their spatial structure
+      in the kernel and the uncertainty estimator.
+    \item But GPs are rather slow. And (fortunately) due to parallization (or speed-up tricks like subsampling)
+      we have more design points to train on.
+      \item Categorical features are also a problem in GPs
+        (although methods exist, usually by changing the kernel)
+      \item Random Forests handle categorical features nicely, are much faster. But they don't rely on a
+      spatial kernel and the uncertainty estimation is much more heuristic / may not represent what we want.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Challenge: Time Heterogeneity}
+    \begin{itemize}
+      \item Complex configuration spaces across many algorithms results in vastly different runtimes
+        in design points.
+      \item Actually just the RBF-SVM tuning can result in very different runtimes.
+      \item We don't care how many points we evaluate, we care about total walltime of the configuration.
+      \item The option to subsample further complicates things.
+      \item Parallelization further complicates things.
+      \item Option: Estimate runtime as well with a surrogate, integrate it into acquisition function.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Software Links}
+\begin{minipage}[t]{0.75\linewidth}
+\vspace{0pt}
+We use \textbf{R} for machine learning and SMBO.\\
+Find us on GitHub:
+  \begin{itemize}
+    \item \url{github.com/mlr-org/mlr}
+    \item \url{github.com/berndbischl/mlrMBO}
+  \end{itemize}
+\end{minipage}
+\begin{minipage}[t]{0.14\linewidth}
+\vspace{0pt}
+  \includegraphics[width = \linewidth]{figure_man/mlrLogo_blue_566x256}
+  \vspace{0.1cm}
+  \includegraphics[width = 0.66\linewidth]{figure_man/GitHub-Mark}
+\end{minipage}
+\end{frame}
+
+\endlecture

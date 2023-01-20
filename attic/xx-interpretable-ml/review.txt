@@ -1,0 +1,80 @@
+﻿2: muss 1 satz / bsp drunter zu erklärung, sonst versteht man das nicht
+
+  \item Models using proxies instead of causal inputs
+  \item When the loss function does not cover all constraints
+
+dafür darf das zitat gerne in kurzschreibweise sein!
+DONE
+
+9 : openml download fehlt immer noch?
+bitte hochladen und data id / task id angeben
+DONE by Christian
+
+12ff: wir diskutieren immer noch nicht korrekt finde ich die voraussetzungden fer perm imp.
+nämlich dass es ein dedicated test set geben muss. und dass das eigentlich im setup her quatsch ist. wenigstens sagen dass ein dedicated test set notwendig ist
+
+DONE. Auf den Folien stand schon dass man Testdaten nehmen soll, jetzt stehts an noch mehr Stellen
+
+13: animation: yhat sollte auch in den tabellen vorkommen und unten drunter die losses und deren differenz
+
+14: ist das wirklich ein "factor of 18"? es ist auch sehr doof dass das aus der grafik nicht pinzipiell ablesbar ist, wenn die direkt aus IML kommt. außerdem wurde vorher nie erklärt dass man die unterschiede im loss als faktor ODER als differenz messen könnte
+
+DONE. Im Algorithmus steht jetzt explizit dass wir den faktor berechnen.
+
+21: die neue tab sollte unter der alten tab links stehen
+dann springt das bild rechts auch nicht...
+CS: DONE, beide Spalten in der Mitte zentriert.
+
+26: na gut. aber was "schlimmes" passiert denn nun? wir behaupten ein bias passiere.
+aber das zeigen wir gar nicht....
+---> wenigsten eine issue machen dass das bsp hier ausgebaut werden sollte
+CS: DONE, Issue geöffnet.
+
+29ff im gesamten ALE:
+das ist nicht "standardkonform" mit der notation der VL.
+variablen von f / beobachtungsvektoren sind bei mir immer kleines x, hier steht immer ein großes X.
+bold-x^i ist der i-te daten punkt
+bold-x_j der j-te feature vektor.
+--> bitte anpassen
+CS: DONE: habe fettgedruckte Notation nun für Vektoren benutzt, auch für einen Vektor aus Zufallsvariablen z.B. x_{\setminus{j}}. Anmerkung: CIM2 Notation verwirrend, da sowohl Zufallsvariablen, als auch beobachtete Vektoren kleingeschrieben sind.
+
+31: der plots, also die legende und die beschriftung sind nichtmal auf dem laptop lesbar und auf einem beamer absolut gar nicht
+CS: DONE: Rausgenommen. Dafür umfangreiche 3D-Illustration reingenommen. Habe auf ausreichende Größe geachtet.
+
+33/34:
+- n_j(braucht man nicht) --> |N_j(k)| nutzen
+- in der inneren summe nur schreiben: i \in N_j(k)
+- dafür muss über den formeln haltt die interval partitionierung definiert werden,
+sonst ist nicht klar was Z_k überhaupt ist, und vernmutlich brauchen die einen index
+j für das feature....
+- in der äußeren summe muss wohl  k_j(x) stehen und nicht k_j(x)
+- steht auf folie 34 nicht nochmal EXAKT das gkleiche? raus?
+CS: DONE: Formeln angepasst, Partitionierung am Anfang definiert, Index j bei Intervallen hinzugefügt,
+Algorithmus vereinfacht da sonst redundant.
+
+38: folie total unklar.
+- additive unbiasedness ist nicht wirklich definiert.
+- die notation f_j, f_jk, wurde doch nie eingeführt
+- es ist unklar dass man eine funktuion so zerlegen kann?
+- was folgt aus der berechnung denn nun?
+---> christian: reden
+CS: DONE: Habe die Folie rausgenommen. Stiftet sonst Verwirrung.
+
+42: \item Components can be estimated similar to partial dependence plots
+--> das reicht halt nicht. kann man das bitte präziser auf einer folie zeigen?
+
+43: itemize nicht richtig gemacht....!
+
+47: in beiden bullet point "parst" der text nicht.
+"for .. x is a ..."? "for ... the feature vector is a "?
+
+49: instability: es wird gar nicht gesagt, was das heißt, bzw woher es kommt, bzw
+woran man diese denn nun erkennen kann.
+
+
+
+
+
+
+
+

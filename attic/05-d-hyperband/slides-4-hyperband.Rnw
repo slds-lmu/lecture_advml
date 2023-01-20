@@ -1,0 +1,222 @@
+
+<<setup-child, include = FALSE>>=
+library(knitr)
+library(mlr)
+library(mlbench)
+library(ggplot2)
+library(gridExtra)
+library(qrmix)
+library(smoof)
+set_parent("../style/preamble.Rnw")
+@
+
+
+\input{../../latex-math/basic-math}
+\input{../../latex-math/basic-ml}
+\input{../../latex-math/ml-mbo}
+
+\lecturechapter{16}{Hyperband}
+\lecture{Fortgeschrittene Computerintensive Methoden}
+
+
+\begin{frame} {Learning curves}
+  \begin{itemize}
+    \item It is extremely expensive to train complex models (such as deep neural networks) on large datasets.
+    \item In such a scenario, evaluating even a single hyperparameter configuration can take many hours/days.
+    \item For many configurations, it might be clear early on that further training is not likely to significantly improve the performance.
+    \item More importantly, the relative ordering of configurations (for a given set) can also become evident early on.
+    \item Therefore, fully training every single configuration can be quite wasteful.
+  \end{itemize}
+\end{frame}
+
+\begin{frame} {Learning curves}
+    \begin{figure}
+    \centering
+      \scalebox{1}{\includegraphics{figure_man/iteration.png}}
+      \tiny{\\credit : Ameet Talwalkar}
+  \end{figure}
+    
+    \textbf{Main idea} : Terminate training for configurations that aren't promising and instead allocate more resources to training configurations that are likely to perform better.
+\end{frame}
+
+\begin{frame} {Successive-Halving}
+  \begin{itemize}
+    \item To "weed out" poor configurations during training, one simple approach is \textbf{Successive-Halving}.
+    \item Given an initial set of configurations to evaluate :
+      \begin{itemize}
+        \item Train all configurations for a small initial budget.
+        \item Remove the half that performed worst and then double the budget.
+        \item Continue training the remaining configurations until this new budget is exhausted.
+        \item Again, remove the half that performed worst and double the budget.
+        \item Repeat until only a single configuration remains...
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+% \begin{frame} {Multi-Armed Bandits}
+%   \begin{itemize}
+%     \item Imagine a gambler in a casino who wants to maximize his profit.
+%     \item He is free to choose between $n$ different slot machines and has a fixed budget $B$.
+%     \item He begins to spend $b$ units of budget for each machine, such that $b \cdot n \ll B$
+%     \item While he loses some of his budget $B$, he also gains a bit of information concerning each machine's return rates.
+%     \lz
+%     \item How should a gambler allocate his remaining budget on bandits?
+%   \end{itemize}
+% \end{frame}
+
+\begin{frame} {Successive-halving}
+  \begin{figure}
+    \centering
+      \scalebox{1}{\includegraphics{figure_man/hyperband3.png}}
+      \tiny{\\credit: automl.org}
+      \caption{\footnotesize{Illustration of successive halving for eight algorithms/configurations. After evaluating all algorithms on 1/8 of the total budget, half of them are dropped and the budget given to the remaining algorithms is doubled.}}
+  \end{figure}
+\end{frame}
+
+\begin{frame} {Successive-halving - Example}
+Budget $B = 1000$ and $n = 100$ configurations/"arms" : 
+  \begin{figure}
+    \centering
+      \scalebox{1}{\includegraphics{figure_man/hyperband1.png}}
+  \end{figure}
+\end{frame}
+
+\begin{frame} {The $n$ versus $B/n$ problem}
+  \begin{itemize}
+    \item A major drawback of Successive-Halving is that the user has to specify the number of configurations, $n$, beforehand.
+    \item Ideally, we would like to explore the configuration space and evaluate a large number of configurations.
+    \item However, for a fixed budget, as $n$ increases, the budget $B/n$ that can be spent on any single one of those configurations decreases.
+    \item Therefore, the user can either :
+      \begin{itemize}
+        \item train a large number of configuration for a small number of iterations, or,
+        \item train a small number of configurations for a large number of iterations.
+      \end{itemize}
+    \item As $B/n$ decreases, it becomes harder to "pick out" the most promising configurations from a limited number of training iterations.
+  \end{itemize}
+\end{frame}
+
+\begin{frame} {The $n$ versus $B/n$ problem}
+In general, the relative ordering (in terms of validation loss) of two models can vary during training:
+  \begin{figure}
+    \centering
+      \scalebox{0.8}{\includegraphics{figure_man/val_err.png}}
+  \end{figure}
+  
+In the early stages of training, Model B looks more promising than Model A even though the latter ultimately performs better. Therefore, we must be careful not to prematurely terminate training for Model A.
+
+\end{frame}
+
+\begin{frame} {Hyperband in a nutshell}
+  \begin{itemize}
+    \item Hyperband tries to tackle the $n$ versus $B/n$ problem by considering \textbf{several} values of $n$ for a fixed $B$.
+    \item Each distinct $n$ corresponds to a different "bracket".
+    \item In every bracket, a new set of $n$ random configurations is sampled and then solved by a mutation of the Successive Halving algorithm.
+    \item Therefore, it represents a "hedging strategy" which tries to \textit{simultaneously} minimize the risks of under-exploration (small $n$) and premature elimination (small $B/n$).
+    \item In simple terms, it is a clever way to "have your cake and eat it too".
+  \end{itemize}
+\end{frame}
+
+\begin{frame} {Hyperband in a nutshell} 
+  \begin{itemize}
+    \item Hyperband requires the user to specify two parameters :
+      \begin{itemize}
+        \item $R$ corresponds to the maximum budget that can be spent on any specific configuration.
+        \item $\eta$ corresponds to the proportion of configurations that are discarded in each round of Successive Halving.
+      \end{itemize}
+    \item For example, if $\eta$ = 3, then only a third of the configurations survive a given round.
+    \item Based on these two parameters, the number of brackets that are tried is $s_{\text{max}} + 1$, where $s_{\text{max}} = \lfloor \log_{\eta}R \rfloor$.
+  \end{itemize}
+\end{frame}
+
+\begin{frame} {Hyperband - Example}
+Hyperband for $R = 81$ and $\eta = 3$
+  \begin{figure}
+    \centering
+      \scalebox{0.7}{\includegraphics{figure_man/hyperband2.png}}
+  \end{figure}
+  
+  \begin{itemize}
+    \item $n_i$ and $r_i$ are the number of configurations and the budget-per-configuration, respectively.
+    \item The bracket corresponding to $s = 4$ is designed to maximize exploration. 
+  \end{itemize}
+  
+\end{frame}
+
+\begin{frame} {Hyperband - Example}
+Hyperband for $R = 81$ and $\eta = 3$
+  \begin{figure}
+    \centering
+      \scalebox{0.7}{\includegraphics{figure_man/hyperband2.png}}
+  \end{figure}
+  \begin{itemize}
+    \item Within each bracket, Successive Halving is performed on a randomly sampled set of $n$ configurations.
+    \item Note : Each bracket uses approximately the same amount of resources.
+  \end{itemize}
+  
+\end{frame}
+
+\begin{frame} {Hyperband - Pseudocode}
+  \begin{figure}
+    \centering
+      \scalebox{1.1}{\includegraphics{figure_man/hyp_pseudo.png}}
+      \tiny{\\source : Li et al. (2016)}
+  \end{figure}
+\end{frame}
+
+\begin{vbframe} {Bayesian Optimization \& Hyperband (BOHB)}
+  
+  \begin{itemize}
+    \item In each bracket of Hyperband, the configurations are sampled completely at random.
+    \item Model-based optimization, on the other hand, learns from the performance of previously sampled configurations.
+    \item However, a downside of model-based optimization is that evaluations can be very expensive for complex models such as neural networks.
+    \item BOHB is an algorithm which combines the two approaches.
+    \item The budgets are chosen according to Hyperband but the configurations for a run of successive halving are sampled from a surrogate model.
+    \item BOHB outperforms both Bayesian Optimization and Hyperband on a wide range of tasks.
+  \end{itemize}
+  
+  \framebreak
+  
+  \begin{itemize}
+      \item Instead of using a GP as the surrogate model, BOHB uses a non-parametric multi-dimensional Kernel Density Estimator (KDE) which scales better. 
+    % \item A GP models $p(y|x)$ where $y$ is the performance amd $x$ is the configuration. By contrast, in the KDE approach, $p(x|y)$ is modeled.
+    \item To build such a model, the set of previously evaluated configurations is divided into two groups based on their observed performance $y$. 
+    \item A KDE is then fit for each of the two groups:
+          \begin{align*}
+            l(\lambda) &= p(y < \alpha | \lambda) \;\;\; \text{('good' configurations)} \\
+            g(\lambda) &= p(y \geq \alpha | \lambda) \;\;\; \text{('bad' configurations)}
+          \end{align*}
+          where $\alpha$ is a cutoff value which represents a pre-defined percentile.
+    \item It can shown that maximizing Expected Improvement is equivalent to maximizing the ratio
+      $\frac {l(\lambda)}{g(\lambda)}$.
+  \end{itemize}
+  
+  \framebreak
+
+  \begin{itemize}
+    \item At each iteration of BOHB, the number of configurations to be evaluated is determined according to Hyperband.
+    \item Samples are then drawn from the surrogate model and Successive Halving is carried out. 
+    \item Note : BOHB draws a constant fraction of the samples uniformly at random to preserve some of the theoretical guarantees of HB.
+    \item To sample a configuration from the model, 
+      \begin{itemize} 
+        \item Step 1 : A fixed number of samples are drawn from $l^{\prime}(\lambda)$ (which is the same KDE as $l(\lambda)$ but with a different bandwidth designed to encourage exploration).
+        \item Step 2 : The sample with the highest ratio $\frac {l(\lambda)}{g(\lambda)}$ is chosen.
+      \end{itemize}
+    \item Because different configurations may be evaluated on different budgets, BOHB always builds the surrogate model using the largest budget for which sufficiently many observations are available as they tend to be more reliable.
+  \end{itemize}
+  
+  \framebreak
+  
+  \begin{figure}
+    \centering
+      \scalebox{0.65}{\includegraphics{figure_man/comparison_1.png}}
+      \tiny{\\source: Falkner et al. 2018}
+      \caption{\footnotesize{Illustration of typical results obtained for optimizing six hyperparameters of a neural network. The curves give the immediate regret of the best configuration found by 4 methods as a function of time. For small to medium budgets, Hyperband outperforms random search and Bayesian Optimization (BO). For larger budgets, the model-based approach of BO seems to outperform Hyperband. BOHB achieves the best of both worlds.}}
+  \end{figure}
+
+\small{BOHB has strong anytime performance (desirable for smaller budgets) and converges quickly to optimal configurations.}
+
+\end{vbframe}
+
+
+\endlecture
+

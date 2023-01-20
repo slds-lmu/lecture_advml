@@ -1,0 +1,1023 @@
+<<setup-child, include = FALSE>>=
+library(knitr)
+library(qrmix)
+library(mlr)
+library(dplyr)
+library(smoof)
+set_parent("../style/preamble.Rnw")
+@
+
+\lecturechapter{\Sexpr{lecture_nr}}{Bayesian Optimization}
+\lecture{Fortgeschrittene Computerintensive Methoden}
+
+\input{../../latex-math/basic-math}
+\input{../../latex-math/basic-ml}
+\input{../../latex-math/ml-mbo}
+
+\section{Optimization via Surrogate Modeling}
+
+\begin{vbframe}{Optimization via Surrogate Modeling}
+
+
+\textbf{Starting point:}
+\begin{itemize}
+\item We do not know the objective function $\Psi: \Lambda \to \R$
+\item But we can evaluate $\Psi$ for a few different inputs $\lambdavec \in \Lambda$
+\item For now we assume that those evaluations are noise-free
+
+<<mbo-example1, echo = FALSE, fig.height = 3.5, warnings =FALSE, message = FALSE>>=
+library(ggplot2)
+library(mlr)
+
+f = function(x) 2 * x * sin(14 * x)
+
+set.seed(123)
+lambda = c(0.1, 0.3, 0.65, 1)
+psi = f(lambda)
+df = data.frame(lambda = lambda, psi = psi)
+
+p = ggplot(data = df)
+p = p + geom_point(aes(x = lambda, y = psi), size = 2.5)
+p = p + xlab(expression(lambda)) + ylab(expression(Psi))
+p + ylim(c(-2, 2))
+@
+
+
+
+\item \textbf{Idea:}
+Use the data $\D = \metadata_{i = 1, ..., \minit}$, $\Psi^{[i]} := \Psi(\lambdai)$, to derive properties about the unknown function $\Psi$.
+\end{itemize}
+
+\framebreak 
+
+\begin{enumerate}
+\item \textbf{Fit} a \textbf{regression model} (black) to extract maximum information from the design points and learn properties of $\Psi$
+\vspace{+.05cm}
+<<mbo-example2, echo = FALSE, fig.height = 4, warnings =FALSE, message = FALSE>>=
+configureMlr(show.info = FALSE, show.learner.output = FALSE)
+
+task = makeRegrTask(data = df, target = "psi")
+lrn = makeLearner("regr.km")
+
+p = plotLearnerPrediction(lrn, task, cv = 0L, se.band = FALSE, pointsize = 2.5)  + ylim(c( -2, 2))
+p = p + xlab(expression(lambda)) + ylab(expression(Psi))
+p
+@
+\vspace{-.1cm}
+As we can evaluate $\Psi$ without noise, we fit an interpolating regression model. 
+
+
+\framebreak 
+
+\item Instead of the expensive $\Psi$, we optimize the cheap model function (black) to \textbf{propose} a new point $\lambdanew$ for evaluation 
+\vspace{+.05cm}
+<<mbo-example3, echo = FALSE, fig.height = 4, warnings =FALSE, message = FALSE>>=
+configureMlr(show.info = FALSE, show.learner.output = FALSE)
+proposePoint = function(mod, xmin, xmax) {
+  input = data.frame(lambda = seq(xmin, xmax, by = 0.01))
+  pred = predict(mod, newdata = input)
+  idx.min = which.min(pred$data$response)
+  lambdanew = input$lambda[idx.min]
+  psinew = f(lambdanew)
+
+  return(list(x.new = lambdanew, y.new = psinew))
+}
+
+mod = train(lrn, task)
+points = proposePoint(mod, -1, 1)
+
+p = plotLearnerPrediction(lrn, task, cv = 0L, se.band = FALSE)
+p = p + geom_vline(aes(xintercept = points$x.new), colour = "blue", lty = 2)
+p = p + xlab(expression(lambda)) + ylab(expression(Psi))
+p = p + ylim(c(- 2, 2))
+p
+@
+\vspace{-.1cm}
+In the context of model-based optimization, the regression model is called \textbf{surrogate model}, because it is a cheap approximation of $\Psi$ that is iteratively trained. 
+
+
+\framebreak 
+
+\item And finally evaluate $\Psi$ on $\lambdanew$ 
+\vspace{+.45cm}
+<<mbo-example4, echo = FALSE, fig.height = 4, warnings =FALSE, message = FALSE>>=
+p = p + geom_point(aes(x = points$x.new, points$y.new), color = "blue", size = 2)
+p = p + xlab(expression(lambda)) + ylab(expression(Psi))
+p
+@
+
+\framebreak 
+
+\item After evaluation of the new point, we \textbf{adjust} the model on the expanded dataset via (slow) refitting or a (cheaper) online update
+
+<<mbo-example5, echo = FALSE, fig.height = 4, warnings =FALSE, message = FALSE>>=
+df = rbind(df, data.frame(lambda = points$x.new, psi = points$y.new))
+task = makeRegrTask(data = df, target = "psi")
+
+p = plotLearnerPrediction(lrn, task, cv = 0L, se.band = FALSE)
+p = p + xlab(expression(lambda)) + ylab(expression(Psi))
+p = p + ylim(c(- 2, 2))
+p
+
+@
+
+
+\framebreak 
+
+\item We repeat: (i) \textbf{fit} the model, (ii) \textbf{propose} a new point and, (iii) \textbf{evaluate} that point. 
+
+<<mbo-example6, echo = FALSE, fig.height = 4, warnings =FALSE, message = FALSE>>=
+
+configureMlr(show.info = FALSE, show.learner.output = FALSE)
+
+mod = train(lrn, task)
+points = proposePoint(mod, -1, 1)
+
+p = plotLearnerPrediction(lrn, task, cv = 0L, se.band = FALSE)
+p = p + geom_vline(aes(xintercept = points$x.new), colour = "blue", lty = 2)
+p = p + ylim(c(- 2, 2))
+p = p + geom_point(aes(x = points$x.new, points$y.new), color = "blue", size = 2)
+p = p + xlab(expression(lambda)) + ylab(expression(Psi))
+p
+@
+
+
+\end{enumerate}
+
+
+
+
+\end{vbframe}
+
+
+\begin{vbframe}{Exploration vs. Exploitation}
+\vspace{+.1cm}
+We perform another iteration on this problem. 
+\vspace{+.5cm}
+<<mbo-error1, echo = FALSE, fig.height = 4, warnings =FALSE, message = FALSE>>=
+# --- PROPOSE & EVALUATE 
+p 
+@
+
+\framebreak
+
+We perform another iteration on this problem. 
+\vspace{+.5cm}
+<<mbo-error2, echo = FALSE, fig.height = 4, warnings =FALSE, message = FALSE>>=
+# --- FIT 
+
+configureMlr(show.info = FALSE, show.learner.output = FALSE)
+
+df = rbind(df, data.frame(lambda = points$x.new, psi = points$y.new))
+task = makeRegrTask(data = df, target = "psi")
+
+p = plotLearnerPrediction(lrn, task, cv = 0L, se.band = FALSE)
+p  = p + ylim(c(- 2, 2))
+p = p + xlab(expression(lambda)) + ylab(expression(Psi))
+p 
+@
+
+\framebreak 
+
+After this iteration the algorithm has converged.
+\vspace{+.5cm}
+<<mbo-error3, echo = FALSE, fig.height = 4, warnings =FALSE, message = FALSE>>=
+# --- Propose
+mod = train(lrn, task)
+points = proposePoint(mod, -1, 1)
+
+p = p + geom_vline(aes(xintercept = points$x.new), colour = "blue", lty = 2)
+p = p + geom_point(aes(x = points$x.new, points$y.new), color = "blue", size = 2)
+p
+@
+
+
+\framebreak 
+
+The dashed green line is the \enquote{unknown} black-box function the sequential optimization procedure has been applied to.  
+
+\vspace*{0.2cm} 
+
+<<mbo-error7, echo = FALSE, fig.height = 4, warnings =FALSE, message = FALSE>>=
+configureMlr(show.info = FALSE, show.learner.output = FALSE)
+
+x = seq(0, 1, by = 0.01)
+y = f(x)
+
+pl = plotLearnerPrediction(lrn, task, cv = 0L, se.band = FALSE)
+pl = pl + geom_line(data = data.frame(x = x, y = y), aes(x = x, y = y), color = "darkgreen", lty = 2)
+pl = pl + ylim(c(- 2.5, 2.5))
+pl = pl + xlab(expression(lambda)) + ylab(expression(Psi))
+pl
+@
+
+We see: We ran into a local minimum. We did not \enquote{explore} the most crucial areas and \textbf{missed} the global minimum. 
+
+\end{vbframe} 
+
+
+\begin{vbframe}{Bayesian Surrogate Modeling}
+
+\textbf{Goal:}
+
+Find a trade-off between \textbf{exploration} (explore areas we do not know well) and \textbf{exploitation} (exploit interesting areas)
+  % maybe do a plot of exploration vs. exploitation
+  <<mbo-error9, echo = FALSE, fig.height = 4, warnings =FALSE, message = FALSE>>=
+  df2 = data.frame(xmin = c(0.25, 0.75), xmax = c(0.4, 0.8), ymin = c(-2, -2), ymax = c(2, 2), type = c("well-known", "unknown"))
+  p = pl + geom_rect(data = data.frame(), aes(xmin = c(0.25), xmax = c(0.45), ymin = - Inf, ymax = Inf, fill = c("well explored")), alpha = 0.1, fill = "lightblue")
+  p = p + geom_rect(data = data.frame(), aes(xmin = c(0.7), xmax = c(0.9), ymin = - Inf, ymax = Inf, fill = c("insufficiently explored")), alpha = 0.1, fill = "red")
+   p = p + geom_text(data = data.frame(), aes(x = c(0.25), y = -1.8, label = c("well explored")), color = "lightblue4")
+   p = p + geom_text(data = data.frame(), aes(x = c(0.75), y = -1.8, label = c("insufficiently explored")), color = "indianred4")
+
+  p = p + geom_line(data = data.frame(x = x, y = y), aes(x = x, y = y), color = "darkgreen", lty = 2)
+  p
+  @  
+
+
+
+
+  \framebreak 
+
+    \begin{itemize}
+  \item \textbf{Idea}: Use a \textbf{Bayesian approach} to get a model that yields estimates for 
+  \begin{itemize}
+    \item the posterior mean $m(\lambdab)$
+    \item the posterior variance $ s^2(\lambdab)$
+  \end{itemize}
+  \item The posterior variance expresses the \enquote{confidence} in the prediction
+  \item The posterior variance should be high in regions where we have only few observations (red area) and low where we have a lot of observations (blue area)
+  \item The most prominent choice for a surrogate model is a \textbf{Gaussian process} (proposed by \emph{Jones, 1998, Efficient Global Optimization of Expensive Black-Box Functions}). 
+  \item Since spatial dependencies are extremely well modeled by GPs (points that are \enquote{close} in the input space are also close in the objective space), they are considered particularly suitable in the context of optimization. 
+  \end{itemize}
+
+\end{vbframe}
+
+
+\begin{vbframe}{Gaussian Process Surrogate Model} 
+
+
+We fit a Gaussian process to $\D = \metadata_{i = 1, ..., 6}$. 
+
+\lz 
+
+The Gaussian process gives us a \textbf{distribution over functions} we can draw from. We see the regions of high variance in the plot. 
+
+
+<<mbo-error8, echo = FALSE, fig.height = 4, warnings =FALSE, message = FALSE>>=
+library(mvtnorm)
+library(reshape2)
+library(gridExtra)
+library(scales)
+
+x.obs = df$lambda
+y.obs = df$psi
+
+squared.exp = function(x1, x2, l = 1) {
+  
+  D = as.matrix(dist(c(x1, x2), method = "euclidean"))
+  
+  K = exp(-1 / 2 * D^2 / l^2 / 0.01)
+  
+  return(K)
+}
+
+
+n = 200
+
+x = seq(0, 1, length.out = n)
+
+j = 6
+
+K = squared.exp(x, x.obs)
+K.xx = K[(n + 1):nrow(K), (n + 1):nrow(K)]
+K.xxs = K[1:n, (n + 1):nrow(K)]
+K.xsxs = K[1:n, 1:n]
+
+# Update of posterior
+m.post = K.xxs[, 1:j] %*% solve(K.xx[1:j, 1:j]) %*% y.obs[1:j]
+K.post = K.xsxs - K.xxs[ ,1:j] %*% solve(K.xx[1:j, 1:j]) %*% t(K.xxs[, 1:j])
+
+dfp = data.frame(x = x)
+
+for (i in 1:n) {
+  dfp[, i + 1] = as.vector(mvtnorm::rmvnorm(1, m.post, sigma = K.post))
+  i
+}
+
+df.hist = data.frame(index = mapply(function(x) which.min(dfp[,x]), x = seq(2, n +1, by = 1)))
+df.hist = cbind.data.frame(df.hist, min = dfp[df.hist$index, 1])
+df.plot = melt(dfp, id.vars = "x")
+
+
+p = ggplot() + geom_line(data = df.plot, aes(x = x, y = value, colour = variable))
+p = p + geom_point(data = data.frame(x = x.obs[1:j], y = y.obs[1:j]), aes(x = x, y = y), size = 2)
+p = p + xlab(expression(lambda)) + ylab(expression(Psi)) + ylim(c(-2.5, 3)) + xlim(c(0, 1))
+p = p + theme_bw() + theme(legend.position = "none") #+ ggtitle(paste0("Posterior process after ", j, " observation", ifelse(j == 1, "", "s"), " with n = ", n))
+p = p + geom_rect(data = data.frame(), aes(xmin = c(0.25), xmax = c(0.45), ymin = - Inf, ymax = Inf, fill = c("well explored")), alpha = 0.1, fill = "lightblue")
+p = p + geom_rect(data = data.frame(), aes(xmin = c(0.7), xmax = c(0.9), ymin = - Inf, ymax = Inf, fill = c("insufficiently explored")), alpha = 0.1, fill = "red")
+p = p + geom_text(data = data.frame(), aes(x = c(0.25), y = -1.8, label = c("well explored")), color = "lightblue4")
+p = p + geom_text(data = data.frame(), aes(x = c(0.75), y = -1.8, label = c("insufficiently explored")), color = "indianred4")
+p
+@
+
+
+\framebreak 
+
+We fit a Gaussian process to $\D = \metadata_{i = 1, ..., 6}$. 
+
+\lz 
+
+The Gaussian process gives us a \textbf{distribution over functions} we can draw from. We see the regions of high variance in the plot. 
+
+
+<<mbo-error10, echo = FALSE, fig.height = 4, warnings =FALSE, message = FALSE>>=
+dfp = data.frame(x = x, y = f(x))
+dfp = rbind(data.frame(x = x.obs, y = y.obs), dfp)
+
+train = 1:length(x.obs)
+istrain = 1:length(dfp$x) %in% train
+
+configureMlr(show.info = FALSE, show.learner.output = FALSE)
+
+tsk = makeRegrTask(id = "GP as interpolator", data = dfp, target = "y")
+lrn = makeLearner("regr.km", predict.type = "se", par.vals = list(nugget.estim = FALSE))
+
+mod = train(lrn, tsk, subset = train)
+pred = predict(mod, tsk)
+pred = cbind(pred$data, x = dfp$x, type = istrain)
+
+p = ggplot() + geom_line(data = pred, aes(x = x, y = response))
+p = p + geom_point(data = data.frame(x = x.obs[1:j], y = y.obs[1:j]), aes(x = x, y = y), size = 2)
+p = p + geom_ribbon(data = pred, aes(x = x, ymin = response - 2 * se, ymax = response + 2 * se), fill = "grey70", alpha = 0.3) + ylim(c(-2.5, 3))
+p = p + theme_bw() + xlab(expression(lambda)) + ylab(expression(Psi))
+p
+@
+
+
+\framebreak 
+
+The posterior mean and the posterior variance for a Gaussian process (kriging) can be derived analytically: 
+
+\begin{itemize}
+\item Let $\D = \metadata_{i = 1, ..., n}$ be the data we are fitting the Gaussian process on. 
+\item Let $\bm{\Psi}:= \left(\Psi^{[1]}, ..., \Psi^{[m]}\right)$ the vector of observed outputs. 
+\item For a covariance kernel $k(\lambdab, \tilde \lambdab)$, let $\bm{K} := \left(k(\lambdab^{[i]}, \lambdab^{[j]})\right)$ denote the \textbf{kernel (Gram) matrix} and $k(\lambdab) = \left(k(\lambdab^{[1]}, \lambdab), ..., k(\lambdab^{[m]}, \lambdab)\right)^\top$
+\item Further, we assume a zero-mean Gaussian process prior. $^{(*)}$  
+\end{itemize}
+
+\vfill
+
+\begin{footnotesize}
+ $^{(*)}$ It is common but by no means necessary to consider GPs with a zero mean function. We could also model a Gaussian process with a constant trend, for example. Note, however, that using zero-mean Gaussian priors is not a drastic limitation, since the mean of the posterior process is not confined to be zero. 
+\end{footnotesize}
+
+\framebreak 
+
+
+The predictive distribution of the posterior process $\psi(\lambdab)$ for $\lambdab \in \Lambda$ is 
+
+\begin{eqnarray*}
+\psi(\lambdab) ~|~ \D \sim \mathcal{N}\left(m(\lambdab), s^2(\lambdab)\right)
+\end{eqnarray*}
+
+with 
+
+\begin{eqnarray*}
+  m(\lambdab) &=& k(\lambdab)^\top \bm{K}^{-1} \bm{\Psi} \\
+  s^2(\lambdab) &=& k(\lambdab, \lambdab) - k(\lambdab)^\top \bm{K}^{-1} k(\lambdab).
+\end{eqnarray*}
+
+\vfill
+
+\textbf{Note:} We denote the Gaussian process by a lowercase Greek letter $\psi(\lambdab)$, while the black-box function $\Psi: \Lambda \to \R$ as well as evaluations $\Psi^{[i]} = \Psi(\lambdai)$ are denoted by capital greek letters. 
+
+
+\end{vbframe}
+
+
+\begin{vbframe}{Initial Design to train the initial model}
+
+\begin{itemize}
+\item The initial design $\D = \metadata_{i = 1, ..., \minit}$ is used to train the \textbf{first} regression model. 
+\item It should cover the input space sufficiently: commonly used designs are
+\begin{itemize}
+  \item Latin hypercube sampling (LHS)
+  \item Maximin designs (Minimum distance between points is maximized)
+\end{itemize}
+\item Type of design usually has not the largest effect on model-based optimization, and unequal distances between points could even be beneficial 
+\item A more important choice is the \textbf{size} of the initial design
+\item It should neither be too small (bad initial fit) nor too large (spending too much budget without doing \enquote{intelligent} optimization) 
+\item Recommendations are based on the dimension of the input space $d$: $2d, 4 d, 10d$
+\end{itemize}
+
+\framebreak 
+
+Latin hypercube design vs. a completely random design: 
+
+\begin{figure}
+\centering
+\includegraphics[height = 5cm]{figure_man/initdes.png}
+\end{figure}
+
+\end{vbframe}
+
+
+\section{Infill Criteria}
+
+\begin{vbframe}{Which point to propose?}
+
+To sequentially propose new points based on the Gaussian process $\psi(\lambdab)$, we derive so-called \textbf{infill criteria} (also: \textbf{acquisition functions}) 
+
+$$
+a: \Lambda \to \R.
+$$ 
+
+Let  $\textcolor{orange}{\Psi^{\min}} = \min \left\{\Psi^{[1]}, ..., \Psi^{[m]}\right\}$ denote the best observed value so far. 
+
+\vspace*{-0.2cm}
+
+
+<<infill-1, echo = FALSE, fig.height = 3, warnings =FALSE, message = FALSE>>=
+configureMlr(show.info = FALSE, show.learner.output = FALSE)
+
+task = makeRegrTask(data = df[1:4, ], target = "psi")
+lrn = makeLearner("regr.km")
+
+p = plotLearnerPrediction(lrn, task, cv = 0L, pointsize = 2.5)  + ylim(c( -2, 3))
+p = p + xlab(expression(lambda)) + ylab(expression(Psi))
+p = p + geom_point(aes(x = df[2, ]$lambda, y = df[2, ]$psi), color = "orange", size = 3)
+p
+@
+
+\vspace*{-0.3cm}
+
+In the examples before we simply used the posterior mean $a(\lambda) = m(\lambda)$ as infill criterion. However, uncertainty was not taken into account.
+
+
+\framebreak 
+
+% \begin{itemize}
+% \item We \textbf{improve} if 
+
+% $$
+%   \psi(\lambdab) < \Psi^{\min}. 
+% $$
+% \item The \textbf{improvement} over the best visited point can be quantified: it is $0$ (no improvement), if there is no improvement and it is $\Psi^{\min} - \psi(\lambdab)$ otherwise
+
+% $$
+%   I(\lambdab) := \max\{\Psi^{\min} - \psi(\lambdab), 0\}
+% $$
+% \item Note that the improvement is bounded from below by $0$, and thus uncertainty only enters in the case of real improvement $\Psi^{\min} - \psi(\lambdab) > 0$
+% \end{itemize}
+
+% \vfill
+
+% \begin{footnotesize}
+% \textbf{Note:} Both $[ \psi(\lambdab) < \Psi^{\min}]$ and $I(\lambdab)$ are \textbf{random variables} since $\psi(\lambdab)$ is a RV. 
+% \end{footnotesize}
+
+\end{vbframe}
+
+\begin{vbframe}{Probability of Improvement}
+
+\textbf{Goal}: Find $\lambda^{\text{new}}$ that maximizes the \textbf{probability of improvement}
+
+$$
+  PI(\lambdab) = \P(\psi(\lambdab) < \Psi^{\min}) = \Phi\left(\frac{\Psi^{\min} - m(\lambdab)}{ s(\lambdab)}\right). 
+$$
+
+By assuming a Gaussian process, we know that every point the target at every input in Gaussian $\Psi\left(\lambdab\right) \sim \mathcal{N}\left( m(\lambdab),  s^2(\lambdab)\right)$. 
+
+<<infill-2, echo = FALSE, fig.height = 3.5, warnings =FALSE, message = FALSE>>=
+configureMlr(show.info = FALSE, show.learner.output = FALSE)
+
+task = makeRegrTask(data = df[1:4, 1:2], target = "psi")
+lrn = makeLearner("regr.km", predict.type = "se")
+mod = train(lrn, task)
+
+xnew = 0.35
+predxnew = predict(mod, newdata = data.frame(lambda = xnew))
+
+y = seq(-2, 3, by = 0.01)
+dens = data.frame(y = y, x = xnew + dnorm(y, mean = predxnew$data[[1]], sd = predxnew$data[[2]]) / 30)
+
+fill = data.frame(x = dens$x[1:which.max(dens$x)], 
+                  ymin = dens$y[1:which.max(dens$x)], 
+                  ymax = rep(df[2, ]$psi, which.max(dens$x)),
+                  fill = rep("red", which.max(dens$x)))
+
+p = plotLearnerPrediction(lrn, task, cv = 0L, pointsize = 2.5) + xlim(c(0.2, 0.6)) + ylim(c(-1, 0.5))
+p = p + xlab(expression(lambda)) + ylab(expression(Psi))
+p = p + geom_point(aes(x = df[2, ]$lambda, y = df[2, ]$psi), color = "orange", size = 3)
+p = p + geom_hline(aes(yintercept = df[2, ]$psi), color = "orange")
+p = p + geom_path(data = dens, aes(x, y), color="salmon", lwd=1.1)
+p = p + geom_vline(aes(xintercept = xnew), color = "salmon", lty = 2)
+p = p + geom_ribbon(data = fill, aes(x = x, ymin = ymin, ymax = ymax), fill = "red", alpha = .3)
+p = p + geom_text(aes(x = 0.45, y = -.8, label = "Probability mass"), color = "red")
+p
+@
+
+\framebreak 
+
+Thus, the probability of improvement is
+
+\begin{eqnarray*}
+  PI(\lambdab) &=& \P(\psi(\lambdab) < \psi^{\min}) =  \P\left(\frac{\psi(\lambdab) - m(\lambdab)}{ s(\lambdab)} < \frac{\Psi^{\min} -  m(\lambdab)}{ s(\lambdab)}\right) \\
+  &=& \Phi\left(\frac{\Psi^{\min} -  m(\lambdab)}{ s(\lambdab)}\right)
+\end{eqnarray*}
+
+where $\Phi$ denotes the distribution function of a standard normal. 
+
+\vfill
+
+\begin{footnotesize}
+\textbf{Note:} The probability of improvement is $0$ for points that have already been visited. This is clear by definition of the PI-criterion (we seek for a \enquote{real} improvement \enquote{$<$}). But it can also be seen analytically: For a visited point $s(\lambdab) = 0$ and $m(\lambdab) = \Psi(\lambdab) \ge \Psi^{\min}$, and thus $\Psi^{\min} -  m(\lambdab) \le 0$. Thus
+
+$$
+  \Phi\left(\frac{\Psi^{\min} -  m(\lambdab)}{ s(\lambdab)}\right) = \Phi\left(- \infty\right) = 0. 
+$$
+
+\end{footnotesize}
+
+% \framebreak 
+
+% \begin{center}
+%   \includegraphics{figure_man/gauss_1D.png}
+% \end{center}
+
+\framebreak 
+
+\begin{footnotesize}
+
+The probability of improvement only considers \textbf{if} we improve, but neglects \textbf{how much} we improve. Thus, it tends to     propose points that are near to already observed points. 
+
+\end{footnotesize}
+
+ <<infill-probability-improvement, echo = FALSE, results = FALSE, fig.height = 5>>=
+library(mlrMBO)
+library(DiceKriging)
+set.seed(4)
+
+#generate own infill criterion since Probability Of Improvement not implemented
+makeMBOInfillCritPI = function(se.threshold = 1e-6) {
+  assertNumber(se.threshold, lower = 1e-20)
+  force(se.threshold)
+  makeMBOInfillCrit(
+    fun = function(points, models, control, par.set, designs, iter, progress, attributes = FALSE) {
+      model = models[[1L]]
+      design = designs[[1]]
+      maximize.mult = if (control$minimize) 1 else -1
+      assertString(control$y.name)
+      y = maximize.mult * design[, control$y.name]
+      assertNumeric(y, any.missing = FALSE)
+      p = predict(model, newdata = points)$data
+      p.mu = maximize.mult * p$response
+      p.se = p$se
+      y.min = min(y)
+      d = y.min - p.mu
+      xcr = d / p.se
+      xcr.prob = pnorm(xcr)
+     
+      pi = xcr.prob
+      
+      res = ifelse(p.se < se.threshold, 0, -pi)
+      if (attributes) {
+        res = setAttribute(res, "crit.components", data.frame(se = p$se, mean = p$response))
+      }
+      return(res)
+    },
+    name = "Probability Of Improvement",
+    id = "pi",
+    components = c("se", "mean"),
+    params = list(se.threshold = se.threshold),
+    opt.direction = "maximize",
+    requires.se = TRUE
+  )
+}
+
+iter = c(seq(1,3))
+lrn.km = makeLearner("regr.km", predict.type = "se")
+ctrl.pi = makeMBOControl()
+ctrl.pi = setMBOControlTermination(ctrl.pi, iters = max(iter))
+ctrl.pi = setMBOControlInfill(ctrl.pi, crit = makeMBOInfillCritPI())
+
+test.fun = makeSingleObjectiveFunction(
+ fn = function(x) x * sin(14 * x),
+ par.set = makeNumericParamSet(lower = 0, upper = 1, len = 1L)
+)
+design = data.frame(x = df$lambda[1:4])
+run.pi = exampleRun(test.fun, design = design, learner = lrn.km, control = ctrl.pi, show.info = FALSE)
+
+
+p.list = lapply(iter, renderExampleRunPlot, object = run.pi)
+p.list[[1]]
+
+ @
+
+ \begin{footnotesize}
+    The probability of improvement only considers \textbf{if} we improve, but neglects \textbf{how much} we improve. Thus, it tends to     propose points that are near to already observed points. 
+  \end{footnotesize}
+
+  <<infill-probability-improvement2, echo = FALSE, results = FALSE, fig.height = 5>>=
+p.list[[2]]
+@
+
+ \begin{footnotesize}
+    The probability of improvement only considers \textbf{if} we improve, but neglects \textbf{how much} we improve. Thus, it tends to     propose points that are near to already observed points. 
+  \end{footnotesize}
+
+
+ <<infill-probability-improvement3, echo = FALSE, results = FALSE, fig.height = 5>>=
+p.list[[3]]
+@
+
+\end{vbframe}
+
+\begin{vbframe}{Expected Improvement}
+
+% One of the most popular infill criteria is the \textbf{expected improvement} criterion (EI) proposed by \emph{Jones, 1998}.
+
+% \lz  
+
+\textbf{Goal:} Propose $\lambda^{\text{new}}$ that maximizes the \textbf{expected improvement}: 
+
+\vspace*{-0.5cm}
+
+\begin{eqnarray*}
+  EI(\lambda) &=& \E(\max\{\Psi^{\min} - \psi(\lambdab), 0\}) \\
+\end{eqnarray*} 
+
+\vspace*{-0.5cm}
+
+Note that the improvement is bounded from below by $0$. Uncertainty only enters in the case of real improvement $\Psi^{\min} - \psi(\lambdab) > 0$. This enforces exploration. 
+
+<<infill-3, echo = FALSE, fig.height = 3.5, warnings =FALSE, message = FALSE>>=
+configureMlr(show.info = FALSE, show.learner.output = FALSE)
+
+task = makeRegrTask(data = df[1:4, 1:2], target = "psi")
+lrn = makeLearner("regr.km", predict.type = "se")
+mod = train(lrn, task)
+
+xnew = 0.35
+predxnew = predict(mod, newdata = data.frame(lambda = xnew))
+
+y = seq(-2, 3, by = 0.01)
+dens = data.frame(y = y, x = xnew + dnorm(y, mean = predxnew$data[[1]], sd = predxnew$data[[2]]) / 30)
+
+fill = data.frame(x = dens$x[1:which.max(dens$x)], 
+                  ymin = dens$y[1:which.max(dens$x)], 
+                  ymax = rep(df[2, ]$psi, which.max(dens$x)),
+                  fill = rep("red", which.max(dens$x)))
+
+p = plotLearnerPrediction(lrn, task, cv = 0L, pointsize = 2.5) + xlim(c(0.2, 0.6)) + ylim(c(-1, 0.5))
+p = p + xlab(expression(lambda)) + ylab(expression(Psi))
+p = p + geom_point(aes(x = df[2, ]$lambda, y = df[2, ]$psi), color = "orange", size = 3)
+p = p + geom_hline(aes(yintercept = df[2, ]$psi), color = "orange")
+p = p + geom_path(data = dens, aes(x, y), color="salmon", lwd=1.1)
+p = p + geom_vline(aes(xintercept = xnew), color = "salmon", lty = 2)
+p = p + geom_ribbon(data = fill, aes(x = x, ymin = ymin, ymax = ymax), fill = "red", alpha = .3)
+p = p + geom_text(aes(x = 0.45, y = -.8, label = "Expectation"), color = "red")
+p
+@
+
+\framebreak
+
+For a GP, i.e. $\psi\left(\lambdab\right) \sim \mathcal{N}\left(m(\lambdab), s^2(\lambdab)\right)$, we can express the $EI(\lambdab)$ in closed-form as: 
+
+$$
+EI(\lambdab) = (\Psi^{\min}-{m}(\lambdab)) \Phi \Big(\frac{\Psi^{\min} - {m}(\lambdab)}{{s}(\lambdab)}\Big) + 
+{s}(\lambdab) \phi\Big(\frac{\Psi^{\min}-{m}(\lambdab)}{{s}(\lambdab)}\Big), 
+$$
+
+where $\phi(\cdot)$ denotes the density function of a standard normal random variable.
+
+\vfill
+
+\begin{footnotesize}
+
+\textbf{Note:} The expected improvement is $0$ for points that have already been visited: 
+
+$$
+EI(\lambdab) = (\Psi^{\min}-{m}(\lambdab)) \underbrace{ \Phi \left(\frac{\Psi^{\min} - m(\lambdab)}{s(\lambdab)} \right)}_{= 0, \text{ see PI }} + \underbrace{s(\lambdab)}_{ = 0} \phi \left(\frac{\Psi^{\min} - m(\lambdab)}{s(\lambdab)} \right),
+$$
+
+\end{footnotesize}
+
+\framebreak
+
+\begin{footnotesize}
+The expected improvement proposes a point that yields a bigger (potential) improvement than the point proposed by the probability of improvement. 
+\end{footnotesize}
+
+ <<infill-expected-improvement, echo = FALSE, results = FALSE, fig.height = 5>>=
+
+ctrl.ei = makeMBOControl()
+ctrl.ei = setMBOControlTermination(ctrl.ei, iters = 4L)
+ctrl.ei = setMBOControlInfill(ctrl.ei, crit = makeMBOInfillCritEI())
+
+run.ei = exampleRun(test.fun, design = design, learner = lrn.km, control = ctrl.ei, show.info = FALSE)
+
+iter = c(seq(1,3))
+p.list = lapply(iter, renderExampleRunPlot, object = run.ei)
+p.list[[1]]
+# grid.arrange(grobs=lapply(list(p.list[[1]], p.list[[2]], p.list[[3]], p.list[[4]]), grobTree), ncol = 2, nrow = 2)
+
+ @
+
+ \begin{footnotesize}
+The expected improvement proposes a point that yields a bigger (potential) improvement than the point proposed by the probability of improvement. 
+\end{footnotesize}
+
+ <<infill-expected-improvement2, echo = FALSE, results = FALSE, fig.height = 5>>=
+  p.list[[2]]
+ @
+
+ \begin{footnotesize}
+The expected improvement proposes a point that yields a bigger (potential) improvement than the point proposed by the probability of improvement. 
+\end{footnotesize}
+
+ <<infill-expected-improvement3, echo = FALSE, results = FALSE, fig.height = 5>>=
+p.list[[3]]
+ @
+
+
+
+\end{vbframe}
+
+\begin{vbframe}{Lower Confidence Bound}
+
+Note that both the PI as well as the EI criterion balance posterior mean $m(\lambdab)$ and posterior variance $s(\lambdab)$. Another simple approach to balance $m(\lambdab)$ and $s(\lambdab)$ is the \textbf{lower confidence bound (LCB)} criterion
+
+$$
+LCB(\lambdab) = m(\lambdab) - \tau \cdot s(\lambdab).
+$$
+
+$\tau > 0$ is a constant that controls the \enquote{mean vs. uncertainty} trade-off. 
+
+%\vspace*{-0.3cm}
+
+<<lcb, echo = FALSE, fig.height = 3, warnings =FALSE, message = FALSE>>=
+configureMlr(show.info = FALSE, show.learner.output = FALSE)
+
+task = makeRegrTask(data = df[1:4, 1:2], target = "psi")
+lrn = makeLearner("regr.km", predict.type = "se")
+mod = train(lrn, task)
+
+xnew = 0.35
+predxnew = predict(mod, newdata = data.frame(lambda = xnew))
+
+y = seq(-2, 3, by = 0.01)
+
+df = data.frame(lambda = seq(0.2, 0.6, by = 0.01))
+pred = predict(mod, newdata = df)
+df$y = pred$data$response
+df$se = pred$data$se
+tau = c(0.5, 1)
+
+dfl = list()
+
+for (i in 1:length(tau)) {
+  t = tau[i]
+  dfl[[i]] = df
+  dfl[[i]]$ymax = df$y + t * df$se
+  dfl[[i]]$ymin = df$y - t * df$se
+  dfl[[i]]$tau = t
+}
+
+df = do.call(rbind, dfl)
+df$tau = as.factor(df$tau)
+
+p = plotLearnerPrediction(lrn, task, cv = 0L, pointsize = 2.5, se.band = FALSE) + xlim(c(0.2, 0.6)) + ylim(c(-1, 0.5))
+p = p + xlab(expression(lambda)) + ylab(expression(Psi))
+p = p + geom_ribbon(data = df, aes(x = lambda, ymin = ymin, ymax = ymax, fill = tau), alpha = 0.4)
+p = p + geom_vline(data = df %>% group_by(tau) %>% filter(ymin == min(ymin)), aes(xintercept = lambda, color = tau))
+p
+@
+
+\vspace*{-0.3cm}
+
+\begin{footnotesize}
+The shaded area corresponds to $m(\lambdab) \pm \tau \cdot s(\lambdab)$. Vertical lines are the minimum of $m(\lambdab) - \tau \cdot s(\lambdab)$.
+\end{footnotesize}
+
+
+\framebreak
+
+The lower $\tau$, the more we focus on pure mean minimization (here $\tau = 0.2$) ... 
+
+ <<infill-lcb1, echo = FALSE, results = FALSE, fig.height = 4.5>>=
+
+ctrl.lcb = makeMBOControl()
+ctrl.lcb = setMBOControlTermination(ctrl.lcb, iters = 1L)
+ctrl.lcb = setMBOControlInfill(ctrl.lcb, crit = makeMBOInfillCritCB(cb.lambda = 0.1))
+
+run.ei = exampleRun(test.fun, design = design, learner = lrn.km, control = ctrl.lcb, show.info = FALSE)
+
+iter = c(seq(1))
+p.list = lapply(iter, renderExampleRunPlot, object = run.ei)
+p.list
+# grid.arrange(grobs=lapply(list(p.list[[1]], p.list[[2]], p.list[[3]], p.list[[4]]), grobTree), ncol = 2, nrow = 2)
+
+ @
+
+ \framebreak 
+
+
+ ... the higher $\tau$, the more we concentrate on reducing variance (here $\tau = 100$). 
+
+ <<infill-lcb2, echo = FALSE, results = FALSE, fig.height = 4.5>>=
+
+ctrl.lcb = makeMBOControl()
+ctrl.lcb = setMBOControlTermination(ctrl.lcb, iters = 1L)
+ctrl.lcb = setMBOControlInfill(ctrl.lcb, crit = makeMBOInfillCritCB(cb.lambda = 100))
+
+run.ei = exampleRun(test.fun, design = design, learner = lrn.km, control = ctrl.lcb, show.info = FALSE)
+
+iter = c(seq(1))
+p.list = lapply(iter, renderExampleRunPlot, object = run.ei)
+p.list
+# grid.arrange(grobs=lapply(list(p.list[[1]], p.list[[2]], p.list[[3]], p.list[[4]]), grobTree), ncol = 2, nrow = 2)
+
+ @
+
+\end{vbframe}
+
+\begin{vbframe}{Infill Criteria: Comparison}
+
+\begin{itemize}
+  \item It can be shown that (under some mild conditions) Bayesian optimization with a Gaussian process surrogate model with expected improvement is a \textbf{global optimizer}
+  \item That means: Convergence to the \textbf{global} (!) optimum is guaranteed given an unlimited budget
+  \item This cannot be proven by the PI or the LCB criterion
+  \item From a theoretical perspective, this suggests choosing the EI as infill criterion
+  \item In practical applications, however, time to convergence is too long to rely on that theoretical property
+  \item LCB has proven to be a good alternative to the EI criterion 
+\end{itemize}
+
+\end{vbframe}
+
+
+
+\begin{vbframe}{Infill Optimization}
+
+\begin{itemize}
+  \item In every iteration, the $a(\lambdab)$ is maximized to propose a new point. 
+  \item However, the function $a: \Lambda \to \R$ is often not differentiable and highly multimodal. 
+  <<mbo-2d, echo = FALSE, out.width = '7cm', warnings =FALSE, message = FALSE>>=
+  configureMlr(show.info = FALSE, show.learner.output = FALSE)
+
+  set.seed(1234)
+  obj.fun =  makeHimmelblauFunction()
+  des = generateDesign(n = 5, par.set = getParamSet(obj.fun))
+  des$y = apply(des, 1, obj.fun)
+  surr.km = makeLearner("regr.km", predict.type = "se", covtype = "gauss")
+
+  control = makeMBOControl(store.model.at = c(1L, 6L))
+  control = setMBOControlTermination(control, iters = 5)
+  control = setMBOControlInfill(control, crit = makeMBOInfillCritEI())
+
+  run = mbo(obj.fun, design = des, learner = surr.km, control = control, show.info = TRUE)
+
+  points = data.frame(run$opt.path)
+  fmin = min(points$y)
+
+  x = seq(getLowerBoxConstraints(obj.fun)[1], getUpperBoxConstraints(obj.fun)[1], length.out = 200)
+  z = expand.grid(x1 = x, x2 = x)
+  pred = predict(run$models[[1]], newdata = z)
+  z$se = pred$data$se
+  z$pred = pred$data$response
+  z$ratio = (fmin - z$pred) / z$se
+  z$ei = (fmin - z$pred) * pnorm(z$ratio) + z$se * dnorm(z$ratio)
+
+  p1 = ggplot() #+ ylim(c(-4.5, 4.5)) + xlim(c(-4.5, 4.5))
+  p1 = p1 + geom_raster(data = z, aes(x = x1, y = x2, fill = ei), alpha = 0.8) 
+  p1 = p1 + geom_point(data = points, aes(x = x1, y = x2), size = 3, color = "orange")
+  p1 = p1 + scale_fill_gradient(low = "black", high = "white", name = expression(EI(lambda))) 
+  p1 = p1 + xlab(expression(lambda[1])) + ylab(expression(lambda[2]))
+  p1 = p1 + theme(legend.text = element_text(size = 12))
+
+  p1
+  @
+  \begin{footnotesize}
+  The plot exemplarily shows the expected improvement for a 2D-objective function after some evaluations (orange). The function has multiple local extrema. 
+  \end{footnotesize}
+
+  \framebreak 
+
+  \item Luckily, the evaluation of the infill criterion is \textbf{cheap} compared to evaluations of the objective function $\Psi$, e.g. for the expected improvement
+  \item Thus, we can use optimization methods that require a large number of evaluations. 
+  \item Common used infill optimizers are e.g. evolutionary algorithms. 
+\end{itemize}
+
+
+\end{vbframe}
+
+
+
+% \begin{vbframe}{Focus Search}
+
+%     \begin{itemize}
+%       \item Focus search is an iterated, focusing random search coined \enquote{focus search}
+%       \item In each iteration a random search is performed
+%       \item We then shrink the constraints of the feasible region towards the best point in the current
+%         iteration (focusing) and iterate, to enforce local convergence
+%       \item Whole process is restarted a few times
+%       \item Works also for categorical and hierarchical params
+%     \end{itemize}
+
+% \end{vbframe}
+
+
+% \begin{vbframe}{Other Surrogate Models}
+
+% \begin{itemize}
+%   \item So far, we have used a Gaussian process as a surrogate model. 
+%   \item During optimization, we only need the posterior mean $m(\lambdab)$ and the posterior variance $s^2(\lambdab)$ to calculate the infill criterion. 
+%   \item Even though the Gaussian process has some very nice properties, we could use any other model that gives us a prediction $m(\lambdab)$ and an uncertainty estimate $s^2(\lambdab)$. 
+%   \item One drawback of the Gaussian processes is that it can only be used for a purely numeric input domain $\Lambda$. 
+%   \item In those cases, the \textbf{random forest} is a popular choice:
+%   \begin{itemize}
+%     \item The random forest can handle mixed numeric-categorical input spaces $\Lambda$
+%     \item The random forest gives us an uncertainty estimate (variance of the predictions across the trees)
+%   \end{itemize} 
+
+
+% \framebreak 
+
+% Posterior variance for a Gaussian process (left) and a random forest (right). The Gaussian process models the spatial variance structure much \enquote{smoother}. 
+
+
+% <<mbo-rf-2d, echo = FALSE, fig.height = 4, warnings =FALSE, message = FALSE>>=
+% configureMlr(show.info = FALSE, show.learner.output = FALSE)
+
+% set.seed(1234)
+% obj.fun =  makeHimmelblauFunction()
+% des = generateDesign(n = 10, par.set = getParamSet(obj.fun), )
+% des$y = apply(des, 1, obj.fun)
+% surr.km = makeLearner("regr.km", predict.type = "se", covtype = "gauss")
+% surr.rf = makeLearner("regr.randomForest", predict.type = "se")
+
+% control = makeMBOControl()
+% control = setMBOControlTermination(control, iters = 5)
+% control = setMBOControlInfill(control, crit = makeMBOInfillCritEI())
+
+% run1 = mbo(obj.fun, design = des, learner = surr.km, control = control, show.info = TRUE)
+% run2 = mbo(obj.fun, design = des, learner = surr.rf, control = control, show.info = TRUE)
+
+% points = data.frame(run$opt.path)
+
+% x = seq(-4.5, 4.5, length.out = 200)
+% z = expand.grid(x1 = x, x2 = x)
+% pred1 = predict(run1$models[[1]], newdata = z)
+% pred2 = predict(run2$models[[1]], newdata = z)
+
+% z$se1 = pred1$data$se
+% z$pred1 = pred1$data$response
+% z$se2 = pred2$data$se
+% z$pred2 = pred2$data$response
+
+
+% p1 = ggplot() + ylim(c(-4.5, 4.5)) + xlim(c(-4.5, 4.5))
+% p1 = p1 + geom_raster(data = z, aes(x = x1, y = x2, fill = se1), alpha = 0.8) 
+% p1 = p1 + geom_point(data = points, aes(x = x1, y = x2), size = 3, color = "orange")
+% p1 = p1 + labs(fill = expression(s(x))) + theme(legend.position = "bottom")
+% p1 = p1 + xlab(expression(lambda[1])) + ylab(expression(lambda[2]))
+% p1 = p1 + theme(legend.text = element_text(size = 10))
+
+% p2 = ggplot() + ylim(c(-4.5, 4.5)) + xlim(c(-4.5, 4.5))
+% p2 = p2 + geom_raster(data = z, aes(x = x1, y = x2, fill = se2), alpha = 0.8) 
+% p2 = p2 + geom_point(data = points, aes(x = x1, y = x2), size = 3, color = "orange")
+% p2 = p2 + labs(fill = expression(s(x))) + theme(legend.position = "bottom")
+% p2 = p2 + xlab(expression(lambda[1])) + ylab(expression(lambda[2]))
+% p2 = p2 + theme(legend.text = element_text(size = 10))
+
+% grid.arrange(p1, p2, ncol = 2)
+
+% @
+
+
+% \end{itemize}
+
+% \end{vbframe}
+
+\begin{vbframe}{Summary: Model-based Optimization} 
+
+\begin{algorithm}[H]
+  \caption{Model-based Optimization: Algorithm}
+  \begin{algorithmic}[1]
+  \State Create an initial design $\D = \metadata_{i = 1, ..., \minit}$ 
+  \vspace*{0.1cm}
+  \While {Termination criterion not fulfilled}
+    \vspace*{0.1cm}
+    \State{\textbf{Fit} the surrogate model on the observed data $\D$}
+    \vspace*{0.1cm}
+    \State \textbf{Propose} $\lambdanew$ that maximizes the infill criterion $I(\lambdab)$ 
+    \State \textbf{Evaluate} $\Psi$ on $\lambda^{\text{new}}$ and update $\D \leftarrow \D \cup \left\{\left(\lambdanew, \Psi(\lambdanew\right)\right\}$
+  \EndWhile
+  \end{algorithmic}
+\end{algorithm}
+
+\end{vbframe}
+
+\endlecture
+
+
