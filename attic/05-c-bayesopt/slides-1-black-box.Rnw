@@ -1,0 +1,304 @@
+<<setup-child, include = FALSE>>=
+library(knitr)
+library(qrmix)
+library(mlr)
+library(smoof)
+set_parent("../style/preamble.Rnw")
+@
+
+\lecturechapter{15}{Black-Box Optimization}
+\lecture{Fortgeschrittene Computerintensive Methoden}
+
+\input{../../latex-math/basic-math}
+\input{../../latex-math/basic-ml}
+\input{../../latex-math/ml-mbo}
+
+
+\begin{vbframe}{Standard vs. Black-Box Optimization}
+
+\textbf{Optimization: } Find
+$$
+\lambdaopt = \argmin_{\lambdab \in \Lambda} \Psi(\lambdab),
+$$
+
+where $\Psi: \Lambda \to \R$ with $\Lambda \subseteq \R^{d}$ bounded. 
+
+\lz 
+
+\begin{columns}
+\begin{column}{0.4\textwidth}
+% & \texttt{optim(par, $f(x)$)} is not enough! \\
+\begin{center}
+\includegraphics[height = 4cm]{figure_man/Multimodal-example1.png}
+\end{center}
+\end{column}
+\begin{column}{0.59\textwidth}
+%\begin{figure}
+If we are lucky ... 
+\begin{itemize}
+\item ... we have an analytic description of $\Psi: \Lambda \to \R$ \\ (relation between $\lambdab = (\lambda_1,...,\lambda_d)$ and target value $\Psi(\lambdab)$ is known)
+\item ... we can calculate gradients and use gradient-based methods (e.g. gradient descent) for optimization 
+\end{itemize}
+\end{column}
+\end{columns}
+
+\framebreak 
+
+\textbf{Optimization: } Find
+$$
+\lambdaopt = \argmin_{\lambdab \in \Lambda} \Psi(\lambdab),
+$$
+
+where $\Psi: \Lambda \to \R$ with $\Lambda \subseteq \R^{d}$ bounded. 
+
+\lz 
+
+\begin{columns}
+\begin{column}{0.4\textwidth}
+\begin{center}
+\includegraphics[height = 4cm]{figure_man/cross-in-tray.jpg}
+\end{center}
+\end{column}
+\begin{column}{0.59\textwidth}
+%\begin{figure}
+Optimization gets harder ...
+\begin{itemize}
+\item ... if we cannot calculate gradients (because $\Psi$ is not differentiable or $\Psi$ is not known to us)
+\item ... but as long as evaluations of $\Psi$ are cheap, we can use standard derivative-free optimization methods (e.g. Nelder-Mead, Simulated Annealing)
+\end{itemize}
+\end{column}
+\end{columns}
+
+\framebreak 
+
+
+\textbf{Optimization: } Find
+$$
+\lambdaopt = \argmin_{\lambdab \in \Lambda} \Psi(\lambdab),
+$$
+
+where $\Psi: \Lambda \to \R$ with $\Lambda \subseteq \R^{d}$ bounded. 
+
+\lz 
+
+\begin{columns}
+\begin{column}{0.4\textwidth}
+
+\vspace*{-0.8cm}
+
+\input{figure_man/gear.tex}
+%http://tex.stackexchange.com/questions/6135/how-to-make-beamer-overlays-with-tikz-node
+
+\tikzset{
+  %Style of the black box
+  bbox/.style={draw, fill=black, minimum size=3cm,
+  label={[white, yshift=-1.3em]above:$in$},
+  label={[white, yshift=1.3em]below:$out$},
+  label={[rotate = 90, xshift=1em, yshift=0.5em]left:Black-Box}
+  },
+  multiple/.style={double copy shadow={shadow xshift=1.5ex,shadow
+  yshift=-0.5ex,draw=black!30,fill=white}}
+}
+\begin{center}
+\begin{tikzpicture}[>=triangle 45, semithick]
+\node[bbox] (a) {};
+\draw[thick, shift=({-0.4cm,0.2cm}), draw = white](a.center) \gear{18}{0.5cm}{0.6cm}{10}{2}; \draw[thick, shift=({0.4cm,-0.3cm}), draw = white](a.center) \gear{14}{0.3cm}{0.4cm}{10}{2};
+{
+  \draw[<-] (a.120) --++(90:2em) node [above] {$\lambda_1$};
+  \draw[<-] (a.100) --++(90:2em) node [above] {$\lambda_2$};
+  \draw[<-] (a.80) --++(90:2em) node [above] {$\ldots$};
+  \draw[<-] (a.60) --++(90:2em) node [above] {$\lambda_d$};
+}
+{
+  \draw[->] (a.270) --++(90:-2em) node [below] {$\Psi(\lambda)$};
+}
+\end{tikzpicture}
+\end{center}
+\end{column}
+\begin{column}{0.59\textwidth}
+%\begin{figure}
+Optimization gets \textbf{really hard} if ...
+\begin{itemize}
+\item ... there is no analytic description of $\Psi: \Lambda \to \R$ (\textbf{black box}) 
+\item Evaluations of $\Psi$ for given values of $\lambdab$ are \textbf{time consuming}
+\end{itemize}
+
+\end{column}
+\end{columns}
+
+\end{vbframe}
+
+
+\begin{vbframe}{Examples for model based optimization} 
+\begin{enumerate}
+\item Robot Gait Optimization: The robot's gait is controlled by a \textbf{parameterized controller}
+
+
+\medskip
+
+\begin{center}
+\includegraphics[width = 2.5 cm]{figure_man/robot_gait.png}\\
+\end{center}
+\begin{footnotesize}
+\begin{itemize}
+\item \textbf{Goal: } Find parameters s.t. velocity of the robot is maximized
+\item \emph{Calandra et al. (2014), An Experimental Evaluation of Bayesian Optimization on Bipedal Locomotion}
+\end{itemize}
+\end{footnotesize}
+
+\framebreak 
+
+\item Optimization of a cookie recipe
+\medskip
+
+\begin{center}
+\includegraphics[width = 5 cm]{figure_man/cookie.jpg}\\
+\tiny{\url{https://www.bettycrocker.com}} \\
+\includegraphics[width = 8 cm]{figure_man/cookie2.png}
+\end{center}
+\begin{itemize}
+\item \textbf{Goal: } Find \enquote{optimal} amounts and composition of ingredients 
+\item \textbf{Evaluation: } Cookies are baked according to the recipe, tested and rated by volunteers
+\item \emph{Kochanski et al., Bayesian Optimization for a Better Dessert}
+\end{itemize}
+
+% \framebreak 
+
+% \item Optimization of parameters in machine learning context
+% \medskip
+
+% \begin{center}
+% \includegraphics[width = 7 cm, height = 5 cm]{figure_man/mlrMBO1.pdf}
+% \end{center}
+% \begin{itemize}
+% \item \textbf{Goal: } Find \enquote{optimal} amounts and composition of ingredients (see table above) 
+% \item \emph{Kochanski et al., Bayesian Optimization for a Better Dessert}
+% \end{itemize}
+\end{enumerate}
+\end{vbframe}
+
+% \begin{vbframe}{Model parameter tuning}
+% \begin{center}
+% \textit{A model hyperparameter is external to the model and thus its value cannot be estimated from data leaving the user with manual configuration}
+% \end{center}
+% \medskip
+
+% We can distinguish between different sets of parameters
+% \begin{enumerate}
+% \item Regularization-parameters
+% \begin{itemize}
+% \item The \textbf{parameter C} in SVM which controls for the tolerance towards missclassification.
+% \end{itemize}
+
+% \item Optimization-parameters
+% \begin{itemize}
+% \item The \textbf{learning rate} $\bm{\lambda}$
+% \end{itemize}
+
+% \item model-parameters
+% \begin{itemize}
+% \item The \textbf{parameter k} in a k-nearest neighbor algorithm
+% \end{itemize}
+% \end{enumerate}
+% \end{vbframe}
+
+\begin{vbframe}{Naive Approaches}
+\begin{enumerate}
+\item Empirical knowledge / manual tuning
+\begin{itemize}
+\item Select parameters based on \enquote{expert} knowledge 
+\item \textbf{Advantages:} Can lead to fairly good outcomes for known problems
+\item \textbf{Disadvantages:} Very (!) inefficient; poor reproducibility; chosen solution can also be far away from a global optimum; 
+\end{itemize}
+
+
+\framebreak 
+
+
+\item Grid search / random search / Latin hypercube sampling
+\begin{itemize}
+\item Grid search: Exhaustive search of a predefined grid of inputs
+\item Random search: Evaluate uniformly sampled inputs 
+\item Latin hypercube sampling: inputs are sampled randomly, but no two inputs share the same value in a dimension. 
+\item \textbf{Advantages: } Easy, intuitive, parallelization is trivial
+\item \textbf{Disadvantages: } Inefficient, search large irrelevant areas
+\end{itemize}
+
+\begin{center}
+\begin{figure}
+\includegraphics[width = 3cm]{figure_man/01_GridSearch.png} ~ \includegraphics[width = 3cm]{figure_man/02_RandomSearch.png} ~ \includegraphics[width = 3cm]{figure_man/03_LatHypercube.png}
+\end{figure}
+\begin{footnotesize}
+  Examples for a grid (left), random design (middle), and a Latin Hypercube design (right). The curves on the axes represent the function values w.r.t. the respective parameter (the other parameter is integrated out). 
+\end{footnotesize}
+\end{center}
+
+% Samples are exactly uniform across each parameter but random in combinations
+
+
+% \item Search the entire space of parameter combinations
+% \item Very expensive approach in terms of computational effort and time
+% \item Often coarse grid leads to less computational effort but often fails to identify an improved model configuration
+% \end{itemize}
+% \hspace{+1.5cm}
+% \includegraphics[width = 5.1cm]{figure_man/01_GridSearch.png}
+% \newpage
+% \item Random Search
+% \begin{itemize}
+% \item Use random combinations of hyperparameter values
+% \item Combinations might be concentrated in regions that completely omit the most effective values of one or more parameters
+% \end{itemize}
+% \hspace{+1.5cm}
+% \includegraphics[width = 5.1cm]{figure_man/02_RandomSearch.png}
+% \newpage
+% \item Latin Hypercube Sampling
+% \begin{itemize}
+% \item Similar to random search
+% \item Samples are exactly uniform across each parameter but random in combinations
+% \item Procedure attempts to ensure that points are approximately equidistant from each other
+% \end{itemize}
+% \hspace{+1.5cm}
+% \includegraphics[width = 5.1cm]{figure_man/03_LatHypercube.png}
+% \end{enumerate}
+
+\framebreak 
+
+\item Traditional black-box optimization 
+\begin{itemize}
+\item Traditional approaches that do not require derivatives 
+\item E.g. Nelder-Mead, Simulated Annealing, evolutionary algorithms
+\item \textbf{Advantages:} True iterative optimization procedure; more focus on relevant regions
+\item \textbf{Disadvantages:} Still inefficient; usually lots of evaluations are needed to produce good outcomes
+\end{itemize}
+
+\begin{figure}
+\begin{center}
+\includegraphics[width = 3.5cm]{figure_man/neldermead.png} ~
+\begin{tikzpicture}[node distance=1cm, auto,]
+\tikzstyle{every node}=[font=\tiny]
+%nodes
+\node (init) {Initial Population};
+\node[below = 0.2cm of init](dummy1) {};
+\node[below = 0.6cm of init](selection) {Selection};
+\node[below = 1cm of init](dummy2) {};
+\node[right = 1cm of dummy2](crossover) {Crossover};
+\node[right = 1cm of dummy1](mutation) {Mutation};
+\node[below = 0.7cm of selection](stop) {Termination};
+\draw[->] (init) to (selection) node[midway, above]{};
+\draw[->] (selection) to (stop) node[midway, above]{};
+\draw[->] (selection) to [bend right=50, looseness=1](crossover) node[midway, below]{};
+\draw[->] (crossover) to [bend right=50, looseness=1](mutation) node[midway, below]{};
+\draw[->] (mutation) to [bend right=50, looseness=1](selection) node[midway, above]{};
+\end{tikzpicture} \\
+\end{center}
+\begin{footnotesize}
+Left: Simplices of the Nelder-Mead algorithm; Right: Components of an evolutionary algorithm 
+\end{footnotesize}
+\end{figure}
+
+\end{enumerate}
+
+\end{vbframe}
+
+
+\endlecture

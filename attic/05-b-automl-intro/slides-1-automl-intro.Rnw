@@ -1,0 +1,164 @@
+
+<<setup-child, include = FALSE>>=
+library(knitr)
+library(mlr)
+library(mlbench)
+library(ggplot2)
+library(gridExtra)
+library(qrmix)
+library(smoof)
+set_parent("../style/preamble.Rnw")
+@
+
+
+\input{../../latex-math/basic-math}
+\input{../../latex-math/basic-ml}
+\input{../../latex-math/ml-mbo}
+
+\lecturechapter{16}{AutoML}
+\lecture{Fortgeschrittene Computerintensive Methoden}
+
+
+\begin{frame}{Machine Learning}
+  \begin{itemize}
+    \item Successful, but requires human labor and expertise :
+    \begin{itemize}
+      \item Pre-process data
+      \item Select/engineer features
+      \item Select a model family
+      \item Optimize hyperparameters
+      % \item $\cdots$
+    \end{itemize}
+    \item Deep learning lets us automatically learn features.
+    \begin{itemize}
+      \item Automates feature engineering, with large amount of data.
+      \item Even more sensitive to architectures, hyperparameters, $\cdots$
+    \end{itemize}
+  
+  \end{itemize}
+  % \begin{center}
+    % \scalebox{0.65}{\includegraphics{figure_man/automl1.png}}
+  % \end{center}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Automatic Machine Learning}
+  \begin{itemize}
+    \item Can algorithms be trained to automatically build end-to-
+end machine learning systems?
+  \end{itemize}
+  
+  Use machine learning to do better machine learning.
+  
+   \begin{itemize}
+    \item Can we turn \\
+   \textit{Solution = data + manual exploration + computation}
+    \item Into \\
+    \textit{Solution = data + computation (x100)}
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}{Automatic Machine Learning}
+  
+  AutoML is \textbf{not} about automating data scientists.
+  
+  \vspace{3mm}
+    \begin{itemize}
+    \item Efficient exploration of techniques
+    \begin{itemize}
+    \item Automate the tedious aspects (inner loop).
+    \item Make every data scientist a super data scientist.
+  \end{itemize}
+    \item Democratization
+    \begin{itemize}
+    \item Allow individuals, small companies to use machine
+learning effectively (at lower cost).
+\item Open source tools and platforms.
+  \end{itemize}
+    \item Data Science
+    \begin{itemize}
+    \item Better understand algorithms, develop better ones.
+    \item Self-learning algorithms.
+  \end{itemize}
+
+  \end{itemize}
+
+\end{frame}
+  
+  \begin{frame}{Automatic Machine Learning: Techniques}
+    \begin{itemize}
+      \item \textbf{Grid Search/Random Search:} Search a predefined grid or sample uniformly within a predefined range.
+      \item \textbf{Bayesian Optimization:} Iteratively choose better configurations based on a surrogate model.
+      \item \textbf{Evolutionary algorithms:} Evolve a population of configurations using operations that emulate natural selection.
+      \item \textbf{Meta-learning:} learn from previous applications to predict useful pipelines/ architectures for new problems.
+      \item \textbf{Transfer Learning:} train models on one problem, then transfer (parts) of good solutions to solve new problems.
+      \item \textbf{Reinforcement Learning:} Train an RL agent to generate better configurations using accuracy as a reward signal. 
+      \item \textbf{Multi-fidelity methods:} Extrapolate learning curves and terminate unpromising configurations early. Example : Hyperband.
+      \item \textbf{Combinations of all of these}
+    \end{itemize}
+  \end{frame}
+
+\begin{vbframe}{Pipeline Configuration}
+  
+    
+  \begin{itemize}
+    \item Many parameters for a learner are not decided during fitting.
+    \item Model parameters results of training; 
+      Hyperparameters are inputs! 
+\item Example: In ridge regression the regularization parameter $\lambda$ is needed as an input to enable the computation of $\thetab$.
+    \item The same applies to preprocessing, feature construction and other model-relevant operations. In general we might be interested in optimizing a machine learning "pipeline".
+    \end{itemize}
+    
+    \begin{center}
+      \scalebox{0.7}{\includegraphics{figure_man/automl1.png}}
+    \end{center}
+  \framebreak
+\end{vbframe}
+
+\begin{vbframe} {Possible Approaches}
+    \begin{itemize} 
+      \item Stable performance:\\
+    The algorithm is really insensitive w.r.t. to changes of a parameter, so we don't really have to do anything as long as we stay in a broad range of reasonable values.
+      \item Constant default:\\
+    We can benchmark the algorithm across a broad range of data sets and scenarios and try to find a constant value that works well
+in many different situations. Quite optimistic?
+      \item Dynamic (heuristic) default:\\
+  We can benchmark the algorithm across a broad range of datasets and scenarios and try to find an easily computable function
+that sets the parameter in a data dependent way, e.g. \texttt{mtry}= p/3 or defining kernel widths of RBF SVMs w.r.t. the pairwise distance distribution of training data points.\\
+How to construct or learn that heuristic function, though?
+    
+  \framebreak
+    \item Ex-post determination: Set the parameter by extracting more info from the fitted model. E.g. early stopping in boosting or ntree for a random forest (does OOB error increase or stagnate?). Some regularized linear models also allow cheap full-path computation for all possible $\lambda$ values.
+    \item In general, this does not work (reliably) for complex scenarios.
+  \end{itemize}
+\end{vbframe}
+  
+\begin{vbframe}{Pipeline Configuration}
+Optimize pipeline parameters w.r.t. the estimated prediction error, 
+      on an independent test set, or measured by cross-validation.
+\begin{center}
+  \includegraphics[width = \textwidth]{figure_man/automl2.png}
+  \end{center}
+\end{vbframe}
+
+
+% \begin{frame}{Focussearch}
+%     \begin{itemize}
+%       \item EI optimization is multimodal and not that simple
+%       \item But objective is now cheap to evaluate
+%       \item Many different algorithms exist, from gradient-based methods with restarts to 
+%         evolutionary algorithms
+%       \item We use an iterated, focusing random search coined \enquote{focus search}
+%       \item In each iteration a random search is performed
+%       \item We then shrink the constraints of the feasible region towards the best point in the current 
+%         iteration (focusing) and iterate, to enforce local convergence
+%       \item Whole process is restarted a few times
+%       \item Works also for categorical and hierarchical params
+%     \end{itemize}
+% \end{frame}
+
+
+  
+\endlecture
