@@ -51,43 +51,55 @@
 \begin{vbframe}{Cost-Sensitive learning: In a Nutshell}
 	%	
 	\scriptsize{
-		%
-		%
+
 		\begin{itemize}
-%			
-		\item Cost-sensitive learning: 
+		
+    		\item Cost-sensitive learning: 
+                \begin{itemize}
+                    \scriptsize
+                    \item Different (mis-)classification costs are taken into consideration.
+                    \item The learner seeks to minimize the total costs in expectation.
+                    \item Classical learning assumes that the data sets are balanced, and all errors have the same cost.
+                \end{itemize}
+    		
+    		\item Real-world applications, where different costs between misclassifications are present:
+      
+    		\begin{itemize}
+    			\scriptsize	
+    			\item Medicine --- Misdiagnosing a cancer patient as healthy vs.\ misdiagnosing a healthy patient as having cancer (and then check again).
+       
+    			\item (Extreme) Weather prediction ---  Incorrectly predicting that no hurricane occurs vs.\ predicting a strong wind as a hurricane.
+    	
+    			\item Credit granting --- Lending to a risky client vs. not lending to a trustworthy client.
+    		\end{itemize}
+         
+		
+		\end{itemize}
+        \vspace{15pt}
+
+        \begin{minipage}{0.49\textwidth}
+            \begin{table}[]
+                \centering
+                \begin{tabular}{p{1cm}c|cc}
+                    & &\multicolumn{2}{c}{Truth} \\
+                    & & With Tumor & No Tumor  \\
+                    \hline
+                    \multirow{2}{*}{\parbox{1cm}{Diagnosis}} & Malignent & 0 & $ 1 $\\
+                    & Benign & $10000$ & $0$   \\
+                \end{tabular}
+            \end{table}
+        \end{minipage}
+        \hfill
+        \begin{minipage}{0.49\textwidth}
             \begin{itemize}
                 \scriptsize
-                \item Different (mis-)classification costs are taken into consideration.
-                \item The learner seeks to minimize the total costs in expectation.
-                \item Classical learning assumes that the data sets are balanced, and all errors have the same cost.
-            \end{itemize}
+                \item In these examples, \textbf{the costs of a false negative is much higher than the costs of a false positive}.
+                \vspace{15pt}
+                
+                \item In some applications, the costs are \textbf{unknown} $\leadsto$ need to be specified by experts, or be learnt.
+            \end{itemize}   
+        \end{minipage}
 		
-%
-		\item Real-world applications, where different costs between misclassifications are present:
-%		
-		\begin{itemize}
-			\scriptsize
-%			
-			\item Medicine --- Misdiagnosing a cancer patient as healthy vs.\ misdiagnosing a healthy patient as having cancer (and then check again).
-			%					
-			\item Tracking criminals ---  Classify an innocent person as a terrorist vs.\ overlooking a terrorist.
-			%			
-			\item (Extreme) Weather prediction ---  Incorrectly predicting that no hurricane occurs vs.\ predicting a strong wind as a hurricane.
-%			
-			\item Credit granting --- Lending to a risky client vs. not lending to a trustworthy client.
-			%			
-			\item $\ldots$
-%    	
-%			
-		\end{itemize}
-%	
-		\item In these examples, \textbf{the costs of a false negative is much higher than the costs of a false positive}.
-        \item In some applications, the costs are \textbf{unknown} $\leadsto$ need to be specified by experts, or be learnt.
-%
-		\end{itemize}
-		
-	%
 	}
 \end{vbframe}
 
@@ -310,6 +322,35 @@
         \item What if two local minima? We prefer the one whose ``valley'' has a wider span (e.g. $T_2$ in the 3rd subfigure). Because it is less sensitive to small changes in $T$.
 
         \item Search the best $T$ on \textbf{validation} sets, and do $K$-fold cross-validation to avoid overfitting!
+    \end{itemize}
+\end{vbframe}
+
+\begin{vbframe}{Threshold Adjusting for Imbalanced Learning: Multi-class Case}
+    \footnotesize
+    \begin{itemize}
+        \footnotesize
+        \item It is also possible perform threshold adjusting in multi-class classifcation.
+        
+        \item Here, we present a simple approach for classifiers that output scores $\pi(\xv) = (\pi(\xv)_1,\ldots,\pi(\xv)_g)^\top$ in multi-class classification:
+        
+        \begin{itemize}
+            \footnotesize
+            \item In the standard setting, we predict class $h(\xv) = \argmax_{j} \pi(\xv)_j$.
+            \vspace{10pt}
+            
+            \item Now, we model the miss-classification costs $M_C$ as a function $M_C = g(\mathbf{T})$ where $\mathbf{T} \in \R^{g}$.
+            \vspace{10pt}
+            
+            \item At step 1, we re-scale the scores $\tilde{\pi}(\xv) = (\frac{\pi(\xv)_1}{\mathbf{T}_1},\ldots, \frac{\pi(\xv)_g}{ \mathbf{T}_g})^\top$, and predict class $\tilde{h}(x) = \argmax_j \tilde{\pi}(\xv)_j$.
+            \vspace{10pt}
+
+            \item At step 2, we compute $M_C$ using the cost matrix $C$ and $\tilde{h}(x)$.
+            \vspace{10pt}
+
+            \item Similar to the binary case, we adjust $\mathbf{T}$ for $g$ classes to achieve the minimal mis-classification cost $M_C$.
+            \vspace{10pt}
+
+        \end{itemize}
     \end{itemize}
 \end{vbframe}
 
