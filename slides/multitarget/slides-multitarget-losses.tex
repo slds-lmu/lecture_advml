@@ -62,14 +62,14 @@
 %		
 		\item If we want to follow the machine learning paradigm based on loss minimization, we need a \emph{multivariate loss functions} 
 		$$
-		\ell: \, \Yspace^m \times \Yspace^m \rightarrow \mathbb{R}.
+		L: \, (\Yspace_1 \times \cdots \times \Yspace_l) \times (\R^{g_1} \times \cdots \times \R^{g_l}) \rightarrow \mathbb{R}.
 		$$  
 		Compared to single-target prediction,  a broad spectrum of such multivariate loss functions	is conceivable. 
 %		
-		\item In case we have an appropriate multivariate loss function $\ell$, we want to find a (Bayes) predictor $\fbayes$ that minimizes expected loss with regard to $\ell:$
+		\item In case we have an appropriate multivariate loss function $\ell$, we want to find a (Bayes) predictor $\fbayes$ that minimizes expected loss with regard to $L$:
 %		
 		\begin{eqnarray*}
-			\fbayes &=& \argmin_{f: \Xspace \to \Yspace^m} \risk_\ell \left(f\right) = \argmin_{f: \Xspace \to \Yspace^m}\Exy\left[ \ell(y,\fx) \right]\\ &=&  \argmin_{f: \Xspace \to \Yspace^m }\int \ell(y,\fx) \text{d}\Pxy. 
+			\fbayes &=& \argmin_{f} \risk_L \left(f\right) = \argmin_{f}\Exy\left[ L(y,\fx) \right]\\ &=&  \argmin_{f}\int L(y,\fx) \text{d}\Pxy. 
 		\end{eqnarray*}
 %				
 %		\item Can we achieve this goal through simple reduction, i.e., by training one model for each target independently? Or can we do better with more sophisticated methods?  
@@ -90,7 +90,7 @@
 		\small 
 		\item \emph{Squared error loss} (typically used in multivariate regression):
 		$$
-		\ell(\yv, \yh) = \sum_{j=1}^m (y_j - \hat{y}_j)^2 \, ,
+		L(\yv, \yh) = \sum_{j=1}^m (y_j - \hat{y}_j)^2 \, ,
 		$$
 		where $\yv , \yh \in \mathbb{R}^m$.
 		
@@ -109,12 +109,12 @@
 		
 		\item The \emph{Hamming loss} averages over mistakes on individual scores:    
 		$$
-		\displaystyle \ell_H(\yv, \hat{y}) = \frac{1}{m}  \, \sum_{j=1}^m \, \mathds{1}_{[y_j \neq  \hat y_j ]}
+		\displaystyle L_H(\yv, \hat{y}) = \frac{1}{m}  \, \sum_{j=1}^m \, \mathds{1}_{[y_j \neq  \hat y_j ]}
 		$$
 		
 		\item The \emph{subset 0/1 loss} simply checks for entire correctness:  
 		\begin{align*}
-			\displaystyle \ell_{0/1}(\yv, \hat{y}) & = \mathds{1}_{[ \yv \ne \hat{y} ]}  =  \max_j \, \mathds{1}_{[y_j \neq  \hat y_j]}
+			\displaystyle L_{0/1}(\yv, \hat{y}) & = \mathds{1}_{[ \yv \ne \hat{y} ]}  =  \max_j \, \mathds{1}_{[y_j \neq  \hat y_j]}
 		\end{align*}
 		
 		
@@ -324,9 +324,9 @@
 	\lz
 	\item Thus, we have	
 	$$
-	L =  \sum_{i,j} \ell(y_{ij} , \hat{y}_{ij}),
+	L =  \sum_{i,j} L(y_{ij} , \hat{y}_{ij}),
 	$$
-	where $\ell: \Yspace \times \Yspace \to \R$ in this case.
+	where $L: \Yspace \times \Yspace \to \R$ in this case.
 %	
 	\end{itemize}
 
@@ -367,7 +367,7 @@
 	\lz
 	\item Thus, we have	
 		$$
-	L =  \sum_{i,j} \ell(y_{ij} , \hat{y}_{ij}),
+	L =  \sum_{i,j} L(y_{ij} , \hat{y}_{ij}),
 	$$
 	where $\ell: \Yspace \times \Yspace \to \R$ in this case.
 %	
