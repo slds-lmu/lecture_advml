@@ -99,24 +99,24 @@
 %		
 		\item 	We illustrate the typical approach by means of linear basis function model for the $j$-th target: 
 		\begin{equation*}
-			f_j(\xv) = \ba_j^\intercal \phi(\xv) \,,
+			f(\xv)_m = \ba_m^\intercal \phi(\xv) \,,
 			\label{eq:binrel}
 		\end{equation*}
 %	
-		where $\ba_j$ is a target-specific parameter vector and $\phi$ some feature mapping.
+		where $\ba_m$ is a target-specific parameter vector and $\phi$ some feature mapping.
 %
 		\item The parameter vectors are found by solving a (regularized) optimization problem: 
 %		
 		\begin{equation*}
 			\label{eq:multiridge}
-			\min_A \|Y - \Xmat A \|^2_F +  \sum_{j=1}^m \lambda_j \,\|\ba_j\|^2 \,,
+			\min_A \|Y - \Xmat A \|^2_F +  \sum_{m=1}^l \lambda_m \,\|\ba_m\|^2 \,,
 		\end{equation*}
 %	
-		where $ \| B \|^2_F  = \sqrt{ \sum_{i=1}^n \sum_{j=1}^m B_{i,j}^2 } $ is the Frobenius norm for a matrix $B \in \R^{n \times m}$ and 
+		where $ \| B \|^2_F  = \sqrt{ \sum_{i=1}^n \sum_{m=1}^l B_{i,m}^2 } $ is the Frobenius norm for a matrix $B \in \R^{n \times l}$ and 
 %		
 		\begin{equation*}
 			\label{eq:notation}
-			\Xmat = \begin{bmatrix} \phi(\xv^{(1)})^\top \\ \vdots \\ \phi(\xv^{(n)})^\top \end{bmatrix} \qquad A = [\ba_1 \quad \cdots \quad \ba_m] \,.
+			\Xmat = \begin{bmatrix} \phi(\xv^{(1)})^\top \\ \vdots \\ \phi(\xv^{(n)})^\top \end{bmatrix} \qquad A = [\ba_1 \quad \cdots \quad \ba_l] \,.
 		\end{equation*}
 % 	$$Y: (n \times m) \qquad  X: (n \times p) \qquad A: (p \times m)$$
 %
@@ -156,7 +156,7 @@
 %	
 	\begin{itemize}
 %		
-		\item Consider a sample of a multivariate normal distribution $\yv \sim \normal(\thetab, \sigma^2\mathbf{I}),$ i.e., the components $y_1,\ldots,y_m$ of $\yv$ are independent of each other.
+		\item Consider a sample of a multivariate normal distribution $\yv \sim \normal(\thetab, \sigma^2\mathbf{I}),$ i.e., the components $y_1,\ldots,y_l$ of $\yv$ are independent of each other.
 %		
 		\begin{center}
 			\includegraphics[width = 4cm]{figure/biva}
@@ -200,7 +200,7 @@
 		$$
 		\thetabh^{\mathrm{JS}}(\bm{v}) = \left (1 - \frac{(m-2)\sigma^2}{\|\yv - \bm{v}\|^2} \right )(\yv - \bm{v}) + \bm{v}
 		$$
-		\item Only outperforms the maximum likelihood estimator w.r.t.\ the sum of squared errors over all components, and only when $m \geq 3.$
+		\item Only outperforms the maximum likelihood estimator w.r.t.\ the sum of squared errors over all components, and only when $l \geq 3.$
 		\item The result can be generalized to the case with $n$ iid observations of $\normal(\thetab, \sigma^2\mathbf{I})$ as well as for the case of iid samples of $\normal(\thetab, \bm{\Sigma})$ for a general covariance matrix $\bm{\Sigma}.$
 %		\item Take-away message: 
 	\end{itemize}
@@ -226,7 +226,7 @@
 					\vspace{0.2cm}
 				\begin{equation*}
 					\label{eq:meanreg}
-					\min_A \|Y - \Xmat A \|^2_F + \lambda \sum\nolimits_{j=1}^m \|\ba_j - \frac{1}{m} \sum\nolimits_{j'=1}^m \ba_{j'} \|^2 \, ,
+					\min_A \|Y - \Xmat A \|^2_F + \lambda \sum\nolimits_{m=1}^l \|\ba_m - \frac{1}{l} \sum\nolimits_{m'=1}^l \ba_{m'} \|^2 \, ,
 				\end{equation*}
 %				
 				\item \emph{Disadvantage}: The assumption of all target models being similar might be invalid for many applications. \lz
@@ -344,12 +344,12 @@
 %				
 				\item Level 1 learners: learn a model for every target independently 
 %				
-				\item   [$\leadsto$] $f_1,\ldots,f_m$
+				\item   [$\leadsto$] $f(\xv)_1,\ldots,f(\xv)_l$
 %				
 				\item Level 2 learner: learn again a model for every target independently, using the predictions of the first step as features
 %				
-				\item   [$\leadsto$] $f(\xv) = h(f_1(\xv),\ldots,f_m(\xv))$ \\
-				Or alternatively: $f(\xv) = h(f_1(\xv),\ldots,f_m(\xv),\xv)$  \\
+				\item   [$\leadsto$] $f(\xv) = h(f(\xv)_1,\ldots,f(\xv)_l)$ \\
+				Or alternatively: $f(\xv) = h(f(\xv)_1,\ldots,f(\xv)_l,\xv)$  \\
 %				
 %				 
 			\end{itemize}
@@ -475,7 +475,7 @@
 		\item 	Graph-based regularization is an approach that can be applied to the tree types of relations in the targets: 
 		%
 		\begin{equation*}
-			\min_A \|Y - XA \|^2_F + \lambda \sum_{j=1}^m \sum_{j' \in \mathcal{N}(j)} \|\ba_j - \ \ba_{j'}\|^2,
+			\min_A \|Y - XA \|^2_F + \lambda \sum_{m=1}^l \sum_{m' \in \mathcal{N}(m)} \|\ba_m - \ \ba_{m'}\|^2,
 		\end{equation*}
 		%
 		where $\mathcal{N}(j)$ is the set of targets that are related to target $j.$
@@ -502,9 +502,9 @@
 		\item %	
 		In addition to performance gains in general, hierarchies can also be used to define specific loss functions, such as the Hierarchy-loss: 
 		%	
-		$$\ell_{Hier}(\yv,\hat{\yv}) = \sum_{j: y_j \neq \hat{y_j}} c_j \, \mathds{1}_{ [\textit{anc}(y_j) = \textit{anc}(\hat{y}_j)]  },$$
+		$$L_{Hier}(\yv, f) = \sum_{m: y_m \neq \hat{y_m}} c_m \, \mathds{1}_{ [\textit{anc}(y_m) = \textit{anc}(\hat{y}_m)]  },$$
 		%	
-		where $c_j$ are costs depending on the depth of node $j.$
+		where $c_m$ are costs depending on the depth of node $m.$
 		%	
 %		
 	\end{itemize}
@@ -538,16 +538,16 @@
 	
 	\begin{itemize}
 		\item Estimate the \alert{joint} conditional distribution $\P(\yv ~|~  \xv)$. 
-		\item For optimizing the \alert{subset 0/1} loss:  $$ \ell_{0/1}(\yv, \hat{y}) = \mathds{1}_{[\yv \ne \hat{y}]}$$
+		\item For optimizing the \alert{subset 0/1} loss:  $$ \ell_{0/1}(\yv, \hat{\yv}) = \mathds{1}_{[\yv \ne \hat{yv}]}$$
 		\item Repeatedly apply the \emph{product rule} of probability:
 		$$
-		\P(\yv ~|~ \xv) = \prod_{j=1}^{m} \P(y_j ~|~ \xv, y_1, \ldots,y_{j-1}) \, .
+		\P(\yv ~|~ \xv) = \prod_{j=m}^{l} \P(y_m ~|~ \xv, y_1, \ldots,y_{m-1}) \, .
 		$$
 		\item  Learning relies on constructing \alert{probabilistic classifiers} for estimating 
 		$$
-		\P( y_i|\xv, y_1, \ldots,y_{j-1}) \,,
+		\P( y_m|\xv, y_1, \ldots,y_{m-1}) \,,
 		$$
-		{independently} for each $j = 1, \ldots, m$. 
+		{independently} for each $m = 1, \ldots, l$. 
 		%\item One can use scoring functions $f_i(\xv^\prime,y_i)$ and use logistic transformation.
 		%\item By using the linear models, the overall scoring function takes the form:
 		%$$
@@ -600,7 +600,7 @@
 	\vspace{0.1cm}
 	\begin{itemize}\small
 		\item For subset 0/1 loss one needs to find $
-		\fbayes(\xv) = \argmax_{\yv \in \Yspace^m} \P(\yv ~|~ \xv)
+		\fbayes(\xv) = \argmax_{\yv} \P(\yv ~|~ \xv)
 		$.
 		\item Greedy and approximate search techniques with guarantees exist.
 %		\footnote{Kumar et al., Beam search algorithms for multilabel
@@ -646,9 +646,9 @@
 	
 	
 	\begin{itemize}
-		\item $A$: parameter matrix of dimensionality $p \times m$ 
+		\item $A$: parameter matrix of dimensionality $p \times l$ 
 		\item $p$: the number of features
-		\item $m$: the number of targets
+		\item $l$: the number of targets
 		\item Assume a low-rank structure of $A$:\\
 %		
 		$ \qquad  \qquad\qquad \quad  U  \quad \times \qquad  V \qquad \quad  =  \qquad  A$
@@ -659,10 +659,10 @@
 		\end{center}
 		
 		\item We can write $A=UV$ and $A \xv = UV \xv$
-		\item $V$ is a $p \times \hat{m}$ matrix
-		\item  $U$ is an $\hat{m} \times m$ matrix
+		\item $V$ is a $p \times \hat{l}$ matrix
+		\item  $U$ is an $\hat{l} \times l$ matrix
 		
-		\item $\hat{m}$ is the rank of $A$
+		\item $\hat{l}$ is the rank of $A$
 		
 	\end{itemize}
 	
