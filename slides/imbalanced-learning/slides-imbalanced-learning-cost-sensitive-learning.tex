@@ -287,7 +287,7 @@
 			\item Plugging $\mathbf{C}^\prime$ into the inequality above, we obtain:	
 			\begin{align*}	
                 & p(-1 ~|~ \xv ) C^\prime(1,-1)  + 	p(1 ~|~ \xv ) C^\prime(1,1) \leq  p(-1 ~|~ \xv ) C^\prime(-1,-1)  + 	p(1 ~|~ \xv ) C^\prime(-1,1)  \\ 
-                &\Rightarrow [1 - p(1 ~|~ \xv)] \cdot 1 + p(1 ~|~ \xv) C^\prime(1, 1) \leq p(1 ~|~ \xv) C^\prime(1, -1) \\
+                &\Rightarrow [1 - p(1 ~|~ \xv)] \cdot 1 + p(1 ~|~ \xv) C^\prime(1, 1) \leq p(1 ~|~ \xv) C^\prime(-1, 1) \\
                 &\Rightarrow p(1 ~|~ \xv) \geq \frac{1}{C^\prime(-1, 1) - C^\prime(1, 1) + 1} \\
                 &\Rightarrow p(1 ~|~ \xv) \geq \frac{C(1, -1) - C(-1, -1)}{C(-1, 1) - C(1, 1) + C(1, -1) - C(-1, -1)}
 			\end{align*}
@@ -359,7 +359,7 @@
 	\small{
 	\begin{itemize}
 
-		\item In stead of making individual algorithms cost-sensitive, a better solution would be converting cost-insensitive classifiers into cost-sensitive ones.
+		\item Instead of making individual algorithms cost-sensitive, a better solution would be converting cost-insensitive classifiers into cost-sensitive ones.
 
 		\item MetaCost is a wrapper method:
         \begin{itemize}
