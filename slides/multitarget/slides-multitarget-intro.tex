@@ -22,7 +22,8 @@
 
 \newcommand{\Tspace}{\mathcal{T}}
 \newcommand{\tv}{\mathbf{t}}
-\newcommand{\tij}{\mathbf{t}^{(i)}_j}
+\newcommand{\tim}{\mathbf{t}^{(i)}_m}
+\newcommand{\yim}{y^{(i)}_m}
 
 \usepackage{multicol}
 
@@ -86,9 +87,9 @@
 
 		\begin{itemize} \small
 	
-			\item A training data set $\D$ consists of $(\xi,\tij,y_{ij})$, where $y_{ij} \in \Yspace$ denotes a score that characterizes the relationship between the instance $\xi \in \Xspace$ and the target $\tij \in \Tspace$.  
+			\item A training data set $\D$ consists of $(\xi,\tim, \yim)$, where $\yim \in \Yspace_m$ denotes a score that characterizes the relationship between the instance $\xi \in \Xspace$ and the target $\tim \in \Tspace$.  
 			
-			\item $n$ instances and $l$ targets are observed during training. Thus, the scores $y_{ij}$ can be arranged in an $n \times l$ matrix $Y$. Note $Y$ may have missing values.
+			\item $n$ instances and $l$ targets are observed during training. Thus, the scores $\yim$ can be arranged in an $n \times l$ matrix $Y$. Note $Y$ may have missing values.
 	
 			\item The score set $\Yspace$ is one-dimensional and can be nominal, ordinal or real-valued.  
 		
@@ -118,7 +119,7 @@ In the conventional MTP setting there is no side information for targets availab
     			\item The score set is $\Yspace = \mathbb{R}$. 
                 \vspace{10pt}
     
-                \item No side information is available for targets. Without loss of generality, we can hence assign the numbers $1$ to $l$ as identifiers to targets, such that the target space is $\Tspace = \{1,...,l\}$. 
+                \item No side information is available for targets. We can re-index the targets with $\tv = (1, 2, \ldots, l)^T$. 
             \end{minipage}
             \hfill
 			\begin{minipage}{0.45\textwidth}    
@@ -147,12 +148,12 @@ In the conventional MTP setting there is no side information for targets availab
             \item $|\Tspace|=l$ $\leadsto$ all targets are observed during training.
             \vspace{10pt}
             
-            \item No side information is available for targets. Again, we can identify targets with natural numbers, such that the target space is $\Tspace = \{1,...,l\}$. 
+            \item No side information is available for targets. Again, we can re-index the targets with $\tv = (1, 2, \ldots, l)^T$. 
             \vspace{10pt}
             
 			\item The score matrix $Y$ has no missing values. 	
             \vspace{10pt}
-			\item The score set is $\Yspace = \{0,1\}$.	
+			\item The score set is $\Yspace_m = \{0,1\}$ for all $m$.	
 		\end{minipage}
         \hfill
 		\begin{minipage}{0.45\textwidth}    
@@ -180,13 +181,13 @@ In the conventional MTP setting there is no side information for targets availab
                 \item $|\Tspace| = l$ $\leadsto$ all targets are observed during training. 
                 \vspace{10pt}
 
-    			\item No side information is available for targets. Again, we identify targets with natural numbers, such that the target space is $\Tspace = \{1,...,l\}$. 		
+    			\item No side information is available for targets. Again, we can re-index the targets with $\tv = (1, 2, \ldots, l)^T$. 		
                 \vspace{10pt}
                 
     			\item $Y$ has no missing values. 
                 \vspace{10pt}
                 
-    			\item The score set $\Yspace = \{1, \ldots , l\}$, and the scores (i.e. ranks) $y_{ij} \neq y_{ik}$ for all $1 \leq j,k \neq l$. 
+    			\item The score set $\Yspace_m = \{1, \ldots , l\}$ for all $m$, and the scores (i.e. ranks) $\yim \neq y_{k}^{(i)}$ for all $1 \leq m,k \neq l$. 
                 \vspace{10pt}
 			\end{minipage}
             \hfill
@@ -212,16 +213,16 @@ In the conventional MTP setting there is no side information for targets availab
 			
 			\begin{minipage}{0.45\textwidth}  
 
-                \item \textbf{Not all targets are relavent for all instances}. E.g. a student may only attend one school, other labels are unknown and irrelavent.
+                \item \textbf{Not all targets are relavent for all instances}. E.g. a student may only attend one school, other labels are \textbf{irrelavent}.
                 \vspace{10pt}
                 
                 \item $|\Tspace|= l$ $\leadsto$ all targets are observed during training.
                 \vspace{10pt}
 
-			    \item No side information is available for targets. Again, the target space can hence be taken as $\Tspace = \{1,...,l\}$. 
+			    \item No side information is available for targets. Again, we can re-index the targets with $\tv = (1, 2, \ldots, l)^T$. 
                 \vspace{10pt}
        
-				\item The score set is homogenous across columns of $Y$, e.g., $\Yspace = \{0,1\}$ or $\Yspace = \mathbb{R}$.
+				\item The score set is homogenous across columns of $Y$, e.g., $\Yspace_m = \{0,1\}$ or $\Yspace_m = \R$ for all $m$.
                 \vspace{10pt}
 
 			\end{minipage}
@@ -236,6 +237,28 @@ In the conventional MTP setting there is no side information for targets availab
 		\end{itemize}
     \vspace{10pt}
 	Example: Predict for students (rows) the final grades for a specific high-school course (columns).
+
+
+\end{frame}
+
+\begin{frame}{Remarks}
+
+		\begin{itemize}\small
+			\item So far, it seems that the introduction of $\tv$ is trivial, as a sample index $i$ and a target index $m$ is sufficient for identifying the label $\yim$. \\ 
+            \vspace{10pt} 
+            $\leadsto$ But we will see later that $\tv$ is useful when $Y$ has misssing values, or when we want to leverage the similarity between targets.
+            \vspace{20pt}
+
+            \item It is also possible when the $m$-th task is multiclass classification. That is, $f(\xv)_m \in \R^{g_m}$ is the probability predictions for $g_m$ classes. \\
+            \vspace{10pt}
+            $\leadsto$ The techniques for multi-target learning are also applicalble under this setting. But the notations will be cumbersome, so we will not cover it.
+            \vspace{20pt}
+
+            \item Score set can be inhomogeneous. E.g. $\Yspace_m = \{0, 1\}$ and $\Yspace_k = \R$. \\
+            \vspace{10pt}
+            $\leadsto$ A mixture of multi-label classification and multivariate regression.
+            
+		\end{itemize}
 
 
 \end{frame}
@@ -288,7 +311,7 @@ In the conventional MTP setting there is no side information for targets availab
         
         \item Generally speaking, such settings cover problems that obey the four properties listed in the MTP definition.
         
-        \item Scores $y_{ij}$ can be arranged in a matrix $Y$, which is often sparse. 
+        \item Scores $\yim$ can be arranged in a matrix $Y$, which is often sparse. 
         
         \item Thus, \emph{dyadic prediction} can be seen as \emph{multi-target prediction with target features}. 
     \end{itemize}
