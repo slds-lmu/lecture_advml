@@ -263,6 +263,31 @@
             \item After cost transformation, the misclassification costs across classes are equal to 1. $\leadsto$ Sample-wise weighted binary classification problem.
             \vspace{5pt}
         \end{itemize}
+        
+        \item Example continued: Consider instance $(\xv_1, y_1, \cv_1) =(\xv_1, 1, \mat{0 & 2 & 3 & 1})$.
+        \begin{itemize}
+        \footnotesize
+            \item For class 1 vs. 2, $\argmin_{l \in \{1, 2\}} \cv_1[l] = 1$ remains as the ground truth class. The sample-wise weight is $|\cv_1[1] - \cv_1[2]| = 2$.
+            \vspace{5pt}
+            
+            \item Calculate new costs: $\tilde \cv_1[1] = \cv_1[1]/(|\cv_1[1] - \cv_1[2]|) = 0$ and $\tilde \cv_1[2] = 1$.
+            \vspace{5pt}
+
+            \item For class 2 vs. 3, $\argmin_{l \in \{2, 3\}} \cv_1[l] = 2$ becomes the new ground truth class. The sample-wise weight is $|\cv_1[2] - \cv_1[3]| = 3$.
+            \vspace{5pt}
+            
+            \item Calculate new costs: $\tilde \cv_1[2] = \cv_1[2]/(|\cv_1[2] - \cv_1[3]|) = 0$ and $\tilde \cv_1[3] = 1$.
+            \vspace{5pt}           
+
+        \end{itemize}
+
+    \end{itemize}
+\end{vbframe}
+
+
+\begin{vbframe}{CSOVO with instance-specific costs}
+    \footnotesize
+    \begin{itemize}
 
     \item Wrap everything up:
     \begin{enumerate}
