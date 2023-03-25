@@ -31,8 +31,6 @@
 \newcommand{\learninggoals}{
   \item Learn cost matrix modelling in cost-sensitive learning
   \item Understand Minimum Expected Cost Principle
-  \item Learn threshold adjusting in cost-sensitive learning
-  \item Get to know MetaCost as a general approach to make classifiers cost-sensitve
 }
 
 \title{Advanced Machine Learning}
@@ -40,7 +38,7 @@
 
 \begin{document}
 
-\lecturechapter{Imbalanced Learning via Cost-Sensitive Learning}
+\lecturechapter{Imbalanced Learning via Cost-Sensitive Learning Part 1}
 \lecture{Advanced Machine Learning}
 
 
@@ -188,7 +186,7 @@
 \end{vbframe}
 
 
-\begin{vbframe}{Minimum expected Cost Principle}
+\begin{vbframe}{Minimum expected Cost Principle (MECP)}
 
 	\footnotesize{
 
@@ -225,7 +223,7 @@
 	}
 \end{vbframe}
 
-\begin{vbframe}{Minimum expected cost principle}
+\begin{vbframe}{MECP}
     \footnotesize
     \begin{itemize}
         \item Thus, if we have a classifier $f$ which uses a probabilistic score function $\pi:\Xspace \to [0,1]^g$ with $\pi(\xv) = (\pi(\xv)_1,\ldots,\pi(\xv)_g)^\top$ and $\sum_{j=1}^g \pi(\xv)_j = 1$ for the classification, then one can easily modify $h$ to take the expected costs into account:
@@ -248,7 +246,7 @@
 \end{vbframe}
 
 
-\begin{vbframe}{Minimum expected Cost Principle: Binary Case}
+\begin{vbframe}{MECP: Binary Case}
 	%	
 	\footnotesize{
 		%		
@@ -305,249 +303,6 @@
 	}
 \end{vbframe}
 
-\begin{vbframe}{Threshold adjusting for imbalanced learning: binary case}
-    \footnotesize 
-    \begin{itemize}
-        \footnotesize
-        \item Motivation: The threshold provided by Minimum Expected Cost is not always the truly optimal due to e.g. wrong model class, finite data, etc.
-        \item Key idea: model the mis-classification cost $M_C$ as a function $M_C = g(T)$ of \textbf{probability threshold} $T \in [0, 1]$.
-        \item By adjusting $T$, we can plot a curve of $M_C$ versus $T$ as the following figure (copied from Fig.1 in \href{https://www.aaai.org/Library/AAAI/2006/aaai06-076.php}{\beamergotobutton{Sheng et al. 2006}}):
-        \begin{figure}[h]
-            \centering
-            \includegraphics[width=0.6\textwidth]{slides/imbalanced-learning/figure/threshold_adjusting.png}
-        \end{figure}
-
-        \item The optimal threshold $T^{*}$ corresponds to the point with the smallest $M_C$.
-
-        \item What if two local minima? We prefer the one whose ``valley'' has a wider span (e.g. $T_2$ in the 3rd subfigure). Because it is less sensitive to small changes in $T$.
-
-        \item Search the best $T$ on \textbf{validation} sets, and do $K$-fold cross-validation to avoid overfitting!
-    \end{itemize}
-\end{vbframe}
-
-\begin{vbframe}{Threshold Adjusting for Imbalanced Learning: Multi-class Case}
-    \footnotesize
-    \begin{itemize}
-        \footnotesize
-        \item It is also possible perform threshold adjusting in multi-class classifcation.
-        
-        \item Here, we present a simple approach for classifiers that output scores $\pi(\xv) = (\pi(\xv)_1,\ldots,\pi(\xv)_g)^\top$ in multi-class classification:
-        
-        \begin{itemize}
-            \footnotesize
-            \item In the standard setting, we predict class $h(\xv) = \argmax_{j} \pi(\xv)_j$.
-            \vspace{10pt}
-            
-            \item Now, we model the miss-classification costs $M_C$ as a function $M_C = g(\mathbf{T})$ where $\mathbf{T} \in \R^{g}$.
-            \vspace{10pt}
-            
-            \item At step 1, we re-scale the scores $\tilde{\pi}(\xv) = (\frac{\pi(\xv)_1}{\mathbf{T}_1},\ldots, \frac{\pi(\xv)_g}{ \mathbf{T}_g})^\top$, and predict class $\tilde{h}(x) = \argmax_j \tilde{\pi}(\xv)_j$.
-            \vspace{10pt}
-
-            \item At step 2, we compute $M_C$ using the cost matrix $C$ and $\tilde{h}(x)$.
-            \vspace{10pt}
-
-            \item Similar to the binary case, we adjust $\mathbf{T}$ for $g$ classes to achieve the minimal mis-classification cost $M_C$.
-            \vspace{10pt}
-
-        \end{itemize}
-    \end{itemize}
-\end{vbframe}
-
-\begin{vbframe}{MetaCost: Overview}
-
-	\small{
-	\begin{itemize}
-
-		\item Instead of making individual algorithms cost-sensitive, a better solution would be converting cost-insensitive classifiers into cost-sensitive ones.
-
-		\item MetaCost is a wrapper method:
-        \begin{itemize}
-            \small
-            \item can be used for \emph{any} type of classifier to obtain a cost-sensitive classifier.
-            \vspace{5pt}
-            
-            \item treats underlying classifier as a black-box, $\leadsto$ no knowledge about its mechanism is required, and no changes to its mechanism is needed.
-            \vspace{5pt}
-            
-            \item needs only a cost-matrix $\mathbf{C}$, which is used to adapt the decision boundaries. {\scriptsize (Some tuning parameters are also needed.)}
-            \vspace{5pt}
-            
-            \item The rough procedure: 
-                \begin{enumerate}
-                    \small
-                    \item relabel the training examples with their ``optimal'' classes, i.e., the ones with low expected costs;
-                    \vspace{5pt}
-                    
-                    \item apply the classifier on the relabeled data set.
-                \end{enumerate} 
-        \end{itemize}
-
-	\end{itemize}
-
-	}
-
-\end{vbframe}
-
-
-\begin{vbframe}{MetaCost: Algorithm}
-	
-	\scriptsize{
-%		
- 	The procedure of MetaCost is divided into three phases:
-			%			
-		\begin{minipage}{0.53\textwidth} 
-%				
-				\begin{enumerate}
-%					
-					\scriptsize
-					\item Bagging --- The underlying classifier is used (trained) $L$ times on different bootstrapped samples of the training data, respectively.
-%					
-					\item Relabeling --- These $L$ trained classifiers are used to relabel the original training data set by taking the cost-matrix into account.
-%					
-					\item Cost-sensitivity ---  The classifier is trained on the relabeled data set resulting in a cost-sensitive classifier.
-%					
-				\end{enumerate}
-%
-	\scriptsize
-	\lz 
-			Predictions of the classifier $f$ are converted (if necessary) into probabilistic prediction:
-			\begin{center}
-				\tiny
-							ProbPrediction$(j,f,\xv) = \begin{cases}
-					(f(\xv))_j & \mbox{$f$ is a prob.\ classifier,} \\
-					\mbox{One-hot$(f(\xv))$}& \mbox{else,}
-				\end{cases}$
-			\end{center}
-%		
-		\scriptsize
-		where One-hot$(f(\xv))$ uses a one-hot-encoding of the prediction to make it a probability. 
-		
-		\end{minipage}
-		\begin{minipage}{0.45\textwidth} 
-			\begin{algorithmic}
-				
-				\tiny
-%				
-				\State \textbf{MetaCost}  
-				\State \textbf{Input:} 
-				$\D = \{(\xi,\yi)\}_{i=1}^n$ training data, \\
-				$L \in \N$ number of bagging iterations, \\
-				$B \in \N$ bootstrap size, \\
-				$f$ (black-box) classifier, 
-				$\mathbf{C}$ cost matrix, 
-%				$g = |\Yspace|$ number of classes
-				\State \# 1st phase:
-				\For{$l=1,\ldots,L$}
-					\State $\D_l  \leftarrow $ BootstrapSample ($\D,B$)
-					\State $f_l  \leftarrow $ train $f$ on $\D_l$
-				\EndFor
-				\State \# 2nd phase:
-				\For{$i=1,\ldots,n$}
-					\If{$\xi \in \D_l$ for all $l=1,\ldots,L$}
-						\State $\tilde L \leftarrow \{1,\ldots,L\}$
-					\Else
-						\State $\tilde L \leftarrow \bigcup_{l: \xi \notin \D_l} \{l\}$
-					\EndIf
-					\For{$j=1,\ldots,g$} (relabel for binary case)
-						\State $p_j(\xi)  \leftarrow \frac{1}{|\tilde L| } \sum_{l \in \tilde L}   p_j(\xi~|~ f_l) $
-						\State $p_j(\xi~|~ f_l) = $ ProbPrediction$(j,f_l,\xi)$
-						\State $\tilde y^{(i)} \leftarrow \argmin_{i^*} \sum_{j=1}^g p_j(\xi) C(i^*,j) $
-					\EndFor
-					\State $\tilde D \leftarrow \tilde D \cup \{(\xi,\tilde y^{(i)})\} $
-				\EndFor
-				\State \# 3rd phase:
-%				
-				\State $f_{meta} \leftarrow$ train $f$ on $\tilde D$
-%			
-			\end{algorithmic}
-		\end{minipage}
-		%
-	}
-	%	
-\end{vbframe}
-
-%%%%%
-
-
-
-%%%
-% reference: https://www.csie.ntu.edu.tw/~htlin/talk/doc/csovo.acml14.handout.pdf
-
-\begin{vbframe}{CSOVO with instance-specific costs}
-    \footnotesize
-    \begin{itemize}
-        \footnotesize
-        \item $\Dn = \{(\xv_i, y_i, \cv_i)\}_i^n$, where $(\xv_i, y_i, \cv_i) \in \mathbb{R}^d \times \{1, 2, \ldots, g\} \times \mathbb{R}^g$.
-        \vspace{5pt}
-        
-        \item Previous discussed cost-sensitive learning is a special case: $\cv_i$ same for all $\xv_i$.
-        \vspace{5pt}
-        
-        \item Cost vector: $\cv_i[y_i] = 0$, i.e. zero-cost for correct prediction. Example:
-        \begin{equation*}
-            \begin{aligned}
-                \mat{
-                    \xv_1 & 1 & \mat{0 & 2 & 3 & 1} \\
-                    \xv_2 & 2 & \mat{1 & 0 & 1 & 2} \\
-                    \xv_3 & 4 & \mat{2 & 1 & 1 & 0} \\
-                }
-            \end{aligned}
-        \end{equation*}
-        \vspace{5pt}
-        \item Now: How to perform cost-sensitive learning when $g > 2$?
-        \vspace{5pt}
-        
-        \item Idea: we have learnt cost-sensitive learning for the binary case. $\leadsto$ Convert the problem to one-versus-one (OVO).
-        \vspace{5pt}
-        
-        \item But for class $j$ vs. $k$, consider two problems:
-        \begin{itemize}
-            \footnotesize
-            \item How to deal with the label $y_i$? $y_i$ can be neither $j$ nor $k$.
-            \vspace{5pt}
-            
-            \item How to deal with the costs $\cv_i[j]$ and $\cv_i[k]$?
-        \end{itemize}
-            
-    \end{itemize}
-\end{vbframe}
-
-\begin{vbframe}{CSOVO with instance-specific costs}
-    \footnotesize
-    \begin{itemize}
-        \item When training a binary classifier $f^{(j, k)}$ for class $j$ vs. $k$,
-        \begin{itemize}
-            \footnotesize
-            \item It is natural to select $\argmin_{l \in \{j, k\}} \cv_i[l]$ as the ground truth class.
-            \vspace{5pt}
-            
-            \item The costs $\cv_i[j]$ and $\cv_i[k]$ can be transformed to a \textbf{sample-wise} weight $|\cv_i[j] - \cv_i[k]|$. Please refer to \href{https://proceedings.mlr.press/v39/lin14.pdf}{\beamergotobutton{Lin et al. 2014}} for details.
-            \vspace{5pt}
-
-            \item After cost transformation, the misclassification costs across classes are equal to 1. $\leadsto$ Sample-wise weighted binary classification problem.
-            \vspace{5pt}
-        \end{itemize}
-
-    \item Wrap everything up:
-    \begin{enumerate}
-        \footnotesize
-        \item For class $j$ vs. $k$, transform all $(\xv_i, y_i, \cv_i)$ to $(\xv_i, \argmin_{l \in \{j, k\}} \cv_i[l])$ with sample-wise weight $|\cv_i[j] - \cv_i[k]|$.
-        \vspace{5pt}
-        
-        \item Train a binary classifier $f^{(j, k)}$ using the transformed samples.
-        \vspace{5pt}
-        
-        \item Repeat step 1 and 2 for different $(i, j)$.
-        \vspace{5pt}
-        
-        \item Predict using the votes from all $f^{(i, j)}$.
-    \end{enumerate}
-    \vspace{5pt}
-
-    \item Theoretical guarantee: test of final classifier $\leq 2\sum_{j < k}$ test cost of $f^{(i, j)}$. 
-    \end{itemize}
-\end{vbframe}
 
 
 %\begin{vbframe}{MetaCost: Example}
