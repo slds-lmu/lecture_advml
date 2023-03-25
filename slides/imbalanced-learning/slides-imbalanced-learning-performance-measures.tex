@@ -264,34 +264,34 @@
 				& & \multicolumn{4}{c}{\bfseries True Class $y$} \\
 				& & $1$ & $2$ & $\ldots$ & $g$  \\
 				\hline
-				\bfseries Classification     & $1$ & $n(1,1)$  &  $n(1,2)$  & $\ldots$ &  $n(1,g)$ \\
+				\bfseries Classification     & $1$ & $n_{11}$  &  $n_{12}$  & $\ldots$ &  $n_{1g}$ \\
 				& & (True 1's) & (False 1's for 2's) & $\ldots$ &  (False 1's for $g$'s)  \\
-				& $2$ &  $n(2,1)$  &  $n(2,2)$  & $\ldots$ & $n(2,g)$  \\
+				& $2$ &  $n_{21}$  &  $n_{22}$  & $\ldots$ & $n_{2g}$  \\
 				$\yh$ & & (False 2's for 1's) & (True 2's) & $\ldots$ &  (False 2's for $g$'s)  \\
 				& $\vdots$ & $\vdots$ & $\vdots$ & $\ldots$ & $\vdots$ \\
-				& $g$ & $n(g,1)$ & $n(g,2)$  & $\ldots$ &  $n(g,g)$\\
+				& $g$ & $n_{g1}$ & $n_{g2}$  & $\ldots$ &  $n_{gg}$\\
 				& & (False $g$'s for 1's) & (False $g$'s for 2's) & $\ldots$ &  (True $g$'s)  \\
 			\end{tabular}
 		\end{center}
 		
 		\begin{itemize}
-			\item $n(i,j)$: the number of $j$ instances classified as $i$.
+			\item $n_{ij}$: the number of $j$ instances classified as $i$.
             \vspace{5pt}
 
-            \item $n_i = \sum_{j=1}^g n(j,i)$ the total number of $i$ instances.
+            \item $n_i = \sum_{j=1}^g n_{ji}$ the total number of $i$ instances.
             \vspace{5pt}
 
             \item \textbf{Class-specific} metrics:
             \begin{itemize}
                 \footnotesize 
                 
-                \item True positive rate (\textbf{Recall}): $\rho_{TPR_i} = \frac{n(i,i)}{n_i}$
+                \item True positive rate (\textbf{Recall}): $\rho_{TPR_i} = \frac{n_{ii}}{n_i}$
                 \vspace{5pt}
 
-                \item True negative rate $\rho_{TNR_i} = \frac{\sum_{j\neq i}n(j,j)}{n-n_i}$ 
+                \item True negative rate $\rho_{TNR_i} = \frac{\sum_{j\neq i}n_{jj}}{n-n_i}$ 
                 \vspace{5pt}
 
-                \item Positive predictive value (\textbf{Precision}) $\rho_{PPR_i} = \frac{n(i,i)}{\sum_{j=1}^g n(i,j)}$.
+                \item Positive predictive value (\textbf{Precision}) $\rho_{PPR_i} = \frac{n_{ii}}{\sum_{j=1}^g n_{ij}}$.
                 
             \end{itemize}
 
@@ -370,9 +370,9 @@
 		
 			\item Moreover, the MCC can be extended to:
 			
-			$$   \rho_{MCC} = \frac{ n  \sum_{i=1}^g n(i,i) -  \sum_{i=1}^g \hat n_i n_i}{\sqrt{ (n^2 - \sum_{i=1}^g \hat n_i^2)(n^2 - \sum_{i=1}^g n_i^2)  }},$$
+			$$   \rho_{MCC} = \frac{ n  \sum_{i=1}^g n_{ii} -  \sum_{i=1}^g \hat n_i n_i}{\sqrt{ (n^2 - \sum_{i=1}^g \hat n_i^2)(n^2 - \sum_{i=1}^g n_i^2)  }},$$
 
-			where $\hat n_i = \sum_{j=1}^g n(i,j)$ is the total number of instances classified as $i.$
+			where $\hat n_i = \sum_{j=1}^g n_{ij}$ is the total number of instances classified as $i.$
             \vspace{10pt}
         
 		
