@@ -67,11 +67,38 @@
     \end{itemize}
 \end{vbframe}
 
+\begin{vbframe}{Threshold adjusting: binary case}
+    \footnotesize 
+    \begin{itemize}
+        \scriptsize
+        \item Example: Consider the German Credit Task, where customers are classified as "good" or "bad". The cost of classifying a bad customer as good is higher than vice versa. Define the following cost matrix:
+        \begin{center}
+                            \begin{tabular}{cc|cc}
+        			& &\multicolumn{2}{c}{True class} \\
+        			& & $y=$ good & $y=$ bad  \\
+        			\hline
+        			\multirow{2}{*}{\parbox{0.3cm}{Pred.  class}} & $\hat y$ = good & 0 & 3 \\
+        			& $\hat y$ = bad & 1 & 0\\
+                \end{tabular}
+        \end{center}
+        \item We can compute the optimal theoretical threshold value by $C(good,bad)/(C(bad,good)+C(good,bad))=3/4=c^{*}$.
+
+        \item Now, train three classifiers with threefold cross-validation and find the best empirical threshold $T$ on the validation sets:
+
+                \begin{figure}[h]
+            \centering
+            \includegraphics[width=0.8\textwidth]{slides/imbalanced-learning/figure_man/Cost_Curves_plot.png}
+        \end{figure}
+
+    \end{itemize}
+\end{vbframe}
+
+
 \begin{vbframe}{Threshold Adjusting: Multi-class Case}
     \footnotesize
     \begin{itemize}
         \footnotesize
-        \item It is also possible perform threshold adjusting in multi-class classifcation.
+        \item It is also possible to perform threshold adjusting in multi-class classifcation.
         
         \item Here, we present a simple approach for classifiers that output scores $\pi(\xv) = (\pi(\xv)_1,\ldots,\pi(\xv)_g)^\top$ in multi-class classification:
         
