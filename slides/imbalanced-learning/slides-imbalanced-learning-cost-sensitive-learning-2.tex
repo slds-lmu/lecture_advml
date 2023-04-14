@@ -173,7 +173,7 @@
 					\item \textcolor{teal}{Bagging --- The underlying classifier is used (trained) $L$ times on different bootstrapped samples of the training data, respectively.}
 %					
 
-     				\item \textcolor{blue}{Relabeling --- If $\xi$ is an element of all bootstrap samples (very unlikely), the index set becomes $\tilde M = \{1,\ldots,M\}$. Else, the index set is the union of the OOB indices.}
+     				\item \textcolor{blue}{Relabeling --- The index set is the union of the classifier indices for which $\xi$ is OOB.}
 
                         \item \textcolor{magenta}{ Relabeling --- Compute $\pi_j(\xi)$ by averaging over the predictions of the OOB classifiers.}
 
@@ -207,11 +207,8 @@
 				\EndFor}
 				\State \# 2nd Relabeling:
 				\textcolor{blue}{\For{$i=1,\ldots,n$}
-					\If{$\xi \in \D_m$ for all $m=1,\ldots,M$}
-						\State $\tilde M \leftarrow \{1,\ldots,M\}$
-					\Else
-						\State $\tilde M \leftarrow \bigcup_{m: \xi \notin \D_m} \{m\}$
-					\EndIf}
+					\State $\tilde M \leftarrow \bigcup_{m: \xi \notin \D_m} \{m\}$
+					\EndFor}
 					\textcolor{magenta}{\For{$j=1,\ldots,g$} (relabel for binary case)
 						\State $\pi_j(\xi)  \leftarrow \frac{1}{|\tilde M| } \sum_{m \in \tilde M}   \pi_j(\xi~|~ f_m) $
 					\EndFor}
