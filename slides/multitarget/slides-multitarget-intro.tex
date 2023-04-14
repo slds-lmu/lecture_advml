@@ -50,30 +50,29 @@
 \scriptsize{
     \begin{itemize}    
         \item Conventional supervised learning: Label/Outcome space $\Yspace$ is one-dimensional.	
-        \begin{minipage}{0.45\textwidth}    
 
             \item Multi-target prediction (MTP) problems: multiple target variables of possibly different type (binary, nominal, ordinal, real-valued).
-            \vspace{10pt}
             
             \item Why not just \emph{reducing} an MTP problem to learning one model per target, independently of the other targets? 
-		\end{minipage}
         \hfill
-		\begin{minipage}{0.45\textwidth}    
-			\begin{center}
-
-                \includegraphics[width=0.9\textwidth]{figure/image_annotation} 		\tiny
-                \\ Iliadis et al. (2021), Multi-target prediction for dummies using
-                two-branch neural networks (\href{https://arxiv.org/abs/2104.09967}{\underline{URL}}).
-   	
-			\end{center}
-		\end{minipage}
 
 		\item $\leadsto$ The targets can be more or less \emph{similar} to each other and exhibit \emph{statistical dependencies}.
-	    \vspace{10pt}
 
-        \item TODO add visualization example.
+        \item Consider the multi-label emotions dataset, where emotions of music pieces are automatically detected. Multiple emotions may be attributed to a single piece. We calculate the mutual information of the labels, which are clearly stochastically dependent:
         \vspace{10pt}
-	
+        \begin{center}
+            \begin{tabular}{lrrrr}
+\toprule
+  & Calm & Quiet & Sad & Angry\\
+\midrule
+Calm & 1.0000000 & 0.0725842 & 0.0180316 & 0.2897012\\
+Quiet & 0.0725842 & 1.0000000 & 0.2412528 & 0.1643673\\
+Sad & 0.0180316 & 0.2412528 & 1.0000000 & 0.0668555\\
+Angry & 0.2897012 & 0.1643673 & 0.0668555 & 1.0000000\\
+\bottomrule
+\end{tabular}
+        \end{center}
+	\vspace{10pt}
 		\item Consequently, there is hope to achieve better performance by tackling the targets \emph{simultaneously}.
 
     \end{itemize}}
