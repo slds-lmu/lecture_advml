@@ -449,7 +449,7 @@
 
 		\begin{itemize}
 		
-			\item SMOTE generalizes the decision region for the minority class instead of making it quite specific such as by random oversampling. 
+			\item SMOTE generalizes the decision region for the minority class instead of making it quite specific, such as by random oversampling. 
             \vspace{10pt}
 		
 			\item SMOTE is, however, prone to overgeneralizing as it generalizes the minority area without paying attention to the majority class(es).
@@ -460,6 +460,36 @@
             \vspace{10pt}
 
 			\item A quite common approach is also to combine SMOTE with undersampling techniques such as Tomek link or NCL.
+
+		\end{itemize}		
+
+	\end{frame}
+
+ 	\begin{frame}{Comparison of Sampling Techniques}
+
+		\small
+
+		\begin{itemize}
+		
+			\item We want to compare the different sampling techniques on the Optdigits dataset. The sampling parameters are chosen such that 
+                the class sizes are roughly equal.
+		
+			\item Use a random forest classifier with 100 trees, five-fold crossvalidation and the F1-Score as metric.
+\begin{center}
+\begin{tabular}{lr}
+\toprule
+Learner & F1-Score\\
+\midrule
+Base Ranger & 0.9239437\\
+Undersample Ranger & 0.9537925\\
+Oversample Ranger & 0.9538462\\
+SMOTE Ranger & 0.9576195\\
+\bottomrule
+\end{tabular}    
+\end{center}
+
+
+			\item The sampling techniques perform better than the regular base learner. Notice that SMOTE achieves the best performance, although the differences are rather minimal in comparision to the other techniques.
 
 		\end{itemize}		
 
