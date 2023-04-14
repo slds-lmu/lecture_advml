@@ -5,8 +5,6 @@ library(mlr3pipelines)
 library(ggplot2)
 library(gridExtra)
 
-set.seed(4829)
-
 # get a cost sensitive task
 task = tsk("german_credit")
 
@@ -25,16 +23,21 @@ m = msr("classif.costs", id = "german_credit_costs", costs = costs, normalize = 
 num = seq(0, 1, by = 0.01)
 df = as.data.frame(num)
 df$cost = NA
-learners = c("classif.log_reg", "classif.rpart", "classif.ranger")
+learners = c("classif.log_reg", "classif.xgboost", "classif.ranger")
 out = list()
 
 for (j in 1:length(learners)) {
   for (i in 1:length(num)) {
     th = list(thresholds = num[i])
     # fit models and evaluate with the cost measure
-    learner = as_learner(lrn(learners[j], predict_type = "prob") %>>%
+    if(j == 2){
+    learner = as_learner(po("encode") %>>% lrn(learners[j], predict_type = "prob") %>>%
                            po("threshold", param_vals = th))
-    
+    }else{
+    learner = as_learner(lrn(learners[j], predict_type = "prob") %>>%
+                             po("threshold", param_vals = th))
+    }
+    set.seed(4890)
     rr = resample(task, learner, rsmp("cv", folds = 3))
     res = rr$aggregate(m)
     df$cost[i] = res
@@ -57,20 +60,24 @@ plot_log = ggplot(data=out[[1]], aes(x=num, y=cost, group=1)) +
   labs(x = "threshold") +
   ggtitle("Logistic Regression") +
   geom_point(data = emp_min[[1]], color = "blue") +
-  geom_text(x=0.75, y=275, label="Empirical min (0.81, 145)", color = "blue", size = 4) +
+  geom_text(x=0.75, y=275, label="Empirical min (0.76, 155)", color = "blue", size = 4) +
   geom_point(data = theo_min[[1]], color = "orange") +
-  geom_text(x=0.75, y=250, label="Theoretical min (0.75, 163.33)", color = "orange", size = 4) +
+  geom_text(x=0.75, y=250, label="Theoretical min (0.75, 157.33)", color = "orange", size = 4) +
+  geom_segment(aes(x = 0.76, y = 125, xend = 0.76, yend = 240), linetype="dashed", color = "blue", size=0.75) +
+  geom_segment(aes(x = 0.75, y = 125, xend = 0.75, yend = 240), linetype="dashed", color = "orange", size=0.75) +
   theme(plot.title = element_text(hjust = 0.5))
 
-plot_rpart = ggplot(data=out[[2]], aes(x=num, y=cost, group=1)) +
+plot_xgboost = ggplot(data=out[[2]], aes(x=num, y=cost, group=1)) +
   geom_line(color = "red") +
   geom_point(color = "red") +
   labs(x = "threshold") +
-  ggtitle("Classification Tree") +
+  ggtitle("XGBoost") +
   geom_point(data = emp_min[[2]], color = "blue") +
-  geom_text(x=0.75, y=275, label="Empirical min (0.84, 166)", color = "blue", size = 4) +
+  geom_text(x=0.75, y=275, label="Empirical min (0.62, 171.67)", color = "blue", size = 4) +
   geom_point(data = theo_min[[2]], color = "orange") +
-  geom_text(x=0.75, y=250, label="Theoretical min (0.75, 179)", color = "orange", size = 4) +
+  geom_text(x=0.75, y=250, label="Theoretical min (0.75, 233.33)", color = "orange", size = 4) +
+  geom_segment(aes(x = 0.62, y = 150, xend = 0.62, yend = 240), linetype="dashed", color = "blue", size=0.75) +
+  geom_segment(aes(x = 0.75, y = 150, xend = 0.75, yend = 240), linetype="dashed", color = "orange", size=0.75) +
   theme(plot.title = element_text(hjust = 0.5))
 
 plot_ranger = ggplot(data=out[[3]], aes(x=num, y=cost, group=1)) +
@@ -79,11 +86,13 @@ plot_ranger = ggplot(data=out[[3]], aes(x=num, y=cost, group=1)) +
   labs(x = "threshold") +
   ggtitle("Random Forest") +
   geom_point(data = emp_min[[3]], color = "blue") +
-  geom_text(x=0.75, y=275, label="Empirical min (0.7, 143.33)", color = "blue", size = 4) +
+  geom_text(x=0.75, y=275, label="Empirical min (0.72, 138.33)", color = "blue", size = 4) +
   geom_point(data = theo_min[[3]], color = "orange") +
-  geom_text(x=0.75, y=250, label="Theoretical min (0.75, 148.33)", color = "orange", size = 4) +
+  geom_text(x=0.75, y=250, label="Theoretical min (0.75, 142.33)", color = "orange", size = 4) +
+  geom_segment(aes(x = 0.72, y = 125, xend = 0.72, yend = 240), linetype="dashed", color = "blue", size=0.75) +
+  geom_segment(aes(x = 0.75, y = 125, xend = 0.75, yend = 240), linetype="dashed", color = "orange", size=0.75) +
   theme(plot.title = element_text(hjust = 0.5))
 
-grid.arrange(plot_log, plot_rpart, plot_ranger, ncol = 3, nrow = 1)
+grid.arrange(plot_log, plot_xgboost, plot_ranger, ncol = 3, nrow = 1)
 
 
