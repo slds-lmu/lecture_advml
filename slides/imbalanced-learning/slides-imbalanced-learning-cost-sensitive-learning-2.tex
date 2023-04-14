@@ -83,11 +83,11 @@
         \end{center}
         \item We can compute the optimal theoretical threshold value by $C(good,bad)/(C(bad,good)+C(good,bad))=3/4=c^{*}$.
 
-        \item Now, train three classifiers with threefold cross-validation and find the best empirical threshold $T$ on the validation sets:
+        \item Now, train three classifiers with threefold cross-validation and find the best empirical threshold $T$ on the validation sets. For XGBoost, the empirical minimum deviates substantially from the theoretical minimum in comparison.
 
                 \begin{figure}[h]
             \centering
-            \includegraphics[width=0.8\textwidth]{slides/imbalanced-learning/figure_man/Cost_Curves_plot.png}
+            \includegraphics[width=0.7\textwidth]{slides/imbalanced-learning/figure_man/Cost_Curves_plot.png}
         \end{figure}
 
     \end{itemize}
