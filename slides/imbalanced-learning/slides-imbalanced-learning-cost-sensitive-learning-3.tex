@@ -1,0 +1,294 @@
+\documentclass[11pt,compress,t,notes=noshow, xcolor=table]{beamer}
+\input{../../style/preamble}
+\input{../../latex-math/basic-math}
+\input{../../latex-math/basic-ml}
+
+%\usepackage{algorithm}
+%\usepackage{algorithmic}
+
+\newcommand{\sens}{\mathbf{A}} % vector x (bold)
+\newcommand{\ba}{\mathbf{a}}
+\newcommand{\batilde}{\tilde{\mathbf{a}}}
+\newcommand{\Px}{\mathbb{P}_{x}} % P_x
+\newcommand{\Pxj}{\mathbb{P}_{x_j}} % P_{x_j}
+\newcommand{\indep}{\perp \!\!\! \perp} % independence symbol
+% ml - ROC
+\newcommand{\np}{n_{+}} % no. of positive instances
+\newcommand{\nn}{n_{-}} % no. of negative instances
+\newcommand{\rn}{\pi_{-}} % proportion negative instances
+\newcommand{\rp}{\pi_{+}} % proportion negative instances
+% true/false pos/neg:
+\newcommand{\tp}{\# \text{TP}} % true pos
+\newcommand{\fap}{\# \text{FP}} % false pos (fp taken for partial derivs)
+\newcommand{\tn}{\# \text{TN}} % true neg
+\newcommand{\fan}{\# \text{FN}} % false neg
+\newcommand{\qv}{\mathbf{q}}  % vector q (bold)
+\newcommand{\cv}{\mathbf{c}}    % vector c (bold)
+
+\usepackage{multicol}
+
+\newcommand{\titlefigure}{figure/cost_matrix}
+\newcommand{\learninggoals}{
+  \item Learn threshold adjusting in cost-sensitive learning
+  \item Get to know MetaCost as a general approach to make classifiers cost-sensitve
+}
+
+\title{Advanced Machine Learning}
+\date{}
+
+\begin{document}
+
+\lecturechapter{Imbalanced Learning via Cost-Sensitive Learning Part 3}
+\lecture{Advanced Machine Learning}
+
+
+
+\sloppy
+
+%%%%%
+
+
+
+%%%
+% reference: https://www.csie.ntu.edu.tw/~htlin/talk/doc/csovo.acml14.handout.pdf
+
+\begin{vbframe}{Binary Instance-specific cost Learning}
+    \footnotesize
+    \begin{itemize}
+        \footnotesize
+        \item Assumes instance-specific costs for every observation. Formally, we can write $\D^{(n)} = \{(\xi, \yi, \cv_i)\}_i^n$, where $(\xi, \yi, \cv_i) \in \mathbb{R}^d \times \{0,1\} \times \mathbb{R}^2$.
+        
+        \item Define observation weights: 
+        % Consider four instances, where $\cv_i[0]$ and $\cv_i[1]$ denote the instance-wise cost of classifying an example as 0 or 1 respectively, $\yi$ the true label and 
+
+        \begin{center}
+                            \begin{tabular}{cc|cccc}\
+        			& & $\cv_i[0]$ & $\cv_i[1]$ & $\yi$ & $w^{(i)}$ \\
+        			\hline & $\xv^{(1)}$ & 1 & 1 & 0 & 0\\
+        			& $\xv^{(2)}$ & 1 & 2 & 0 & 1\\
+        			& $\xv^{(3)}$ & 7 & 3 & 1 & 4\\
+%        			& $\xv^{(4)}$ & 2 & 5 & 0 & 3\\
+
+                \end{tabular}
+        \end{center}
+        \item Now solve weighted ERM:
+        \begin{equation*}
+            \mathcal{R}_{emp}(\boldsymbol{\theta}) = \sum_{i=1}^{n}w^{(i)}L(\yi,f(\xi))
+        \end{equation*}
+        \item NB: Instances with equal costs are effectively ignored.
+        \end{itemize}
+            
+\end{vbframe}
+
+\begin{vbframe}{Multiclass Costs}
+    \begin{itemize}
+        \footnotesize
+        \item Now $g > 2$
+
+        \item Vanilla CSL is special case of instance specific, use $\cv_i$ same for all $\xi$
+        %straightforward to see that class-specific cost-sensitive learning is a special case of instance-specific cost learning: 
+        
+        %\item Now consider a multiclass label space $\mathcal{Y}=\{1,2,3\}$. For class-specific cost sensitive learning, we may define the following cost matrix: 
+        \vspace{5pt}
+        \begin{center}
+                            \begin{tabular}{cc|ccc}
+        			& &\multicolumn{3}{c}{True class} \\
+        			& & $y=1$ & $y=2$ & $y=3$  \\
+        			\hline
+        			\multirow{3}{*}{\parbox{0.6cm}{Pred.  class}} & $\hat y=1$ & 0 & 1 & 3\\
+        			& $\hat y=2$ & 1 & 0 & 1\\
+                        & $\hat y=3$ & 7 & 1 & 0\\
+                \end{tabular}
+        \end{center}
+        \vspace{5pt}
+        
+        \item For 2 $\xv$ with $y=2$ and $y = 3$: %instances of class 2 and 3 respectively, we have that 
+          \begin{equation*}
+            \begin{aligned}
+                \mat{
+                    \xv^{(1)} & 2 & \mat{1 & 0 & 1} \\
+                    \xv^{(2)} & 3 & \mat{3 & 1 & 0} \\
+                }
+            \end{aligned}
+        \end{equation*}
+        \item Set $\cv_i[y_i] = 0$, i.e. zero-cost for correct prediction.
+        \vspace{5pt}
+        
+   %     \item Is the multiclass case restricted to class-specific cost sensitive learning? Of course not! Binary instance-specific cost learning can easily be generalized to the multiclass case. 
+            
+    \end{itemize}
+\end{vbframe}
+
+\begin{vbframe}{CSOVO with instance-specific costs}
+    \footnotesize
+    \begin{itemize}
+        \footnotesize
+
+        \item Let $\D^{(n)} = \{(\xi, \yi, \cv_i)\}_i^n$, where $(\xi, \yi, \cv_i) \in \mathbb{R}^d \times \{1, 2, \ldots, g\} \times \mathbb{R}^g$. 
+        \vspace{5pt}    
+        \item Example:
+       % Consider instance-specific costs for three observations of the form $(\xi, \yi, \cv_i)$, with some label space $\mathcal{Y}=\{1, 2, \ldots, g\}$:
+        \vspace{5pt}
+        \begin{equation*}
+            \begin{aligned}
+                \mat{
+                    \xv^{(1)} & 1 & \mat{0 & 2 & 3 & 1} \\
+                    \xv^{(2)} & 2 & \mat{1 & 0 & 1 & 2} \\
+                    \xv^{(3)} & 4 & \mat{2 & 1 & 1 & 0} \\
+                }
+            \end{aligned}
+        \end{equation*}
+        \vspace{5pt}
+        %\item Now: How to perform cost-sensitive learning when $g > 2$?
+        \vspace{5pt}
+        
+        \item Idea: Reduction principle to binary case (weighted fit) by one-versus-one (OVO). 
+        %we have learnt cost-sensitive learning for the binary case. $\leadsto$ Convert the problem to 
+        
+        \vspace{5pt}
+        
+        \item For class $j$ vs. $k$:
+        %, consider two problems:
+        \begin{itemize}
+            \footnotesize
+            \item How to deal with the label $y_i$? $y_i$ can be neither $j$ nor $k$.
+            \vspace{5pt}
+            
+            \item How to deal with the costs $\cv_i[j]$ and $\cv_i[k]$?
+        \end{itemize}
+            
+    \end{itemize}
+\end{vbframe}
+
+\begin{vbframe}{CSOVO with instance-specific costs}
+    \footnotesize
+    \begin{itemize}
+        \item When training a binary classifier $f^{(j, k)}$ for class $j$ vs. $k$,
+        \begin{itemize}
+            \footnotesize
+            \item It is natural to select $\argmin_{l \in \{j, k\}} \cv_i[l]$ as the ground truth class.
+            \vspace{5pt}
+            
+            \item The costs $\cv_i[j]$ and $\cv_i[k]$ can be transformed to a \textbf{sample-wise} weight $|\cv_i[j] - \cv_i[k]|$. Please refer to \href{https://proceedings.mlr.press/v39/lin14.pdf}{\beamergotobutton{Lin et al. 2014}} for details.
+            \vspace{5pt}
+
+            \item After cost transformation, the misclassification costs across classes are equal to 1. $\leadsto$ Sample-wise weighted binary classification problem.
+            \vspace{5pt}
+        \end{itemize}
+        
+        \item Example continued: Consider $(\xv^{(1)}, y^{(1)}, \cv_1) =(\xv^{(1)}, 1, \mat{0 & 2 & 3 & 1})$.
+        \begin{itemize}
+        \footnotesize
+            \item For class 1 vs. 2, $\argmin_{l \in \{1, 2\}} \cv_1[l] = 1$ remains as the ground truth class. The sample-wise weight is $|\cv_1[1] - \cv_1[2]| = 2$.
+            \vspace{5pt}
+            
+            \item Calculate new costs: $\tilde \cv_1[1] = \cv_1[1]/(|\cv_1[1] - \cv_1[2]|) = 0$ and $\tilde \cv_1[2] = 1$.
+            \vspace{5pt}
+
+            \item For class 2 vs. 3, $\argmin_{l \in \{2, 3\}} \cv_1[l] = 2$ becomes the new ground truth class. The sample-wise weight is $|\cv_1[2] - \cv_1[3]| = 1$.
+            \vspace{5pt}
+            
+            \item Calculate new costs: $\tilde \cv_1[2] = \cv_1[2]/(|\cv_1[2] - \cv_1[3]|) = 2$ and $\tilde \cv_1[3] = 3$.
+            \vspace{5pt}           
+
+        \end{itemize}
+
+    \end{itemize}
+\end{vbframe}
+
+
+\begin{vbframe}{CSOVO with instance-specific costs}
+    \footnotesize
+    \begin{itemize}
+
+    \item Wrap everything up:
+    \begin{enumerate}
+        \footnotesize
+        \item For class $j$ vs. $k$, transform all $(\xi, \yi, \cv_i)$ to $(\xi, \argmin_{l \in \{j, k\}} \cv_i[l])$ with sample-wise weight $|\cv_i[j] - \cv_i[k]|$.
+        \vspace{5pt}
+        
+        \item Train a binary classifier $f^{(j, k)}$ using the transformed samples.
+        \vspace{5pt}
+        
+        \item Repeat step 1 and 2 for different $(i, j)$.
+        \vspace{5pt}
+        
+        \item Predict using the votes from all $f^{(i, j)}$.
+    \end{enumerate}
+    \vspace{5pt}
+
+    \item Theoretical guarantee: test of final classifier $\leq 2\sum_{j < k}$ test cost of $f^{(i, j)}$. 
+    \end{itemize}
+\end{vbframe}
+
+
+%\begin{vbframe}{MetaCost: Example}
+%	%	
+%	\small{
+%		\begin{itemize}
+%			%		
+%			\item We compare C4.5 (decision tree) with MetaCost using C4.5 for the \href{http://staffwww.itn.liu.se/~aidvi/courses/06/dm/
+%				labs/heart-c.arff}{heart data set}  in \href{ http://www.cs.waikato.ac.nz/ml/weka/}{Weka}. 
+%			%		
+%			\item The cost matrix $\mathbf{C}$ is 
+%			
+%			\begin{center}
+%				\begin{tabular}{cc|cc}
+%					& &\multicolumn{2}{c}{True class} \\
+%					& & $y=1$ & $y=-1$  \\
+%					\hline
+%					\multirow{2}{*}{\parbox{0.3cm}{Pred.  class}}& $\hat y$ = 1     & $0$                & $ 1 $\\
+%					& $\hat y$ = -1 & $ 4 $              &  $0$   \\
+%				\end{tabular}
+%			\end{center}
+%		
+%			\item The resulting confusion matrices are 
+%			
+%						
+%			\begin{center}
+%				\begin{tabular}{cc|cc}
+%					& &\multicolumn{2}{c}{True class} \\
+%					& MetaCost & $y=1$ & $y=-1$  \\
+%					\hline
+%					\multirow{2}{*}{\parbox{0.3cm}{Pred.  class}}& $\hat y$ = 1     & $104$                & $ 21 $\\
+%					& $\hat y$ = -1 & $ 61 $              &  $117$   \\
+%				\end{tabular}
+%							\begin{tabular}{cc|cc}
+%				& &\multicolumn{2}{c}{True class} \\
+%				& C4.5 & $y=1$ & $y=-1$  \\
+%				\hline
+%				\multirow{2}{*}{\parbox{0.3cm}{Pred.  class}}& $\hat y$ = 1     & $138$                & $ 40 $\\
+%				& $\hat y$ = -1 & $ 27$              &  $98$   \\
+%			\end{tabular}
+%			\end{center}
+%		
+%		
+%			%		
+%			\item The total cost of MetaCost is 145, while C4.5 has total costs of 187. However, MetaCost has $0.729$ correct classifications and C4.5 has $0.779.$ 
+%			
+%			%		
+%		\end{itemize}
+%		%
+%	}
+%	%	
+%\end{vbframe}
+
+
+
+%\begin{vbframe}{Cost-Sensitive Decision Trees}
+%	%	
+%	\small{
+%		\begin{itemize}
+%			%		
+%			\item 
+%			%		
+%		\end{itemize}
+%		%
+%	}
+%	%	
+%\end{vbframe}
+
+
+%
+\endlecture
+\end{document}
