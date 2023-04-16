@@ -358,6 +358,36 @@
 	
 \end{frame}
 
+\begin{frame}{Stacking vs Binary Relevance: Example}
+
+               \begin{itemize}
+               
+                   \item Compare F1-Score of random forest with stacking vs random forest with binary relevance on different multilabel datasets:
+                   \vspace{5pt}
+                   
+                   \begin{center}
+                   \resizebox{10cm}{!}{
+                     \begin{tabular}{lrrrrrrrrrr}
+                       \toprule
+                       & birds & emotions & enron & genbase & image & langLog & reuters & scene & slashdot & yeast\\
+                       \midrule
+                       BR(rf) F1-Score & 0.637 & 0.620 & 0.578 & 0.989 & 0.431 & 0.319 & 0.671 & 0.616 & 0.441 & 0.615\\
+                       STA(rf) F1-Score & 0.646 & 0.634 & 0.583 & 0.986 & 0.446 & 0.317 & 0.685 & 0.633 & 0.453 & 0.624\\
+                       \bottomrule
+                     \end{tabular}
+                     }
+                   \end{center}
+                   
+                   \vspace{5pt}
+                   \item NB: Stacking slightly outperforms binary relevance on average.
+
+                   \vspace{5pt}
+                   \item For more details, please refer to \href{https://journal.r-project.org/archive/2017/RJ-2017-012/RJ-2017-012.pdf}{\beamergotobutton{Probst et al., 2017 }}.
+               \end{itemize}
+
+
+\end{frame}
+
 \begin{frame}{Enforcing similarity in (Deep) Neural Networks}
 	\small
 	\begin{center}
