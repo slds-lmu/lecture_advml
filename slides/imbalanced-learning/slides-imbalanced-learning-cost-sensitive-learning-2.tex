@@ -71,7 +71,7 @@
     \footnotesize 
     \begin{itemize}
         \scriptsize
-        \item Example: Consider the German Credit Task, where customers are classified as "good" or "bad". The cost of classifying a bad customer as good is higher than vice versa. Define the following cost matrix:
+        \item Example: German Credit Task, where customers are classified as "good" or "bad".
         \begin{center}
                             \begin{tabular}{cc|cc}
         			& &\multicolumn{2}{c}{True class} \\
@@ -81,9 +81,9 @@
         			& $\hat y$ = bad & 1 & 0\\
                 \end{tabular}
         \end{center}
-        \item We can compute the optimal theoretical threshold value by $C(good,bad)/(C(bad,good)+C(good,bad))=3/4=c^{*}$.
+        \item $C(good,bad)/(C(bad,good)+C(good,bad))=3/4=c^{*}$ is the optimal theoretical threshold value.
 
-        \item Now, train three classifiers with threefold cross-validation and find the best empirical threshold $T$ on the validation sets. For XGBoost, the empirical minimum deviates substantially from the theoretical minimum in comparison.
+        \item Train three classifiers with threefold cv. Find best empirical threshold $T$ on validation sets. For XGBoost, the empirical minimum deviates substantially from the theoretical minimum.
 
                 \begin{figure}[h]
             \centering
