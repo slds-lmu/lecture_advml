@@ -131,11 +131,11 @@
         \vspace{5pt}
 
                         \begin{center}
-                            \begin{tabular}{cc|cccc}\
-        			& & $\cv^{(i)}[1]$ & $\cv^{(i)}[2]$ & $\cv^{(i)}[3]$ & $\yi$ \\
-        			\hline & $\xv^{(1)}$ & 0 & 2 & 3 & 1\\
-        			& $\xv^{(2)}$ & 1 & 0 & 1 & 2\\
-                 	& $\xv^{(3)}$ & 2 & 0 & 3 & 2\\
+                            \begin{tabular}{cc|ccc}\
+        			& & $\cv^{(i)}[1]$ & $\cv^{(i)}[2]$ & $\cv^{(i)}[3]$  \\
+        			\hline & $\xv^{(1)}$ & 0 & 2 & 3\\
+        			& $\xv^{(2)}$ & 1 & 0 & 1\\
+                 	& $\xv^{(3)}$ & 2 & 0 & 3\\
                 \end{tabular}
         \end{center}
         
@@ -161,7 +161,7 @@
     \end{itemize}
 \end{vbframe}
 
-\begin{vbframe}{CSOVO with instance-specific costs}
+\begin{vbframe}{CSOVO with instance-specific costs \href{https://proceedings.mlr.press/v39/lin14.pdf}{\beamergotobutton{Lin et al. 2014}}}
     \footnotesize
     \begin{itemize}
         \item When training a binary classifier $f^{(j, k)}$ for class $j$ vs. $k$,
@@ -170,7 +170,7 @@
             \item It is natural to select $\argmin_{l \in \{j, k\}} \cv^{(i)}[l]$ as the ground truth class.
             \vspace{5pt}
             
-            \item The costs $\cv^{(i)}[j]$ and $\cv^{(i)}[k]$ can be transformed to a \textbf{sample-wise} weight $|\cv^{(i)}[j] - \cv^{(i)}[k]|$. Please refer to \href{https://proceedings.mlr.press/v39/lin14.pdf}{\beamergotobutton{Lin et al. 2014}} for details.
+            \item The costs $\cv^{(i)}[j]$ and $\cv^{(i)}[k]$ can be transformed to a \textbf{sample-wise} weight $|\cv^{(i)}[j] - \cv^{(i)}[k]|$.
             \vspace{5pt}
 
             %\item After cost transformation, the misclassification costs across classes are equal to 1. $\leadsto$ Sample-wise weighted binary classification problem.
@@ -178,12 +178,20 @@
         \end{itemize}
         
         \item Example continued:
-                        \begin{center}
-                            \begin{tabular}{cc|ccccccc}\
-        			& & $\cv^{(i)}[1 \ \text{vs} \ 2]$ & $w^{(i)}$ & $\cv^{(i)}[2 \ \text{vs} \ 3]$ & $w^{(i)}$ & $\cv^{(i)}[1 \ \text{vs} \ 3]}$ & $w^{(i)}$ & $\yi$ \\
-        			\hline & $\xv^{(1)}$ & 0/2 & 2 & 2/3 & 1 & 0/3 & 3 & 1\\
-        			& $\xv^{(2)}$ & 1/0 & 1 & 0/1 & 1 & -/- & 0 & 2\\
-                 	& $\xv^{(3)}$ & 2/0 & 2 & 0/3 & 3 & 2/3 & 1 & 2\\
+
+                            \begin{tabular}{cc|cccccc}\
+        			& & $\cv^{(i)}[1]$ & $\tilde{y}^{( i)}$ $[1 \ \text{vs} \ 2]$ & $\cv^{(i)}[2]$ & $\tilde{y}^{( i)}$ $[2 \ \text{vs} \ 3]$ & $\cv^{(i)}[3]$ & $\tilde{y}^{( i)}$ $[1 \ \text{vs} \ 3]}$ \\
+        			\hline & $\xv^{(1)}$ & 0 & 1 & 2 & 2 & 3 & 1\\
+        			& $\xv^{(2)}$ & 1 & 2 & 0 & 2 & 1 & -\\
+                 	& $\xv^{(3)}$ & 2 & 2 & 0 & 2 & 3 & 1\\
+                \end{tabular}
+
+            \vspace{5pt}
+                            \begin{tabular}{cc|cccccc}\
+        			& & $\cv^{(i)}[1 \ \text{vs} \ 2]$ & $w^{(i)}$ & $\cv^{(i)}[2 \ \text{vs} \ 3]$ & $w^{(i)}$ & $\cv^{(i)}[1 \ \text{vs} \ 3]}$ & $w^{(i)}$ \\
+                        			\hline & $\xv^{(1)}$ & 0/2 & 2 & 2/3 & 1 & 0/3 & 3\\
+        			& $\xv^{(2)}$ & 1/0 & 1 & 0/1 & 1 & -/- & 0\\
+                 	& $\xv^{(3)}$ & 2/0 & 2 & 0/3 & 3 & 2/3 & 1\\
                 \end{tabular}
         \end{center}
 
