@@ -78,36 +78,94 @@
 	
 \end{frame}
 
+\begin{frame}
+	\frametitle{Multivariate loss functions}
+	\small
+	\begin{itemize}
+%		
+%		\item 
+%
+		\item A loss $L$ (on test data) is decomposable over examples if it can be written in the form
+		$$
+		L = \sum_{i=1}^n L(\yv^{(i)}, f(\xi)) 
+		%\quad \text{vs.} \quad L \ne \sum_{i=1}^n \ell(\yv^{(i)}, f(\xi)) 
+		\, ,
+		$$
+		i.e., as a sum of losses over all (test) examples. 
+		
+		
+		\item A multivariate loss $L$ is decomposable over targets if it can be written as
+		$$
+		L(\yv, f) = \sum_{m=1}^l L_m(y_m, f(\xv)_m) 
+		$$
+		with suitable single-target losses $L_m$. 
+		
+%		
+
+		\begin{minipage}{0.45\textwidth}
+%			
+			\item  In general, we distinguish between two categories of losses: micro- and instance-wise-losses. 
+%			
+		\end{minipage}
+%	
+		\begin{minipage}{0.45\textwidth}
+			\begin{center}
+				\includegraphics[width=0.9\textwidth]{figure/fmeasure}
+			\end{center}
+		\end{minipage}
+%		
+	\end{itemize}
+%
+\end{frame}
+
 
 
 
 \begin{frame}
-	\frametitle{Examples of MTP loss functions}
+	\frametitle{Micro Losses}
 	\begin{itemize}
 		
-		\small 
-		\item \emph{Squared error loss} (typically used in multivariate regression):
+
+            \item Micro-losses: The overall loss corresponds to aggregating the pointwise losses over the targets and the instances.
+                    \vspace{5pt}
+
+            \item Thus, we have	
+	$$
+	L =  \frac{1}{n \cdot l} \sum_{i,m} L(y_m^{(i)} , f(\xv)_m^{(i)}),
+	$$
+	where $L: \Yspace_m \times \R^{g_l} \to \R$ in this case.
+                    \vspace{5pt}            
+		\item Example \emph{Squared error loss} (i.e. used in multivariate regression):
 		$$
 		L(\yv, f) = \sum_{m=1}^l (y_m - f(\xv)_m)^2.
 		$$
-		\vspace{10pt}
+            \item Can also be used for cases with missing entries.
+
 		
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Instance-wise Losses}
+	\begin{itemize}
+		
+            \item Inputs one label vector $\yv$ and computes the loss with respect to the instance-wise predictions.
+                    \vspace{5pt}            
+
 		\item The \emph{Hamming loss} averages over mistakes on individual scores:    
 		$$
 		\displaystyle L_H(\yv, f) = \frac{1}{l}  \, \sum_{m=1}^l \, \mathds{1}_{[y_m \neq h_m(x)]},
 		$$
         where $h_m(x) := [f(\xv)_m \geq c_m]$ is the threshold function for task $m$ with threshold $c_m$.
-        \vspace{10pt}
+        \vspace{5pt}
 		
 		\item The \emph{subset 0/1 loss} simply checks for entire correctness:  
 		\begin{align*}
 			\displaystyle L_{0/1}(\yv, f) & = \mathds{1}_{[ \yv \neq \mathbf{h}(x) ]}  =  \max_m \, \mathds{1}_{[y_m \neq  h_m(x)]}
 		\end{align*}
 		
-		
 	\end{itemize}
 \end{frame}
-
 
 
 \begin{frame}
@@ -184,250 +242,6 @@
 %		
 %	\end{itemize}
 %\end{frame}
-
-
-\begin{frame}
-	\frametitle{Multivariate loss functions}
-	\small
-	\begin{itemize}
-%		
-%		\item 
-%
-		\item A loss $L$ (on test data) is decomposable over examples if it can be written in the form
-		$$
-		L = \sum_{i=1}^n L(\yv^{(i)}, f(\xi)) 
-		%\quad \text{vs.} \quad L \ne \sum_{i=1}^n \ell(\yv^{(i)}, f(\xi)) 
-		\, ,
-		$$
-		i.e., as a sum of losses over all (test) examples. 
-		
-		
-		\item A multivariate loss $L$ is decomposable over targets if it can be written as
-		$$
-		L(\yv, f) = \sum_{m=1}^l L_m(y_m, f(\xv)_m) 
-		$$
-		with suitable single-target losses $L_m$. 
-		
-%		
-
-		\begin{minipage}{0.45\textwidth}
-%			
-			\item  In general, we distinguish between three categories of losses: macro-, micro-, and instance-wise-losses. 
-%			
-		\end{minipage}
-%	
-		\begin{minipage}{0.45\textwidth}
-			\begin{center}
-				\includegraphics[width=0.9\textwidth]{figure/fmeasure}
-			\end{center}
-		\end{minipage}
-%		
-	\end{itemize}
-%
-\end{frame}
-
-
-
-
-
-
-\begin{frame}
-	\frametitle{Macro- and micro-Losses}
-	
-	\begin{itemize}
-		\item<1-> Macro-losses: $L$ is decomposable over targets. The overall loss is the aggregated loss over the targets.
-		
-		\begin{center}
-			\begin{tabular}{|c|c|c|c|}
-				\multicolumn{4}{c}{True scores} \\
-				\hline
-				{\only<2>{\color{putred}}$y_1^{(1)}$} & {\only<3>{\color{putred}}$y_2^{(1)}$} & {\only<4>{\color{putred}}$y_3^{(1)}$} & {\only<5>{\color{putred}}$y_4^{(1)}$} \\
-				{\only<2>{\color{putred}}$y_1^{(2)}$} & {\only<3>{\color{putred}}$y_2^{(2)}$} & {\only<4>{\color{putred}}$y_3^{(2)}$} & {\only<5>{\color{putred}}$y_4^{(2)}$} \\
-				{\only<2>{\color{putred}}$y_1^{(3)}$} & {\only<3>{\color{putred}}$y_2^{(3)}$} & {\only<4>{\color{putred}}$y_3^{(3)}$} & {\only<5>{\color{putred}}$y_4^{(3)}$} \\
-				{\only<2>{\color{putred}}$y_1^{(4)}$} & {\only<3>{\color{putred}}$y_2^{(4)}$} & {\only<4>{\color{putred}}$y_3^{(4)}$} & {\only<5>{\color{putred}}$y_4^{(4)}$} \\
-				{\only<2>{\color{putred}}$y_1^{(5)}$} & {\only<3>{\color{putred}}$y_2^{(5)}$} & {\only<4>{\color{putred}}$y_3^{(5)}$} & {\only<5>{\color{putred}}$y_4^{(5)}$} \\
-				{\only<2>{\color{putred}}$y_1^{(6)}$} & {\only<3>{\color{putred}}$y_2^{(6)}$} & {\only<4>{\color{putred}}$y_3^{(6)}$} & {\only<5>{\color{putred}}$y_4^{(6)}$} \\
-				\hline
-			\end{tabular}
-			$\quad$
-			\begin{tabular}{|c|c|c|c|}
-				\multicolumn{4}{c}{Predicted scores} \\
-				\hline
-				{\only<2>{\color{putred}}$f_1^{(1)}$} & {\only<3>{\color{putred}}$f_2^{(1)}$} & {\only<4>{\color{putred}}$f_3^{(1)}$} & {\only<5>{\color{putred}}$f_4^{(1)}$} \\
-				{\only<2>{\color{putred}}$f_1^{(2)}$} & {\only<3>{\color{putred}}$f_2^{(2)}$} & {\only<4>{\color{putred}}$f_3^{(2)}$} & {\only<5>{\color{putred}}$f_4^{(2)}$} \\
-				{\only<2>{\color{putred}}$f_1^{(3)}$} & {\only<3>{\color{putred}}$f_2^{(3)}$} & {\only<4>{\color{putred}}$f_3^{(3)}$} & {\only<5>{\color{putred}}$f_4^{(3)}$} \\
-				{\only<2>{\color{putred}}$f_1^{(4)}$} & {\only<3>{\color{putred}}$f_2^{(4)}$} & {\only<4>{\color{putred}}$f_3^{(4)}$} & {\only<5>{\color{putred}}$f_4^{(4)}$} \\
-				{\only<2>{\color{putred}}$f_1^{(5)}$} & {\only<3>{\color{putred}}$f_2^{(5)}$} & {\only<4>{\color{putred}}$f_3^{(5)}$} & {\only<5>{\color{putred}}$f_4^{(5)}$} \\
-				{\only<2>{\color{putred}}$f_1^{(6)}$} & {\only<3>{\color{putred}}$f_2^{(6)}$} & {\only<4>{\color{putred}}$f_3^{(6)}$} & {\only<5>{\color{putred}}$f_4^{(6)}$} \\
-				\hline
-			\end{tabular}
-		\end{center}
-	\lz
-	\item Example: Averaging the target losses.
-	$$
-	L = \frac{1}{4} \left( {\only<2>{\color{putred}}L_1} + {\only<3>{\color{putred}}L_2} + {\only<4>{\color{putred}}L_3} + {\only<5>{\color{putred}}L_4} \right)
-	$$
-	\end{itemize}
-	
-
-	
-\end{frame}
-
-
-
-
-\begin{frame}
-	\frametitle{Macro- and micro-Losses}
-	
-	\begin{itemize}
-		\item<1-> Micro-losses: The overall loss corresponds to aggregating the pointwise losses over the targets and the instances.
-		
-		\begin{center}
-			\begin{tabular}{|c|c|c|c|}
-				\multicolumn{4}{c}{True scores} \\
-				\hline
-				\color{putred}$y_1^{(1)}$ & \color{putred}$y_2^{(1)}$ & \color{putred}$y_3^{(1)}$ & \color{putred}$y_4^{(1)}$ \\
-				\color{putred}$y_1^{(2)}$ & \color{putred}$y_2^{(2)}$ & \color{putred}$y_3^{(2)}$ & \color{putred}$y_4^{(2)}$ \\
-				\color{putred}$y_1^{(3)}$ & \color{putred}$y_2^{(3)}$ & \color{putred}$y_3^{(3)}$ & \color{putred}$y_4^{(3)}$ \\
-				\color{putred}$y_1^{(4)}$ & \color{putred}$y_2^{(4)}$ & \color{putred}$y_3^{(4)}$ & \color{putred}$y_4^{(4)}$ \\
-				\color{putred}$y_1^{(5)}$ & \color{putred}$y_2^{(5)}$ & \color{putred}$y_3^{(5)}$ & \color{putred}$y_4^{(5)}$ \\
-				\color{putred}$y_1^{(6)}$ & \color{putred}$y_2^{(6)}$ & \color{putred}$y_3^{(6)}$ & \color{putred}$y_4^{(6)}$ \\
-				\hline
-			\end{tabular}
-			$\quad$
-			\begin{tabular}{|c|c|c|c|}
-				\multicolumn{4}{c}{Predicted scores} \\
-				\hline
-				\color{putred}$f_1^{(1)}$ & \color{putred}$f_2^{(1)}$ & \color{putred}$f_3^{(1)}$ & \color{putred}$f_4^{(1)}$ \\
-				\color{putred}$f_1^{(2)}$ & \color{putred}$f_2^{(2)}$ & \color{putred}$f_3^{(2)}$ & \color{putred}$f_4^{(2)}$ \\
-				\color{putred}$f_1^{(3)}$ & \color{putred}$f_2^{(3)}$ & \color{putred}$f_3^{(3)}$ & \color{putred}$f_4^{(3)}$ \\
-				\color{putred}$f_1^{(4)}$ & \color{putred}$f_2^{(4)}$ & \color{putred}$f_3^{(4)}$ & \color{putred}$f_4^{(4)}$ \\
-				\color{putred}$f_1^{(5)}$ & \color{putred}$f_2^{(5)}$ & \color{putred}$f_3^{(5)}$ & \color{putred}$f_4^{(5)}$ \\
-				\color{putred}$f_1^{(6)}$ & \color{putred}$f_2^{(6)}$ & \color{putred}$f_3^{(6)}$ & \color{putred}$f_4^{(6)}$ \\
-				\hline
-			\end{tabular}
-		\end{center}
-	\lz
-	\item Thus, we have	
-	$$
-	L =  \frac{1}{n \cdot l} \sum_{i,m} L(y_m^{(i)} , f(\xv)_m^{(i)}),
-	$$
-	where $L: \Yspace_m \times \R^{g_l} \to \R$ in this case.
-%	
-	\end{itemize}
-
-\end{frame}
-
-
-\begin{frame}
-	\frametitle{Macro- and micro-Losses}
-	
-	\begin{itemize}
-		\item<1-> Micro-losses: The overall loss corresponds to averaging the pointwise losses over the targets and the instances.
-		
-				\begin{center}
-			\begin{tabular}{|c|c|c|c|}
-				\multicolumn{4}{c}{True scores} \\
-				\hline
-				\color{putred}$y_1^{(1)}$ & \color{putred}$y_2^{(1)}$ & & \color{putred}$y_4^{(1)}$ \\
-				\color{putred}$y_1^{(2)}$ & & \color{putred}$y_3^{(2)}$ & \color{putred}$y_4^{(2)}$ \\
-				\color{putred}$y_1^{(3)}$ & \color{putred}$y_2^{(3)}$ & \color{putred}$y_3^{(3)}$ & \color{putred}$y_4^{(3)}$ \\
-				\color{putred}$y_1^{(4)}$ &  & \color{putred}$y_3^{(4)}$ & \color{putred}$y_4^{(4)}$ \\
-				\color{putred}$y_1^{(5)}$ & \color{putred}$y_2^{(5)}$ & \color{putred}$y_3^{(5)}$ & \color{putred}$y_4^{(5)}$ \\
-				& \color{putred}$y_2^{(6)}$ & \color{putred}$y_3^{(6)}$ & \\
-				\hline
-			\end{tabular}
-			$\quad$
-			\begin{tabular}{|c|c|c|c|}
-				\multicolumn{4}{c}{Predicted scores} \\
-				\hline
-				\color{putred}$f_1^{(1)}$ & \color{putred}$f_2^{(1)}$ &  & \color{putred}$f_4^{(1)}$ \\
-				\color{putred}$f_1^{(2)}$ &  & \color{putred}$f_3^{(2)}$ & \color{putred}$f_4^{(2)}$ \\
-				\color{putred}$f_1^{(3)}$ & \color{putred}$f_2^{(3)}$ & \color{putred}$f_3^{(3)}$ & \color{putred}$f_4^{(3)}$ \\
-				\color{putred}$f_1^{(4)}$ & & \color{putred}$f_3^{(4)}$ & \color{putred}$f_4^{(4)}$ \\
-				\color{putred}$f_1^{(5)}$ & \color{putred}$f_2^{(5)}$ & \color{putred}$f_3^{(5)}$ & \color{putred}$f_4^{(5)}$ \\
-				& \color{putred}$f_2^{(6)}$ & \color{putred}$f_3^{(6)}$ & \\
-				\hline
-			\end{tabular}
-		\end{center}
-	\lz
-	\item Thus, we have	
-	$$
-	L = \frac{1}{n \cdot l} \sum_{i,m} L(y_m^{(i)} , f(\xv)_m^{(i)}),
-	$$
-	where $L: \Yspace_m \times \R^{g_l} \to \R$ in this case.
-%	
-	\item 	
-		Can be used also for cases with missing entries.
-	\end{itemize}
- 
-
-	
-\end{frame}
-
-
-
-
-\begin{frame}
-	\frametitle{Instance-wise losses}
-	
-	\begin{itemize}
-		\item<1-> Instance-wise losses: Aggregating the losses over the instances.
-		
-		\begin{center}
-			\begin{tabular}{|c|c|c|c|}
-				\multicolumn{4}{c}{True scores} \\
-				\hline
-				{\only<2>{\color{putred}}$y_1^{(1)}$} & {\only<2>{\color{putred}}$y_2^{(1)}$} & {\only<2>{\color{putred}}$y_3^{(1)}$} & {\only<2>{\color{putred}}$y_4^{(1)}$} \\
-				{\only<3>{\color{putred}}$y_1^{(2)}$} & {\only<3>{\color{putred}}$y_2^{(2)}$} & {\only<3>{\color{putred}}$y_3^{(2)}$} & {\only<3>{\color{putred}}$y_4^{(2)}$} \\
-				{\only<4>{\color{putred}}$y_1^{(3)}$} & {\only<4>{\color{putred}}$y_2^{(3)}$} & {\only<4>{\color{putred}}$y_3^{(3)}$} & {\only<4>{\color{putred}}$y_4^{(3)}$} \\
-				{\only<5>{\color{putred}}$y_1^{(4)}$} & {\only<5>{\color{putred}}$y_2^{(4)}$} & {\only<5>{\color{putred}}$y_3^{(4)}$} & {\only<5>{\color{putred}}$y_4^{(4)}$} \\
-				{\only<6>{\color{putred}}$y_1^{(5)}$} & {\only<6>{\color{putred}}$y_2^{(5)}$} & {\only<6>{\color{putred}}$y_3^{(5)}$} & {\only<6>{\color{putred}}$y_4^{(5)}$} \\
-				{\only<7>{\color{putred}}$y_1^{(6)}$} & {\only<7>{\color{putred}}$y_2^{(6)}$} & {\only<7>{\color{putred}}$y_3^{(6)}$} & {\only<7>{\color{putred}}$y_4^{(6)}$} \\
-				\hline
-			\end{tabular}
-			$\quad$
-			\begin{tabular}{|c|c|c|c|}
-				\multicolumn{4}{c}{Predicted scores} \\
-				\hline
-				{\only<2>{\color{putred}}$f_1^{(1)}$} & {\only<2>{\color{putred}}$f_2^{(1)}$} & {\only<2>{\color{putred}}$f_3^{(1)}$} & {\only<2>{\color{putred}}$f_4^{(1)}$} \\
-				{\only<3>{\color{putred}}$f_1^{(2)}$} & {\only<3>{\color{putred}}$f_2^{(2)}$} & {\only<3>{\color{putred}}$f_3^{(2)}$} & {\only<3>{\color{putred}}$f_4^{(2)}$} \\
-				{\only<4>{\color{putred}}$f_1^{(3)}$} & {\only<4>{\color{putred}}$f_2^{(3)}$} & {\only<4>{\color{putred}}$f_3^{(3)}$} & {\only<4>{\color{putred}}$f_4^{(3)}$} \\
-				{\only<5>{\color{putred}}$f_1^{(4)}$} & {\only<5>{\color{putred}}$f_2^{(4)}$} & {\only<5>{\color{putred}}$f_3^{(4)}$} & {\only<5>{\color{putred}}$f_4^{(4)}$} \\
-				{\only<6>{\color{putred}}$f_1^{(5)}$} & {\only<6>{\color{putred}}$f_2^{(5)}$} & {\only<6>{\color{putred}}$f_3^{(5)}$} & {\only<6>{\color{putred}}$f_4^{(5)}$} \\
-				{\only<7>{\color{putred}}$f_1^{(6)}$} & {\only<7>{\color{putred}}$f_2^{(6)}$} & {\only<7>{\color{putred}}$f_3^{(6)}$} & {\only<7>{\color{putred}}$f_4^{(6)}$} \\
-				\hline
-			\end{tabular}
-		\end{center}
-		\lz
-%		
-		\item Example: Averaging over the instance-losses.
-%		
-		\begin{align*}
-%			
-			L = & \frac{1}{6} \Big( {\only<2>{\color{putred}} L(\yv^{(1)},f(\xv^{(1)}))} + 
-			{\only<3>{\color{putred}} L(\yv^{(2)},f(\xv^{(2)}))} +
-			{\only<4>{\color{putred}} L(\yv^{(3)},f(\xv^{(3)}))} + \\
-			& {\only<5>{\color{putred}} L(\yv^{(4)},f(\xv^{(4)}))} +
-			{\only<6>{\color{putred}} L(\yv^{(5)},f(\xv^{(5)}))} +
-			{\only<7>{\color{putred}} L(\yv^{(6)},f(\xv^{(6)}))} 
-			\Big)
-%			
-		\end{align*}
-%
-	\end{itemize}
-	
-
-	
-\end{frame}
-
-
-
-
-
-
-
-
 
 
 
