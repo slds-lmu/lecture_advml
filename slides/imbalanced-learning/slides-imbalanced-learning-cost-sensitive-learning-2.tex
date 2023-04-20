@@ -134,6 +134,12 @@
                    
                     \item Apply the classifier on the relabeled data set.
                 \end{enumerate} 
+                \item Example German Credit Task:
+                                \begin{figure}[h]
+            \centering
+            \includegraphics[width=0.85\textwidth]{slides/imbalanced-learning/figure_man/Relabeling_viz.png}
+        \end{figure}
+                
         \end{itemize}
 
 \end{vbframe}
@@ -206,6 +212,29 @@
 	%	
 \end{vbframe}
 
+
+\begin{vbframe}{MetaCost: Example Continued}
+
+
+        \begin{itemize}
+            \item Binary Classification: German Credit Task                     
+            \item Train random forest with threefold cv
+            \item Use OOB-predictions to calculate new labels by
+            \begin{equation*}
+                \tilde y^{(i)} \leftarrow \argmin_{i^* \in \{\text{good, bad}\}} \sum_{j \in \{\text{good, bad}\}} \pi_j(\xi) C(i^*,j)
+            \end{equation*}
+            \item which results in:
+             \begin{itemize}
+               \item $i^* = \text{good}: (1-\pi_j(\xi)) C(\text{good, bad})$
+               \vspace{5pt}
+               \item $i^* = \text{bad}: \pi_j(\xi) C(\text{bad, good})$
+               \vspace{5pt}
+             \end{itemize}
+               \vspace{5pt}
+            if $C(\text{good, good}) = C(\text{bad, bad}) = 0$.
+        \end{itemize}
+
+\end{vbframe}
 %%%%%
 
 
