@@ -13,7 +13,7 @@ d = getOMLDataSet(31)
 df = d[[2]]
 
 p <- ggplot(df, aes(duration, credit_amount)) + 
-  geom_point() +
+  geom_point(size = 3) +
   geom_point(aes(colour = factor(class))) +
   xlab("Duration") +
   ylab("Credit Amount") +
@@ -21,7 +21,8 @@ p <- ggplot(df, aes(duration, credit_amount)) +
   scale_color_manual(breaks = c("good", "bad"),
                      values=c("blue", "red")) +
   ggtitle("Before Relabeling") +
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  theme(text = element_text(size = 20))   
 
 # cost matrix as given on the UCI page of the german credit data set
 # https://archive.ics.uci.edu/ml/datasets/statlog+(german+credit+data)
@@ -60,7 +61,7 @@ pred_df = pred_df %>% mutate(relabel = case_when(min_cost >= 0.5 ~ "good",
 df1 = cbind(df, pred_df$relabel)
 
 p1 <- ggplot(df1, aes(duration, credit_amount)) + 
-  geom_point() +
+  geom_point(size = 3) +
   geom_point(aes(colour = factor(pred_df$relabel))) +
   xlab("Duration") +
   ylab("Credit Amount") +
@@ -68,7 +69,8 @@ p1 <- ggplot(df1, aes(duration, credit_amount)) +
   scale_color_manual(breaks = c("good", "bad"),
                      values=c("blue", "red")) +
   ggtitle("After Relabeling") +
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(text = element_text(size = 20)) 
 
 grid.arrange(p, p1, ncol = 2, nrow = 1)
 
