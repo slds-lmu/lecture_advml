@@ -198,7 +198,7 @@
 					\textcolor{magenta}{\For{$j=1,\ldots,g$} (relabel for binary case)
 						\State $\pi_j(\xi)  \leftarrow \frac{1}{|\tilde M| } \sum_{m \in \tilde M}   \pi_j(\xi~|~ f_m) $
 					\EndFor}
-                        \textcolor{red}{\State $\tilde y^{(i)} \leftarrow \argmin_{i^*} \sum_{j=1}^g \pi_j(\xi) C(i^*,j) $
+                        \textcolor{red}{\State $\tilde y^{(i)} \leftarrow \argmin_{i} \sum_{j=1}^g \pi_j(\xi) C(i,j) $
 					\State $\tilde D \leftarrow \tilde D \cup \{(\xi,\tilde y^{(i)})\} $
 				\EndFor}
 				\State \# 3rd Cost Sensitivity:
@@ -221,13 +221,14 @@
             \item Train random forest with threefold cv
             \item Use OOB-predictions to calculate new labels by
             \begin{equation*}
-                \tilde y^{(i)} \leftarrow \argmin_{i^* \in \{\text{good, bad}\}} \sum_{j \in \{\text{good, bad}\}} \pi_j(\xi) C(i^*,j)
+                \tilde y^{(i)} \leftarrow \argmin_{i \in \{\text{good, bad}\}} \sum_{j \in \{\text{good, bad}\}} \pi_j(\xi) C(i,j)
             \end{equation*}
-            \item which results in:
+            \item Binary case: $\pi(\xi)$ probability of classifying a customer as good.
+            \item Hence, select the better of the two classes, w.r.t.:
              \begin{itemize}
-               \item $i^* = \text{good}: (1-\pi_j(\xi)) C(\text{good, bad})$
+               \item $i = \text{good}: (1-\pi(\xi)) C(\text{good, bad})$
                \vspace{5pt}
-               \item $i^* = \text{bad}: \pi_j(\xi) C(\text{bad, good})$
+               \item $i = \text{bad}: \pi(\xi) C(\text{bad, good})$
                \vspace{5pt}
              \end{itemize}
                \vspace{5pt}
