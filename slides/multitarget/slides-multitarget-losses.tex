@@ -55,7 +55,7 @@
 %		
 		\small
 %		
-		\item In multi-target prediction: For a feature vector $\xv$, predict a vector of scores $f(\xv) = (f(x)_1, f(x)_2, \ldots, f(x)_l)^\top$ for $l$ tasks with a function (hypothesis) $f: \Xspace \rightarrow \R^{g_1} \times \cdots \times \R^{g_l} $.
+		\item In multi-target prediction: For a feature vector $\xv$, predict a tuple of score vectors $f(\xv) = (f(x)_1, f(x)_2, \ldots, f(x)_l)^\top$ for $l$ tasks with a function (hypothesis) $f: \Xspace \rightarrow \R^{g_1} \times \cdots \times \R^{g_l} $.
         \vspace{15pt}
 %		
 		\item If we want to follow the machine learning paradigm based on loss minimization, we need a \emph{multivariate loss functions} 
@@ -85,13 +85,13 @@
 %		
 %		\item 
 %
-		\item A loss $L$ (on test data) is decomposable over examples if it can be written in the form
+		\item A loss $L$ is decomposable over examples if it can be written in the form
 		$$
 		L = \sum_{i=1}^n L(\yv^{(i)}, f(\xi)) 
 		%\quad \text{vs.} \quad L \ne \sum_{i=1}^n \ell(\yv^{(i)}, f(\xi)) 
 		\, ,
 		$$
-		i.e., as a sum of losses over all (test) examples. 
+		i.e., as a sum of losses over all examples. 
 		
 		
 		\item A multivariate loss $L$ is decomposable over targets if it can be written as
@@ -126,14 +126,14 @@
 	\begin{itemize}
 		
 
-            \item Micro-losses: The overall loss corresponds to aggregating the pointwise losses over the targets and the instances.
+            \item Micro-losses: The overall loss corresponds to aggregating the pointwise losses over the targets and instances.
                     \vspace{5pt}
 
             \item Thus, we have	
 	$$
-	L =  \frac{1}{n \cdot l} \sum_{i,m} L(y_m^{(i)} , f(\xv)_m^{(i)}),
+	L =  \frac{1}{n \cdot l} \sum_{i,m} L_m(y_m^{(i)} , f(\xv)_m^{(i)}),
 	$$
-	where $L: \Yspace_m \times \R^{g_l} \to \R$ in this case.
+	where $L_m: \Yspace_m \times \R^{g_m} \to \R$ in this case.
                     \vspace{5pt}            
 		\item Example \emph{Squared error loss} (i.e. used in multivariate regression):
 		$$
@@ -154,14 +154,16 @@
 
 		\item The \emph{Hamming loss} averages over mistakes on individual scores:    
 		$$
-		\displaystyle L_H(\yv, f) = \frac{1}{l}  \, \sum_{m=1}^l \, \mathds{1}_{[y_m \neq h_m(x)]},
+		\displaystyle L_H(\yv, \mathbf{h}(x)) = \frac{1}{l}  \, \sum_{m=1}^l \, \mathds{1}_{[y_m \neq h_m(x)]},
 		$$
-        where $h_m(x) := [f(\xv)_m \geq c_m]$ is the threshold function for task $m$ with threshold $c_m$.
+        where $h_m(x) := [f(\xv)_m \geq c_m]$ is the threshold function for task $m$ with threshold $c_m$. 
+        \vspace{5pt}
+        \item Hamming loss is identical to the average \emph{0/1 loss} if computed on the entire dataset.
         \vspace{5pt}
 		
 		\item The \emph{subset 0/1 loss} simply checks for entire correctness:  
 		\begin{align*}
-			\displaystyle L_{0/1}(\yv, f) & = \mathds{1}_{[ \yv \neq \mathbf{h}(x) ]}  =  \max_m \, \mathds{1}_{[y_m \neq  h_m(x)]}
+			\displaystyle L_{0/1}(\yv, \mathbf{h}(x)) & = \mathds{1}_{[ \yv \neq \mathbf{h}(x) ]}  =  \max_m \, \mathds{1}_{[y_m \neq  h_m(x)]}
 		\end{align*}
 		
 	\end{itemize}
