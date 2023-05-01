@@ -56,7 +56,7 @@
     \footnotesize
     \begin{itemize}
         \footnotesize
-        \item Assumes instance-specific costs for every observation. Formally, we can write $\D^{(n)} = \{(\xi, \yi, \cv^{(i)})\}_i^n$, where $(\xi, \yi, \cv^{(i)}) \in \mathbb{R}^d \times \{0,1\} \times \mathbb{R}^2$.
+        \item Assumes instance-specific costs for every observation. Formally, we can write $\D^{(n)} = \{(\xi, \yi, \cv^{(i)})\}_{i=1}^n$, where $(\xi, \yi, \cv^{(i)}) \in \mathbb{R}^d \times \{0,1\} \times \mathbb{R}^2$.
         
         \item Define observation weights: 
         % Consider four instances, where $\cv^{(i)}[0]$ and $\cv^{(i)}[1]$ denote the instance-wise cost of classifying an example as 0 or 1 respectively, $\yi$ the true label and 
@@ -124,7 +124,7 @@
     \begin{itemize}
         \footnotesize
 
-        \item Let $\D^{(n)} = \{(\xi, \yi, \cv^{(i)})\}_i^n$, where $(\xi, \yi, \cv^{(i)}) \in \mathbb{R}^d \times \{1, 2, \ldots, g\} \times \mathbb{R}^g$. 
+        \item Let $\D^{(n)} = \{(\xi, \yi, \cv^{(i)})\}_{i=1}^n$, $(\xi, \yi, \cv^{(i)}) \in \mathbb{R}^d \times \{1, 2, \ldots, g\} \times \mathbb{R}^g$. 
         \vspace{5pt}    
         \item Example:
        % Consider instance-specific costs for three observations of the form $(\xi, \yi, \cv^{(i)})$, with some label space $\mathcal{Y}=\{1, 2, \ldots, g\}$:
@@ -161,6 +161,7 @@
     \end{itemize}
 \end{vbframe}
 
+
 \begin{vbframe}{CSOVO with instance-specific costs \href{https://proceedings.mlr.press/v39/lin14.pdf}{\beamergotobutton{Lin et al. 2014}}}
     \footnotesize
     \begin{itemize}
@@ -178,22 +179,23 @@
         \end{itemize}
         
         \item Example continued:
-
-                            \begin{tabular}{cc|cccccc}\
-        			& & $\cv^{(i)}[1]$ & $\tilde{y}^{( i)}$ $[1 \ \text{vs} \ 2]$ & $\cv^{(i)}[2]$ & $\tilde{y}^{( i)}$ $[2 \ \text{vs} \ 3]$ & $\cv^{(i)}[3]$ & $\tilde{y}^{( i)}$ $[1 \ \text{vs} \ 3]}$ \\
-        			\hline & $\xv^{(1)}$ & 0 & 1 & 2 & 2 & 3 & 1\\
-        			& $\xv^{(2)}$ & 1 & 2 & 0 & 2 & 1 & -\\
-                 	& $\xv^{(3)}$ & 2 & 2 & 0 & 2 & 3 & 1\\
+\begin{center}
+    
+                            \begin{tabular}{cc|cccc}\
+        			& & $\cv^{(i)}[1]$ & $\cv^{(i)}[1 \ \text{vs} \ 2]$ & $\tilde{y}^{( i)}[1 \ \text{vs} \ 2]$ & $w^{(i)}[1 \ \text{vs} \ 2]$\\
+        			\hline & $\xv^{(1)}$ & 0 & 0/2 & 1 & 2\\
+        			& $\xv^{(2)}$ & 1 & 1/0 & 2 & 1 \\
+                 	& $\xv^{(3)}$ & 2 & 2/0 & 2 & 2\\
                 \end{tabular}
 
             \vspace{5pt}
-                            \begin{tabular}{cc|cccccc}\
-        			& & $\cv^{(i)}[1 \ \text{vs} \ 2]$ & $w^{(i)}$ & $\cv^{(i)}[2 \ \text{vs} \ 3]$ & $w^{(i)}$ & $\cv^{(i)}[1 \ \text{vs} \ 3]}$ & $w^{(i)}$ \\
-                        			\hline & $\xv^{(1)}$ & 0/2 & 2 & 2/3 & 1 & 0/3 & 3\\
-        			& $\xv^{(2)}$ & 1/0 & 1 & 0/1 & 1 & -/- & 0\\
-                 	& $\xv^{(3)}$ & 2/0 & 2 & 0/3 & 3 & 2/3 & 1\\
+                            \begin{tabular}{cc|cccc}\
+        			& & $\cv^{(i)}[2]$ & $\cv^{(i)}[2 \ \text{vs} \ 3]$ & $\tilde{y}^{( i)}[2 \ \text{vs} \ 3]$ & $w^{(i)}[2 \ \text{vs} \ 3]$\\
+        			\hline & $\xv^{(1)}$ & 2 & 2/3 & 2 & 1\\
+        			& $\xv^{(2)}$ & 0 & 0/1 & 2 & 1\\
+                 	& $\xv^{(3)}$ & 0 & 0/3 & 2 & 3\\
                 \end{tabular}
-        \end{center}
+\end{center}
 
     \end{itemize}
 \end{vbframe}
@@ -202,6 +204,16 @@
 \begin{vbframe}{CSOVO with instance-specific costs}
     \footnotesize
     \begin{itemize}
+    \item Example continued
+            \begin{center}                                       
+        \begin{tabular}{cc|cccc}\
+        			& & $\cv^{(i)}[3]$ & $\cv^{(i)}[1 \ \text{vs} \ 3]$ & $\tilde{y}^{( i)}[1 \ \text{vs} \ 3]$ & $w^{(i)}[1 \ \text{vs} \ 3]$\\
+        			\hline & $\xv^{(1)}$ & 3 & 0/3 & 1 & 3\\
+        			& $\xv^{(2)}$ & 1 & -/- & - & 0 \\
+                 	& $\xv^{(3)}$ & 3 & 2/3 & 1 & 1\\
+                \end{tabular}
+    \end{center}
+            \vspace{5pt}
 
     \item Wrap everything up:
     \begin{enumerate}
