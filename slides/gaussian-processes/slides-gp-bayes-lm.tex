@@ -86,17 +86,20 @@
     \begin{figure}
       \includegraphics[width=0.5\textwidth]{figure/bayes_lm/prior_1.pdf}~\includegraphics[width=0.5\textwidth]{figure/bayes_lm/prior_2.pdf}
     \end{figure}
-    
-    \framebreak 
 
-    \foreach \x in{5, 10, 20} {
+\end{vbframe}
+    
+\begin{vbframe}{Review: The Bayesian Linear Model}
+
         \begin{figure}
-            \includegraphics[width=0.49\textwidth]{figure/bayes_lm/posterior_\x_1.pdf}~  \includegraphics[width=0.49\textwidth]{figure/bayes_lm/posterior_\x_2.pdf}
+                \foreach \x in{5, 10, 20} {
+                  \includegraphics[width=0.49\textwidth]{figure/bayes_lm/posterior_merged_\x_1.pdf}
+            }
         \end{figure}
-    }
     
+\end{vbframe}
     
-    \framebreak 
+\begin{vbframe}{Review: The Bayesian Linear Model} 
     
     Based on the posterior distribution 
     
@@ -104,7 +107,7 @@
     \thetab ~|~ \Xmat, \yv \sim \mathcal{N}(\sigma^{-2}\bm{A}^{-1}\Xmat^\top\yv, \bm{A}^{-1})
     $$
     
-    we can derive the predictive distribution for a new observations $\xv_*$. The predictive distribution for the Bayesian linear model, i.e. the distribution of $\thetab^\top \xv_*$, is 
+    we can derive the predictive distribution for a new observation $\xv_*$. The predictive distribution for the Bayesian linear model, i.e. the distribution of $\thetab^\top \xv_*$, is 
     
     $$
     y_* ~|~ \Xmat, \yv, \xv_* \sim \mathcal{N}(\sigma^{-2}\yv^\top \Xmat \Amat^{-1}\xv_*, \xv_*^\top\Amat^{-1}\xv_*)
@@ -112,18 +115,20 @@
 
     Please see the Deep Dive part for more details.
     
-    \framebreak 
-    
-    
-    \foreach \x in{5, 10, 20} {
-    \begin{figure}
-      \includegraphics[width=0.5\textwidth]{figure/bayes_lm/posterior_\x_3.pdf} \\
+\end{vbframe}
+
+\begin{vbframe}{Review: The Bayesian Linear Model} 
+
       \begin{footnotesize}
         For every test input $\xv_*$, we get a distribution over the prediction $y_*$. In particular, we get a posterior mean (orange) and a posterior variance (grey region equals $+/-$ two times standard deviation). 
       \end{footnotesize}
+    
+    \begin{figure}
+        \foreach \x in{5, 10, 20} {
+           \includegraphics[width=0.5\textwidth]{figure/bayes_lm/posterior_\x_3.pdf}
+          }
     \end{figure}
-    }
-
+          
 \end{vbframe}
 
 
