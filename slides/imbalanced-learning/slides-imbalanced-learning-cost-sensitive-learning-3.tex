@@ -181,19 +181,19 @@
         \item Example continued:
 \begin{center}
     
-                            \begin{tabular}{cc|cccc}\
-        			& & $\cv^{(i)}[1]$ & $\cv^{(i)}[1 \ \text{vs} \ 2]$ & $\tilde{y}^{( i)}[1 \ \text{vs} \ 2]$ & $w^{(i)}[1 \ \text{vs} \ 2]$\\
-        			\hline & $\xv^{(1)}$ & 0 & 0/2 & 1 & 2\\
-        			& $\xv^{(2)}$ & 1 & 1/0 & 2 & 1 \\
-                 	& $\xv^{(3)}$ & 2 & 2/0 & 2 & 2\\
+                            \begin{tabular}{cc|ccc|ccc}\
+        			& & $\cv^{(i)}[1]$ & $\cv^{(i)}[2]$ & $\cv^{(i)}[3]$ & $\cv^{(i)}[1 \ \text{vs} \ 2]$ & $\tilde{y}^{( i)}[1 \ \text{vs} \ 2]$ & $w^{(i)}[1 \ \text{vs} \ 2]$\\
+        			\hline & $\xv^{(1)}$ & 0 & 2 & 3 & 0/2 & 1 & 2\\
+        			& $\xv^{(2)}$ & 1 & 0 & 1 & 1/0 & 2 & 1 \\
+                 	& $\xv^{(3)}$ & 2 & 0 & 3 & 2/0 & 2 & 2\\
                 \end{tabular}
 
             \vspace{5pt}
-                            \begin{tabular}{cc|cccc}\
-        			& & $\cv^{(i)}[2]$ & $\cv^{(i)}[2 \ \text{vs} \ 3]$ & $\tilde{y}^{( i)}[2 \ \text{vs} \ 3]$ & $w^{(i)}[2 \ \text{vs} \ 3]$\\
-        			\hline & $\xv^{(1)}$ & 2 & 2/3 & 2 & 1\\
-        			& $\xv^{(2)}$ & 0 & 0/1 & 2 & 1\\
-                 	& $\xv^{(3)}$ & 0 & 0/3 & 2 & 3\\
+                            \begin{tabular}{cc|ccc|ccc}\
+        			& & $\cv^{(i)}[1]$ & $\cv^{(i)}[2]$ & $\cv^{(i)}[3]$ & $\cv^{(i)}[2 \ \text{vs} \ 3]$ & $\tilde{y}^{( i)}[2 \ \text{vs} \ 3]$ & $w^{(i)}[2 \ \text{vs} \ 3]$\\
+        			\hline & $\xv^{(1)}$ & 0 & 2 & 3 & 2/3 & 2 & 1\\
+        			& $\xv^{(2)}$ & 1 & 0 & 1 & 0/1 & 2 & 1\\
+                 	& $\xv^{(3)}$ & 2 & 0 & 3 & 0/3 & 2 & 3\\
                 \end{tabular}
 \end{center}
 
@@ -206,11 +206,11 @@
     \begin{itemize}
     \item Example continued
             \begin{center}                                       
-        \begin{tabular}{cc|cccc}\
-        			& & $\cv^{(i)}[3]$ & $\cv^{(i)}[1 \ \text{vs} \ 3]$ & $\tilde{y}^{( i)}[1 \ \text{vs} \ 3]$ & $w^{(i)}[1 \ \text{vs} \ 3]$\\
-        			\hline & $\xv^{(1)}$ & 3 & 0/3 & 1 & 3\\
-        			& $\xv^{(2)}$ & 1 & -/- & - & 0 \\
-                 	& $\xv^{(3)}$ & 3 & 2/3 & 1 & 1\\
+        \begin{tabular}{cc|ccc|ccc}\
+        			& & $\cv^{(i)}[1]$ & $\cv^{(i)}[2]$ & $\cv^{(i)}[3]$ & $\cv^{(i)}[1 \ \text{vs} \ 3]$ & $\tilde{y}^{( i)}[1 \ \text{vs} \ 3]$ & $w^{(i)}[1 \ \text{vs} \ 3]$\\
+        			\hline & $\xv^{(1)}$ & 0 & 2 & 3 & 0/3 & 1 & 3\\
+        			& $\xv^{(2)}$ & 1 & 0 & 1 & -/- & - & 0 \\
+                 	& $\xv^{(3)}$ & 2 & 0 & 3 & 2/3 & 1 & 1\\
                 \end{tabular}
     \end{center}
             \vspace{5pt}
