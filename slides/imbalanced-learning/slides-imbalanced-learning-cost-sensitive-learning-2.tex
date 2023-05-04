@@ -126,9 +126,11 @@
 \begin{vbframe}{MetaCost: Overview}
 
         \begin{itemize}
+        \small
             \item Model-agnostic wrapper technique                      
             \item General idea: 
                 \begin{enumerate}
+                \small
                     \item Relabel training examples with their ``optimal'' classes, i.e., with low expected costs;
                    
                     \item Apply the classifier on the relabeled data set.
@@ -138,7 +140,7 @@
             \centering
             \includegraphics[width=0.5\textwidth]{slides/imbalanced-learning/figure_man/Relabeling_viz.png}
         \end{figure}
-                
+                \item Relabeled instances colored red. Relabeling from good to bad more common because of misclassification cost.
         \end{itemize}
 
 \end{vbframe}
