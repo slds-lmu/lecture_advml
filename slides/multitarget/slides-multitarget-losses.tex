@@ -154,7 +154,7 @@
 
 		\item The \emph{Hamming loss} averages over mistakes on individual scores:    
 		$$
-		\displaystyle L_H(\yv, \mathbf{h}(x)) = \frac{1}{l}  \, \sum_{m=1}^l \, \mathds{1}_{[y_m \neq h_m(x)]},
+		\displaystyle L_H(\yv, \mathbf{h}) = \frac{1}{l}  \, \sum_{m=1}^l \, \mathds{1}_{[y_m \neq h_m(x)]},
 		$$
         where $h_m(x) := [f(\xv)_m \geq c_m]$ is the threshold function for task $m$ with threshold $c_m$. 
         \vspace{5pt}
@@ -163,7 +163,7 @@
 		
 		\item The \emph{subset 0/1 loss} simply checks for entire correctness:  
 		\begin{align*}
-			\displaystyle L_{0/1}(\yv, \mathbf{h}(x)) & = \mathds{1}_{[ \yv \neq \mathbf{h}(x) ]}  =  \max_m \, \mathds{1}_{[y_m \neq  h_m(x)]}
+			\displaystyle L_{0/1}(\yv, \mathbf{h}) & = \mathds{1}_{[ \yv \neq \mathbf{h} ]}  =  \max_m \, \mathds{1}_{[y_m \neq  h_m(x)]}
 		\end{align*}
 		
 	\end{itemize}
