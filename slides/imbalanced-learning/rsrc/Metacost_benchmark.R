@@ -62,9 +62,9 @@ df1 = df1 %>% mutate(cost_min_class = case_when(class == "good" &
 df1 = df1[1:50,]
 
 p <- ggplot(df1, aes(duration, credit_amount, group = cost_min_class)) + 
-  geom_point(aes(shape = cost_min_class, color = cost_min_class), size = 7) +
+  geom_point(aes(shape = cost_min_class, color = cost_min_class), size = 9) +
   scale_shape_manual(values=c(2, 2, 3, 3)) +
-  scale_color_manual(values=c('black','red', 'black', 'blue')) +
+  scale_color_manual(values=c('black','red', 'black', 'red')) +
   xlab("Duration") +
   ylab("Credit Amount") +
   labs(color = "Credit Class", shape = "Credit Class") +
