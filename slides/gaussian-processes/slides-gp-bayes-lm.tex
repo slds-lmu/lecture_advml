@@ -119,19 +119,19 @@
     
 \end{vbframe}
 
-\begin{vbframe}{Review: The Bayesian Linear Model} 
-
-      \begin{footnotesize}
-        For every test input $\xv_*$, we get a distribution over the prediction $y_*$. In particular, we get a posterior mean (orange) and a posterior variance (grey region equals $+/-$ two times standard deviation). 
-      \end{footnotesize}
+\begin{frame}{Review: The Bayesian Linear Model} 
     
     \begin{figure}
-        \foreach \x in{5, 10, 20} {
-           \includegraphics[width=0.5\textwidth]{figure/bayes_lm/posterior_\x_3.pdf}
+        \foreach \x in{1, 2, 3} {
+           \includegraphics<\x>[width=0.5\textwidth]{figure/bayes_lm/posterior_3_\x.pdf}\par
           }
     \end{figure}
+
+          \begin{footnotesize}
+        For every test input $\xv_*$, we get a distribution over the prediction $y_*$. In particular, we get a posterior mean (orange) and a posterior variance (grey region equals $+/-$ two times standard deviation). 
+      \end{footnotesize}
           
-\end{vbframe}
+\end{frame}
 
 
 \begin{vbframe}{Summary: The Bayesian Linear Model}
