@@ -31,13 +31,13 @@ Let $\mathcal{X} = \left\{\xv^{(1)}, \dots , \xv^{(n)}\right\}$ be a finite set 
 
 \lz
 
-Since the domain of any $h(.) \in \Hspace$ has only $n$ elements, we can represent the function $h(.)$ compactly as a $n$-dimensional vector $$\bm{h} = \left[h\left(\xv^{(1)}\right), \dots, h\left(\xv^{(n)}\right)\right].$$
+Since the domain of any $f(.) \in \Hspace$ has only $n$ elements, we can represent the function $f(.)$ compactly as a $n$-dimensional vector $$\bm{f} = \left[f\left(\xv^{(1)}\right), \dots, f\left(\xv^{(n)}\right)\right].$$
 \end{vbframe}
 
 
 \begin{frame}{Discrete Functions}
 
-\textbf{Example 1:} Let us consider $h: \Xspace \to \Yspace$ where the input space consists of \textbf{two} points $\Xspace = \{0, 1\}$. 
+\textbf{Example 1:} Let us consider $f: \Xspace \to \R$ where the input space consists of \textbf{two} points $\Xspace = \{0, 1\}$. 
 
 \lz 
 
@@ -54,7 +54,7 @@ Examples for functions that live in this space:
 
 \begin{frame}{Discrete Functions}
 
-\textbf{Example 2:} Let us consider $h: \Xspace \to \Yspace$ where the input space consists of \textbf{five} points $\Xspace = \{0, 0.25, 0.5, 0.75, 1\}$.
+\textbf{Example 2:} Let us consider $f: \Xspace \to \R$ where the input space consists of \textbf{five} points $\Xspace = \{0, 0.25, 0.5, 0.75, 1\}$.
 
 \lz 
 
@@ -71,7 +71,7 @@ Examples for functions that live in this space:
 
 \begin{frame}{Discrete Functions}
 
-\textbf{Example 3:} Let us consider $h: \Xspace \to \Yspace$ where the input space consists of \textbf{ten} points. 
+\textbf{Example 3:} Let us consider $f: \Xspace \to \R$ where the input space consists of \textbf{ten} points. 
 
 \lz 
 
@@ -90,9 +90,9 @@ Examples for functions that live in this space:
 
 \vspace*{0.5cm}
 
-One natural way to specify a probability function on discrete function $h \in \Hspace$ is to use the vector representation 
+One natural way to specify a probability function on a discrete function $f \in \Hspace$ is to use the vector representation 
 $$
-  \bm{h} = \left[h\left(\xi[1]\right), h\left(\xi[2]\right), \dots, h\left(\xi[n]\right)\right]
+  \bm{f} = \left[f\left(\xi[1]\right), f\left(\xi[2]\right), \dots, f\left(\xi[n]\right)\right]
 $$ 
 
 
@@ -100,10 +100,10 @@ of the function.
 
 \lz
 
-Let us see $\bm{h}$ as a $n$-dimensional random variable. We will further assume the following normal distribution: 
+Let us see $\bm{f}$ as a $n$-dimensional random variable. We will further assume the following normal distribution: 
 
 $$
-  \bm{h} \sim \mathcal{N}\left(\bm{m}, \bm{K}\right).
+  \bm{f} \sim \mathcal{N}\left(\bm{m}, \bm{K}\right).
 $$ 
 
 \textbf{Note: } For now, we set $\bm{m} = \bm{0}$ and take the covariance matrix $\bm{K}$ as given. We will see later how they are chosen / estimated. 
@@ -112,10 +112,10 @@ $$
 
 \begin{frame}{Discrete Functions}
 
-\textbf{Example 1 (continued):} Let $h: \Xspace \to \Yspace$ be a function that is defined on \textbf{two} points $\Xspace$. We sample functions by sampling from a two-dimensional normal variable
+\textbf{Example 1 (continued):} Let $f: \Xspace \to \R$ be a function that is defined on \textbf{two} points $\Xspace$. We sample functions by sampling from a two-dimensional normal variable
 
 $$
-\bm{h} = [h(1), h(2)] \sim \mathcal{N}(\bm{m}, \bm{K})
+\bm{f} = [f(1), f(2)] \sim \mathcal{N}(\bm{m}, \bm{K})
 $$
 
 
@@ -133,11 +133,11 @@ In this example, $m = (0, 0)$ and $K = \begin{pmatrix} 1 & 0.5 \\ 0.5 & 1 \end{p
 
 \begin{frame}{Discrete Functions}
 
-\textbf{Example 2 (continued):} Let us consider $h: \Xspace \to \Yspace$ where the input space consists of \textbf{five} points. We sample functions by sampling from a five-dimensional normal variable
+\textbf{Example 2 (continued):} Let us consider $f: \Xspace \to \R$ where the input space consists of \textbf{five} points. We sample functions by sampling from a five-dimensional normal variable
 
 
 $$
-\bm{h} = [h(1), h(2), h(3), h(4), h(5)] \sim \mathcal{N}(\bm{m}, \bm{K})
+\bm{f} = [f(1), f(2), f(3), f(4), f(5)] \sim \mathcal{N}(\bm{m}, \bm{K})
 $$
 
 \begin{figure}[h]
@@ -171,10 +171,10 @@ $$
 
 \begin{frame}{Discrete Functions}
 
-\textbf{Example 3 (continued):} Let us consider $h: \Xspace \to \Yspace$ where the input space consists of \textbf{ten} points. We sample functions by sampling from ten-dimensional normal variable
+\textbf{Example 3 (continued):} Let us consider $f: \Xspace \to \R$ where the input space consists of \textbf{ten} points. We sample functions by sampling from ten-dimensional normal variable
 
 $$
-\bm{h} = [h(1), h(2), \dots, h(10)] \sim \mathcal{N}(\bm{m}, \bm{K})
+\bm{f} = [f(1), f(2), \dots, f(10)] \sim \mathcal{N}(\bm{m}, \bm{K})
 $$
 
 \begin{figure}[h]
