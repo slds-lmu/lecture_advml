@@ -32,7 +32,7 @@ plotDiscreteFunction <- function(x, y, xlim, ylim) {
 	p1 <- p1 +
 		scale_x_continuous(breaks = x, labels = round(x, 1)) +
 		scale_color_gradientn(colours = c(low = "#E0E0E0", high = "#004C99")) +
-		ylab("h(x)") + ylim(ylim) +
+		ylab("f(x)") + ylim(ylim) +
 		theme(
 		  plot.background = element_blank(),
 		  panel.grid.major = element_blank(),
