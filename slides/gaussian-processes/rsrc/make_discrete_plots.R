@@ -216,7 +216,7 @@ y <- as.vector(rmvnorm(1, mean = muc, sigma = sigmac))
 
 p1 <- plotDiscreteFunction(x, y, xlim = c(0, 4), ylim = c(- 2, 2)) +
   theme(axis.text.x=element_blank()) +
-  ggtitle(paste0("Sample Function for a)", ", n = ", input)) + ylim(c(-2, 2))
+  ggtitle(paste0("Sample Function for b)", ", n = ", input)) + ylim(c(-2, 2))
 
 ggsave(paste0("../figure/discrete/example_extreme_", input, "_2.pdf"), p1, width = 3.5, height = 3)
 
@@ -227,7 +227,7 @@ y <- as.vector(rmvnorm(1, mean = muc, sigma = sigmac))
 
 p1 <- plotDiscreteFunction(x, y, xlim = c(0, 4), ylim = c(- 2, 2)) +
   theme(axis.text.x=element_blank()) +
-  ggtitle(paste0("Sample Function for a)", ", n = ", input)) + ylim(c(-2, 2))
+  ggtitle(paste0("Sample Function for c)", ", n = ", input)) + ylim(c(-2, 2))
 
 ggsave(paste0("../figure/discrete/example_extreme_", input, "_3.pdf"), p1, width = 3.5, height = 3)
 
@@ -236,13 +236,13 @@ y <- as.vector(rmvnorm(1, mean = muc, sigma = sigmac))
 
 p1 <- plotDiscreteFunction(x, y, xlim = c(0, 4), ylim = c(- 2, 2)) +
   theme(axis.text.x=element_blank()) +
-  ggtitle(paste0("Sample Function for b)", ", n = ", input)) +
+  ggtitle(paste0("Sample Function for d) K = I", ", n = ", input)) +
   ylim(c(-2, 2))
 
 ggsave(paste0("../figure/discrete/example_extreme_", input, "_4.pdf"), p1, width = 3.5, height = 3)
 
 p1 <- p1 +
-  ggtitle(paste0("Sample Function for b) K = I", ", n = ", input)) +
+  ggtitle(paste0("Sample Function for d) K = I", ", n = ", input)) +
   ylim(c(-2, 2))
 
 ggsave(paste0("../figure/discrete/example_extreme_", input, "_5.pdf"), p1, width = 3.5, height = 3)
@@ -253,7 +253,7 @@ y <- as.vector(rmvnorm(1, mean = muc, sigma = sigmac))
 
 p1 <- plotDiscreteFunction(x, y, xlim = c(0, 4), ylim = c(- 2, 2)) +
   theme(axis.text.x=element_blank()) +
-  ggtitle(paste0("Sample Function for c)", ", n = ", input)) +
+  ggtitle(paste0("Sample Function for e)", ", n = ", input)) +
   ylim(c(-2, 2))
 
 ggsave(paste0("../figure/discrete/example_extreme_", input, "_6.pdf"), p1, width = 3.5, height = 3)
