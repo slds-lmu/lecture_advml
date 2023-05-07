@@ -188,18 +188,32 @@ $$
 
 \begin{vbframe}{Role of the Covariance Function}
 
-Note that the covariance controls the \enquote{shape} of the drawn function. Consider two extreme cases where function values are
+Note that the covariance controls the \enquote{shape} of the drawn function. Consider four cases of varying correlation size
+\vspace{10pt}
 
 \begin{enumerate}
-  \item[a)] strongly correlated: $\bm{K} = \begin{footnotesize}\begin{pmatrix} 1 & 0.99 & \dots & 0.99 \\
+  \item[a)] Correlation almost 1: $\bm{K} = \begin{footnotesize}\begin{pmatrix} 1 & 0.99 & \dots & 0.99 \\
   0.99 & 1 & \dots & 0.99 \\
   0.99 & 0.99 & \ddots & 0.99 \\
-  0.99 & \dots & 0.99 & 1 \end{pmatrix}\end{footnotesize}$
-  \item[b)] uncorrelated: $\bm{K} = \id$
+  0.99 & \dots & 0.99 & 1 \end{pmatrix}.\end{footnotesize}$
+  \vspace{10pt}
+  \item[b)] strongly correlated: Off diagonal elements between 0.7-0.9.
+  \vspace{10pt}
+  \item[c)] moderately correlated: Off diagonal elements between 0.4-0.7.
+  \vspace{10pt}
+  \item[d)] uncorrelated: $\bm{K} = \id$.
 \end{enumerate}
+
+\end{vbframe}
+
+\begin{vbframe}{Role of the Covariance Function}
 
 \begin{figure}
   \includegraphics[width=0.35\linewidth]{figure/discrete/example_extreme_50_1.pdf} \includegraphics[width=0.35\linewidth]{figure/discrete/example_extreme_50_2.pdf}
+\end{figure}
+
+\begin{figure}
+  \includegraphics[width=0.35\linewidth]{figure/discrete/example_extreme_50_3.pdf} \includegraphics[width=0.35\linewidth]{figure/discrete/example_extreme_50_4.pdf}
 \end{figure}
 
 
@@ -222,11 +236,11 @@ Note that the covariance controls the \enquote{shape} of the drawn function. Con
 
   \vspace*{0.2cm}
   \begin{enumerate}
-    \item[c)] Spatial correlation: \begin{footnotesize}$K_{ij} = k(\xi[i], \xi[j]) = \exp\left(-\frac{1}{2}\left|\xi - \xi[j]\right|^2\right)$\end{footnotesize}
+    \item[e)] Spatial correlation: \begin{footnotesize}$K_{ij} = k(\xi[i], \xi[j]) = \exp\left(-\frac{1}{2}\left|\xi - \xi[j]\right|^2\right)$\end{footnotesize}
   \end{enumerate}
 
 \begin{figure}
-  \includegraphics[width=0.45\linewidth]{figure/discrete/example_extreme_50_4.pdf}  \includegraphics[width=0.45\linewidth]{figure/discrete/example_extreme_50_3.pdf}
+  \includegraphics[width=0.45\linewidth]{figure/discrete/example_extreme_50_5.pdf}  \includegraphics[width=0.45\linewidth]{figure/discrete/example_extreme_50_6.pdf}
 \end{figure}
 
 \end{itemize}
