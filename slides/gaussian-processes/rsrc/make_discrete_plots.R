@@ -5,6 +5,8 @@ library(gridExtra)
 library(mvtnorm)
 library(matrixcalc)
 library(reshape2)
+library(RKUM)
+library(rv)
 
 
 plotDiscreteFunction <- function(x, y, xlim, ylim) {
@@ -189,7 +191,7 @@ for (input in ninputs) {
 }
 
 
-# --- Two extreme Cases 
+# --- Four Cases 
 
 set.seed(123)
 
@@ -200,39 +202,61 @@ sigmac <- matrix(0.999, input, input) + 0.01 * diag(input)
 
 x <- seq(0, 1, length.out = input)
 y <- as.vector(rmvnorm(1, mean = muc, sigma = sigmac))
-		
+
 p1 <- plotDiscreteFunction(x, y, xlim = c(0, 4), ylim = c(- 2, 2)) +
-	theme(axis.text.x=element_blank()) +
-	ggtitle(paste0("Sample Function for a)", ", n = ", input)) + ylim(c(-2, 2))
+  theme(axis.text.x=element_blank()) +
+  ggtitle(paste0("Sample Function for a)", ", n = ", input)) + ylim(c(-2, 2))
 
 ggsave(paste0("../figure/discrete/example_extreme_", input, "_1.pdf"), p1, width = 3.5, height = 3)
+
+vec <- rep(3, input) + runif(n = 50, min = 0, max = 0.0001)
+sigmac <- outer(vec, vec, "*")
+sigmac <- gkm(sigmac)
+y <- as.vector(rmvnorm(1, mean = muc, sigma = sigmac))
+
+p1 <- plotDiscreteFunction(x, y, xlim = c(0, 4), ylim = c(- 2, 2)) +
+  theme(axis.text.x=element_blank()) +
+  ggtitle(paste0("Sample Function for a)", ", n = ", input)) + ylim(c(-2, 2))
+
+ggsave(paste0("../figure/discrete/example_extreme_", input, "_2.pdf"), p1, width = 3.5, height = 3)
+
+vec <- rep(3, input) + runif(n = 50, min = 0, max = 0.01)
+sigmac <- outer(vec, vec, "*")
+sigmac <- gkm(sigmac)
+y <- as.vector(rmvnorm(1, mean = muc, sigma = sigmac))
+
+p1 <- plotDiscreteFunction(x, y, xlim = c(0, 4), ylim = c(- 2, 2)) +
+  theme(axis.text.x=element_blank()) +
+  ggtitle(paste0("Sample Function for a)", ", n = ", input)) + ylim(c(-2, 2))
+
+ggsave(paste0("../figure/discrete/example_extreme_", input, "_3.pdf"), p1, width = 3.5, height = 3)
 
 sigmac <- diag(input)
 y <- as.vector(rmvnorm(1, mean = muc, sigma = sigmac))
 
 p1 <- plotDiscreteFunction(x, y, xlim = c(0, 4), ylim = c(- 2, 2)) +
-	theme(axis.text.x=element_blank()) +
-	ggtitle(paste0("Sample Function for b)", ", n = ", input)) +
-	ylim(c(-2, 2))
-
-ggsave(paste0("../figure/discrete/example_extreme_", input, "_2.pdf"), p1, width = 3.5, height = 3)
-
-p1 <- p1 +
-	ggtitle(paste0("Sample Function for b) K = I", ", n = ", input)) +
-	ylim(c(-2, 2))
+  theme(axis.text.x=element_blank()) +
+  ggtitle(paste0("Sample Function for b)", ", n = ", input)) +
+  ylim(c(-2, 2))
 
 ggsave(paste0("../figure/discrete/example_extreme_", input, "_4.pdf"), p1, width = 3.5, height = 3)
+
+p1 <- p1 +
+  ggtitle(paste0("Sample Function for b) K = I", ", n = ", input)) +
+  ylim(c(-2, 2))
+
+ggsave(paste0("../figure/discrete/example_extreme_", input, "_5.pdf"), p1, width = 3.5, height = 3)
 
 
 sigmac <- squared.exp(x, x, l = 0.1)[1:input, 1:input]
 y <- as.vector(rmvnorm(1, mean = muc, sigma = sigmac))
 
 p1 <- plotDiscreteFunction(x, y, xlim = c(0, 4), ylim = c(- 2, 2)) +
-	theme(axis.text.x=element_blank()) +
-	ggtitle(paste0("Sample Function for c)", ", n = ", input)) +
-	ylim(c(-2, 2))
+  theme(axis.text.x=element_blank()) +
+  ggtitle(paste0("Sample Function for c)", ", n = ", input)) +
+  ylim(c(-2, 2))
 
-ggsave(paste0("../figure/discrete/example_extreme_", input, "_3.pdf"), p1, width = 3.5, height = 3)
+ggsave(paste0("../figure/discrete/example_extreme_", input, "_6.pdf"), p1, width = 3.5, height = 3)
 
 
 
