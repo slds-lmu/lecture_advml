@@ -84,6 +84,29 @@ for (j in 1:length(x.obs)) {
   ggsave(paste0("../figure/gp_sample/2_", j, ".pdf"), width = 6, height = 4)
 }
 
+
+df$means = rowMeans(df[2:21])
+df$lc = apply(df[2:21], 1, min)
+df$uc = apply(df[2:21], 1, max)
+
+plot <- ggplot() +
+  geom_line(data = df, aes(x = x, y = means), color = "red") +
+  geom_line(data = df, aes(x = x, y = lc), color = "grey") +
+  geom_line(data = df, aes(x = x, y = uc), color = "grey") +
+  geom_ribbon(data = df, aes(x=x, ymax=uc, ymin=lc), fill="grey", alpha=.5) +
+  geom_point(data = data.frame(x = x.obs[1:4], y = y.obs[1:4]),
+             aes(x = x, y = y),
+             size = 2) +
+  xlab("x") +
+  ylab("f(x)") +
+  ylim(c(-3, 3)) +
+  theme_bw() +
+  theme(legend.position = "none") +
+  ggtitle(paste0("Posterior process after 4 observations")) +
+  scale_color_viridis(end = 0.9, discrete = TRUE)
+
+ggsave(paste0("../figure/gp_sample/2_mean_var.pdf"), width = 6, height = 4)
+
 ###############################################
 ##### 10 different samples
 
