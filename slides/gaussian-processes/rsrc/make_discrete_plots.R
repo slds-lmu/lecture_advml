@@ -45,27 +45,22 @@ plotDiscreteFunction <- function(x, y, xlim, ylim) {
 	return(p1)
 }
 
-plotDiscreteFunctionLine <- function(x, y, xlim, ylim) {
-  
-  df <- data.frame(x = x, y = y)
+plotDiscreteFunctionLine <- function(x, y, xlim, ylim, num_seeds) {
   
   p1 <- ggplot() +
     xlim(xlim) +
     theme_bw()
-  if (nrow(df) >= 20) {
+  
+  for (i in 1:length(num_seeds)) {
+    y = list_y[[i]]
+    df <- data.frame(x = x, y = y)
+    
     p1 = p1 + geom_line(data = df, aes(x = x, y = y, xend = x, yend = -Inf), colour = "grey", alpha = 0.5) 
     p1 <- p1 +
       geom_point(data = df,
                  aes(x = x, y = y, color = x),
                  size = 1, shape =
                    15)
-  } else {
-    p1 <- p1 +
-      geom_segment(data = df,
-                   aes(x = x, y = y, xend = x, yend = -Inf),
-                   color = "grey",
-                   lty = 2) +
-      geom_point(data = df, aes(x = x, y = y, color = x), size = 3, shape = 15)
   }
   p1 <- p1 +
     scale_x_continuous(breaks = x, labels = round(x, 1)) +
@@ -227,45 +222,66 @@ for (input in ninputs) {
 }
 
 
-# --- Four Cases 
+# --- Three Cases
 
-set.seed(123)
-
+list_y = list()
+seeds = c(123, 234, 399)
 input <- 50
-
 muc <- rep(0, input)
+x <- seq(0, 1, length.out = input)
+
+
 sigmac <- matrix(0.999, input, input) + 0.01 * diag(input)
 
-x <- seq(0, 1, length.out = input)
-y <- as.vector(rmvnorm(1, mean = muc, sigma = sigmac))
+for (i in 1:length(seeds)){
+  
+  set.seed(seeds[i])
+  list_y[[i]] <- as.vector(rmvnorm(1, mean = muc, sigma = sigmac))
+  
+}
 
-p1 <- plotDiscreteFunctionLine(x, y, xlim = c(0, 4), ylim = c(- 2, 2)) +
+p1 <- plotDiscreteFunctionLine(x, y, xlim = c(0, 4), ylim = c(- 2, 2), num_seeds = seeds) +
   theme(axis.text.x=element_blank()) +
   ggtitle(paste0("Sample Function for b)", ", n = ", input)) + ylim(c(-2, 2))
 
-ggsave(paste0(".../figure/discrete/example_extreme_", input, "_2.pdf"), p1, width = 3.5, height = 3)
+
+ggsave(paste0("/Users/toby/Downloads/figure/discrete/example_extreme_", input, "_2.pdf"), p1, width = 3.5, height = 3)
 
 
+list_y = list()
 sigmac <- diag(input)
-y <- as.vector(rmvnorm(1, mean = muc, sigma = sigmac))
 
-p1 <- plotDiscreteFunctionLine(x, y, xlim = c(0, 4), ylim = c(- 2, 2)) +
+for (i in 1:length(seeds)){
+  
+  set.seed(seeds[i])
+  list_y[[i]] <- as.vector(rmvnorm(1, mean = muc, sigma = sigmac))
+  
+}
+
+p1 <- plotDiscreteFunctionLine(x, y, xlim = c(0, 4), ylim = c(- 2, 2), num_seeds = seeds) +
   theme(axis.text.x=element_blank()) +
   ggtitle(paste0("Sample Function for a) K = I", ", n = ", input)) +
   ylim(c(-2, 2))
 
-ggsave(paste0(".../figure/discrete/example_extreme_", input, "_1.pdf"), p1, width = 3.5, height = 3)
+ggsave(paste0("/Users/toby/Downloads/figure/discrete/example_extreme_", input, "_1.pdf"), p1, width = 3.5, height = 3)
 
 
+list_y = list()
 sigmac <- squared.exp(x, x, l = 0.1)[1:input, 1:input]
-y <- as.vector(rmvnorm(1, mean = muc, sigma = sigmac))
 
-p1 <- plotDiscreteFunctionLine(x, y, xlim = c(0, 4), ylim = c(- 2, 2)) +
+for (i in 1:length(seeds)){
+  
+  set.seed(seeds[i])
+  list_y[[i]] <- as.vector(rmvnorm(1, mean = muc, sigma = sigmac))
+  
+}
+
+p1 <- plotDiscreteFunctionLine(x, y, xlim = c(0, 4), ylim = c(- 2, 2), num_seeds = seeds) +
   theme(axis.text.x=element_blank()) +
   ggtitle(paste0("Sample Function for c)", ", n = ", input)) +
   ylim(c(-2, 2))
 
-ggsave(paste0(".../figure/discrete/example_extreme_", input, "_3.pdf"), p1, width = 3.5, height = 3)
+ggsave(paste0("/Users/toby/Downloads/figure/discrete/example_extreme_", input, "_3.pdf"), p1, width = 3.5, height = 3)
 
 
 
