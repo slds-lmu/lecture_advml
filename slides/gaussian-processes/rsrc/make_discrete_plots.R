@@ -242,10 +242,10 @@ for (i in 1:length(seeds)){
 
 p1 <- plotDiscreteFunctionLine(x, y, xlim = c(0, 4), ylim = c(- 2, 2), num_seeds = seeds) +
   theme(axis.text.x=element_blank()) +
-  ggtitle(paste0("Sample Function for b)", ", n = ", input)) + ylim(c(-2, 2))
+  ggtitle(paste0("Sample Functions for b)", ", n = ", input)) + ylim(c(-2, 2))
 
 
-ggsave(paste0("/Users/toby/Downloads/figure/discrete/example_extreme_", input, "_2.pdf"), p1, width = 3.5, height = 3)
+ggsave(paste0(".../figure/discrete/example_extreme_", input, "_2.pdf"), p1, width = 3.5, height = 3)
 
 
 list_y = list()
@@ -260,10 +260,10 @@ for (i in 1:length(seeds)){
 
 p1 <- plotDiscreteFunctionLine(x, y, xlim = c(0, 4), ylim = c(- 2, 2), num_seeds = seeds) +
   theme(axis.text.x=element_blank()) +
-  ggtitle(paste0("Sample Function for a) K = I", ", n = ", input)) +
+  ggtitle(paste0("Sample Functions for a) K = I", ", n = ", input)) +
   ylim(c(-2, 2))
 
-ggsave(paste0("/Users/toby/Downloads/figure/discrete/example_extreme_", input, "_1.pdf"), p1, width = 3.5, height = 3)
+ggsave(paste0(".../figure/discrete/example_extreme_", input, "_1.pdf"), p1, width = 3.5, height = 3)
 
 
 list_y = list()
@@ -278,10 +278,10 @@ for (i in 1:length(seeds)){
 
 p1 <- plotDiscreteFunctionLine(x, y, xlim = c(0, 4), ylim = c(- 2, 2), num_seeds = seeds) +
   theme(axis.text.x=element_blank()) +
-  ggtitle(paste0("Sample Function for c)", ", n = ", input)) +
+  ggtitle(paste0("Sample Functions for c)", ", n = ", input)) +
   ylim(c(-2, 2))
 
-ggsave(paste0("/Users/toby/Downloads/figure/discrete/example_extreme_", input, "_3.pdf"), p1, width = 3.5, height = 3)
+ggsave(paste0(".../figure/discrete/example_extreme_", input, "_3.pdf"), p1, width = 3.5, height = 3)
 
 
 
