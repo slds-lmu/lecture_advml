@@ -88,6 +88,9 @@ plot_f1 = ggplot(table, aes(x=factor(Task, level = x_labels), y=F1_Score, group 
 
 # Combine plots
 
-grid.arrange(plot_acc, plot_tpr, plot_ppv, plot_f1, ncol = 2, nrow = 2)
+p = grid.arrange(plot_acc, plot_tpr, plot_ppv, plot_f1, ncol = 2, nrow = 2)
+
+ggsave(paste0(".../figure_man/benchmark_plots.pdf"), p, width = 15, height = 10)
+
 
 
