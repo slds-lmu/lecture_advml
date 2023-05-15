@@ -93,6 +93,7 @@ plot_ranger = ggplot(data=out[[3]], aes(x=num, y=cost, group=1)) +
   geom_segment(aes(x = 0.75, y = 125, xend = 0.75, yend = 240), linetype="dashed", color = "orange", size=0.75) +
   theme(plot.title = element_text(hjust = 0.5))
 
-grid.arrange(plot_log, plot_xgboost, plot_ranger, ncol = 3, nrow = 1)
+p = grid.arrange(plot_log, plot_xgboost, plot_ranger, ncol = 3, nrow = 1)
 
+ggsave(paste0(".../figure_man/threshold_plots.pdf"), p, width = 15, height = 5)
 
