@@ -23,13 +23,13 @@ plot1
 
 # Interpolate p2 with p1 for K=2
 # p2 is colored red and its two nearest neighbors blue
-# The convex line between the selected neighbor is colored in green
+# The convex line between the selected neighbor is colored in #00c300
 
 
 plot2 = ggplot(df, aes(V1, V2)) +
   geom_point(size = 5, shape = 3, stroke = 1) +
   coord_cartesian(xlim = c(0,5), ylim = c(0,5)) +
-  geom_segment(aes(x = 1, y = 2, xend = 3, yend = 1), color = "green") +
+  geom_segment(aes(x = 1, y = 2, xend = 3, yend = 1), color = "#00c300") +
   geom_point(data = df[2 ,], size = 5, shape = 3, color = "red", stroke = 1) +
   geom_text(data = df[2 ,], label = "Selected Point", vjust = 3, color = "red") +
   geom_point(data = df[1 ,], size = 5, shape = 3, color = "blue", stroke = 1) +
@@ -55,15 +55,15 @@ plot3 = ggplot(df1, aes(V1, V2)) +
   geom_point(size = 5, shape = 3, stroke = 1) +
   coord_cartesian(xlim = c(0,5), ylim = c(0,5)) +
   labs(x = "x1", y = "x2") +
-  geom_segment(aes(x = 1, y = 2, xend = 3, yend = 1), color = "green") +
+  geom_segment(aes(x = 1, y = 2, xend = 3, yend = 1), color = "#00c300") +
   geom_point(data = df1[2 ,], size = 5, shape = 3, color = "red", stroke = 1) +
   geom_text(data = df1[2 ,], label = "Selected Point", vjust = 3, color = "red", size = 4) +
   geom_point(data = df1[1 ,], size = 5, shape = 3, color = "blue", stroke = 1) +
   geom_text(data = df1[1 ,], label = "Nearest Neighbor", vjust = -3, color = "blue", size = 4) +
   geom_point(data = df1[3 ,], size = 5, shape = 3, color = "blue", stroke = 1) +
   geom_text(data = df1[3 ,], label = "Nearest Neighbor", vjust = 3, color = "blue", size = 4) +
-  geom_point(data = df1[5 ,], size = 5, shape = 3, color = "green", stroke = 1) +
-  geom_text(data = df1[5 ,], label = "Synthetic Point", vjust = 3, color = "green", size = 4) +
+  geom_point(data = df1[5 ,], size = 5, shape = 3, color = "#00c300", stroke = 1) +
+  geom_text(data = df1[5 ,], label = "Synthetic Point", vjust = 3, color = "#00c300", size = 4) +
   theme(axis.text=element_text(size=13),
         axis.title=element_text(size=16))
 
@@ -73,8 +73,8 @@ plot3
 
 plot4 = ggplot(df1, aes(V1, V2)) +
   geom_point(size = 5, shape = 3, stroke = 1) +
-  geom_point(data = df1[5 ,], size = 5, shape = 3, color = "green", stroke = 1) +
-  geom_text(data = df1[5 ,], label = "Synthetic Point", vjust = 3, color = "green", size = 4) +
+  geom_point(data = df1[5 ,], size = 5, shape = 3, color = "#00c300", stroke = 1) +
+  geom_text(data = df1[5 ,], label = "Synthetic Point", vjust = 3, color = "#00c300", size = 4) +
   coord_cartesian(xlim = c(0,5), ylim = c(0,5)) +
   labs(x = "x1", y = "x2") +
   theme(axis.text=element_text(size=13),
@@ -89,14 +89,14 @@ plot5 = ggplot(df1, aes(V1, V2)) +
   geom_point(size = 5, shape = 3, stroke = 1) +
   coord_cartesian(xlim = c(0,5), ylim = c(0,5)) +
   labs(x = "x1", y = "x2") +
-  geom_segment(aes(x = 1, y = 2, xend = 1, yend = 1), color = "green") +
+  geom_segment(aes(x = 1, y = 2, xend = 1, yend = 1), color = "#00c300") +
   geom_point(data = df1[1 ,], size = 5, shape = 3, color = "red", stroke = 1) +
   geom_text(data = df1[1 ,], label = "Selected Point", vjust = -3, color = "red", size = 4) +
   geom_point(data = df1[2 ,], size = 5, shape = 3, color = "blue", stroke = 1) +
   geom_text(data = df1[2 ,], label = "Nearest Neighbor", vjust = 3, color = "blue", size = 4) +
   geom_point(data = df1[3 ,], size = 5, shape = 3, color = "blue", stroke = 1) +
   geom_text(data = df1[3 ,], label = "Nearest Neighbor", vjust = 3, color = "blue", size = 4) +
-  geom_point(data = df1[5 ,], size = 5, shape = 3, color = "green", stroke = 1) +
+  geom_point(data = df1[5 ,], size = 5, shape = 3, color = "#00c300", stroke = 1) +
   theme(axis.text=element_text(size=13),
         axis.title=element_text(size=16))
 
@@ -111,16 +111,16 @@ plot6 = ggplot(df2, aes(V1, V2)) +
   geom_point(size = 5, shape = 3, stroke = 1) +
   coord_cartesian(xlim = c(0,5), ylim = c(0,5)) +
   labs(x = "x1", y = "x2") +
-  geom_segment(aes(x = 1, y = 2, xend = 1, yend = 1), color = "green") +
+  geom_segment(aes(x = 1, y = 2, xend = 1, yend = 1), color = "#00c300") +
   geom_point(data = df2[1 ,], size = 5, shape = 3, color = "red", stroke = 1) +
   geom_text(data = df2[1 ,], label = "Selected Point", vjust = -3, color = "red", size = 4) +
   geom_point(data = df2[2 ,], size = 5, shape = 3, color = "blue", stroke = 1) +
   geom_text(data = df2[2 ,], label = "Nearest Neighbor", vjust = 3, color = "blue", size = 4) +
   geom_point(data = df2[3 ,], size = 5, shape = 3, color = "blue", stroke = 1) +
   geom_text(data = df2[3 ,], label = "Nearest Neighbor", vjust = 3, color = "blue", size = 4) +
-  geom_point(data = df2[5 ,], size = 5, shape = 3, color = "green", stroke = 1) +
-  geom_point(data = df2[6 ,], size = 5, shape = 3, color = "green", stroke = 1) +
-  geom_text(data = df2[6 ,], label = "Synthetic Point", hjust = 1.2, color = "green", size = 4) +
+  geom_point(data = df2[5 ,], size = 5, shape = 3, color = "#00c300", stroke = 1) +
+  geom_point(data = df2[6 ,], size = 5, shape = 3, color = "#00c300", stroke = 1) +
+  geom_text(data = df2[6 ,], label = "Synthetic Point", hjust = 1.2, color = "#00c300", size = 4) +
   theme(axis.text=element_text(size=13),
         axis.title=element_text(size=16))
 
@@ -130,9 +130,9 @@ plot7 = ggplot(df2, aes(V1, V2)) +
   geom_point(size = 5, shape = 3, stroke = 1) +
   coord_cartesian(xlim = c(0,5), ylim = c(0,5)) +
   labs(x = "x1", y = "x2") +
-  geom_point(data = df2[5 ,], size = 5, shape = 3, color = "green", stroke = 1) +
-  geom_point(data = df2[6 ,], size = 5, shape = 3, color = "green", stroke = 1) +
-  geom_text(data = df2[6 ,], label = "Synthetic Point", hjust = 1.2, color = "green", size = 4) +
+  geom_point(data = df2[5 ,], size = 5, shape = 3, color = "#00c300", stroke = 1) +
+  geom_point(data = df2[6 ,], size = 5, shape = 3, color = "#00c300", stroke = 1) +
+  geom_text(data = df2[6 ,], label = "Synthetic Point", hjust = 1.2, color = "#00c300", size = 4) +
   theme(axis.text=element_text(size=13),
         axis.title=element_text(size=16))
 
@@ -144,15 +144,15 @@ plot8 = ggplot(df2, aes(V1, V2)) +
   geom_point(size = 5, shape = 3, stroke = 1) +
   coord_cartesian(xlim = c(0,5), ylim = c(0,5)) +
   labs(x = "x1", y = "x2") +
-  geom_segment(aes(x = 4, y = 4, xend = 3, yend = 1), color = "green") +
+  geom_segment(aes(x = 4, y = 4, xend = 3, yend = 1), color = "#00c300") +
   geom_point(data = df2[4 ,], size = 5, shape = 3, color = "red", stroke = 1) +
   geom_text(data = df2[4 ,], label = "Selected Point", vjust = -3, color = "red", size = 4) +
   geom_point(data = df2[1 ,], size = 5, shape = 3, color = "blue", stroke = 1) +
   geom_text(data = df2[1 ,], label = "Nearest Neighbor", vjust = -3, color = "blue", size = 4) +
   geom_point(data = df2[2 ,], size = 5, shape = 3, color = "blue", stroke = 1) +
   geom_text(data = df2[2 ,], label = "Nearest Neighbor", vjust = 3, color = "blue", size = 4) +
-  geom_point(data = df2[5 ,], size = 5, shape = 3, color = "green", stroke = 1) +
-  geom_point(data = df2[6 ,], size = 5, shape = 3, color = "green", stroke = 1) +
+  geom_point(data = df2[5 ,], size = 5, shape = 3, color = "#00c300", stroke = 1) +
+  geom_point(data = df2[6 ,], size = 5, shape = 3, color = "#00c300", stroke = 1) +
   theme(axis.text=element_text(size=12),
         axis.title=element_text(size=14))
 
@@ -167,17 +167,17 @@ plot9 = ggplot(df2, aes(V1, V2)) +
   geom_point(size = 5, shape = 3, stroke = 1) +
   coord_cartesian(xlim = c(0,5), ylim = c(0,5)) +
   labs(x = "x1", y = "x2") +
-  geom_segment(aes(x = 4, y = 4, xend = 3, yend = 1), color = "green") +
+  geom_segment(aes(x = 4, y = 4, xend = 3, yend = 1), color = "#00c300") +
   geom_point(data = df3[4 ,], size = 5, shape = 3, color = "red", stroke = 1) +
   geom_text(data = df3[4 ,], label = "Selected Point", vjust = -3, color = "red", size = 4) +
   geom_point(data = df3[1 ,], size = 5, shape = 3, color = "blue", stroke = 1) +
   geom_text(data = df3[1 ,], label = "Nearest Neighbor", vjust = -3, color = "blue", size = 4) +
   geom_point(data = df3[2 ,], size = 5, shape = 3, color = "blue", stroke = 1) +
   geom_text(data = df3[2 ,], label = "Nearest Neighbor", vjust = 3, color = "blue", size = 4) +
-  geom_point(data = df3[5 ,], size = 5, shape = 3, color = "green", stroke = 1) +
-  geom_point(data = df3[6 ,], size = 5, shape = 3, color = "green", stroke = 1) +
-  geom_point(data = df3[7 ,], size = 5, shape = 3, color = "green", stroke = 1) +
-  geom_text(data = df3[7 ,], label = "Synthetic Point", hjust = -0.2, color = "green", size = 4) +
+  geom_point(data = df3[5 ,], size = 5, shape = 3, color = "#00c300", stroke = 1) +
+  geom_point(data = df3[6 ,], size = 5, shape = 3, color = "#00c300", stroke = 1) +
+  geom_point(data = df3[7 ,], size = 5, shape = 3, color = "#00c300", stroke = 1) +
+  geom_text(data = df3[7 ,], label = "Synthetic Point", hjust = -0.2, color = "#00c300", size = 4) +
   theme(axis.text=element_text(size=13),
         axis.title=element_text(size=16))
 
@@ -187,9 +187,9 @@ plot10 = ggplot(df2, aes(V1, V2)) +
   geom_point(size = 5, shape = 3, stroke = 1) +
   coord_cartesian(xlim = c(0,5), ylim = c(0,5)) +
   labs(x = "x1", y = "x2") +
-  geom_point(data = df3[5 ,], size = 5, shape = 3, color = "green", stroke = 1) +
-  geom_point(data = df3[6 ,], size = 5, shape = 3, color = "green", stroke = 1) +
-  geom_point(data = df3[7 ,], size = 5, shape = 3, color = "green", stroke = 1) +
+  geom_point(data = df3[5 ,], size = 5, shape = 3, color = "#00c300", stroke = 1) +
+  geom_point(data = df3[6 ,], size = 5, shape = 3, color = "#00c300", stroke = 1) +
+  geom_point(data = df3[7 ,], size = 5, shape = 3, color = "#00c300", stroke = 1) +
   theme(axis.text=element_text(size=13),
         axis.title=element_text(size=16))
 
@@ -224,10 +224,10 @@ for(i in 1:100) {
 }
 
 # Plot new data
-# Color synthetic samples green and original samples black
+# Color synthetic samples #00c300 and original samples black
 
 plot11 = ggplot(df_k2, aes(V1, V2)) +
-  geom_point(size = 5, shape = 3, color = "green", stroke = 1) +
+  geom_point(size = 5, shape = 3, color = "#00c300", stroke = 1) +
   coord_cartesian(xlim = c(0,5), ylim = c(0,5)) +
   labs(x = "x1", y = "x2") +
   geom_point(data = df3[1 ,], size = 5, shape = 3, stroke = 1) +
@@ -256,7 +256,7 @@ for(i in 1:100) {
 }
 
 plot12 = ggplot(df_k3, aes(V1, V2)) +
-  geom_point(size = 5, shape = 3, color = "green", stroke = 1) +
+  geom_point(size = 5, shape = 3, color = "#00c300", stroke = 1) +
   coord_cartesian(xlim = c(0,5), ylim = c(0,5)) +
   labs(x = "x1", y = "x2") +
   geom_point(data = df3[1 ,], size = 5, shape = 3, stroke = 1) +
@@ -268,6 +268,13 @@ plot12 = ggplot(df_k3, aes(V1, V2)) +
 
 
 plot12
+
+plot_list = list(plot1, plot2, plot3, plot4, plot5, plot6, plot7, plot8, plot9,
+                 plot10, plot11, plot12)
+
+for (i in 1:length(plot_list)){
+ggsave(paste0(".../figure_man/smote_viz_", i, ".pdf"), plot_list[[i]], width = 6.5, height = 5)
+}
 
 # plot_list = list(plot1, plot2, plot3, plot4, plot5, plot6, plot7, plot8, plot9,
 #                 plot10, plot11, plot12)
