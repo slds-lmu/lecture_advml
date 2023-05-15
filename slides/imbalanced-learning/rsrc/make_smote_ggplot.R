@@ -33,7 +33,8 @@ plot3 = ggplot(newData_2, aes(x = Sepal.Length, y = Sepal.Width, color = Species
   ggtitle("SMOTE'd iris Data (k=1)") +
   theme(legend.position = "bottom", plot.title = element_text(hjust = 0.5))
 
-ggarrange(plot1, plot2, plot3, ncol = 3, nrow = 1)
+p = ggarrange(plot1, plot2, plot3, ncol = 3, nrow = 1)
 
+ggsave(paste0("/Users/toby/Downloads/smoted_iris_data_ggplot.pdf"), p, width = 7.5, height = 3)
 
 
