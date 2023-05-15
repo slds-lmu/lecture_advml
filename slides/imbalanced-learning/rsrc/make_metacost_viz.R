@@ -71,3 +71,5 @@ p <- ggplot(df1, aes(duration, credit_amount, group = cost_min_class)) +
   ggtitle("After Relabeling") +
   theme(plot.title = element_text(hjust = 0.5)) +
   theme(text = element_text(size = 20)) 
+
+ggsave(paste0(".../figure_man/relabeling_viz.pdf"), p, width = 9, height = 6)
