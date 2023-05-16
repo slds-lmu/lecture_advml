@@ -5,7 +5,7 @@
 \input{../../latex-math/ml-gp}
 
 \newcommand{\titlefigure}{figure_man/discrete/marginalization-more.png} %not best picture
-\newcommand{\learninggoals}{
+\newcommandiscrete{\learninggoals}{
   \item GPs model distributions over functions 
   \item The marginalization property makes this distribution easily tractable
   \item GPs are fully specified by mean and covariance function 
@@ -23,7 +23,7 @@
 \begin{vbframe}{From Discrete to Continuous Functions}
 
 \begin{itemize}
-  \item We defined distributions on functions with discrete domain by defining a Gaussian on the vector of the respective function values 
+  \item We defined distributions on functions with finite domain by putting a finite Gaussian on it
   $$
     \mathbf{f} = [f(\xi[1]), f(\xi[2]), \dots, f(\xi[n])] \sim \mathcal{N}(\bm{m}, \bm{K})
   $$
@@ -64,7 +64,7 @@
       \bm{f} = \left[f\left(\xi[1]\right), \dots, f\left(\xi[n]\right)\right] \sim \mathcal{N}\left(\bm{m}, \bm{K}\right),
     $$ 
     with $\bm{m}$ and $\bm{K}$ being calculated by a mean function $m(.)$ / covariance function $k(.,.)$.
-    \item This property is called \textbf{Marginalization Property}. 
+    \item This property is called \textbf{marginalization property}. 
     \begin{figure}
       \only<2>{\includegraphics[width=0.4\textwidth]{figure/discrete/example_marginalization_5.pdf}\includegraphics[width=0.5\textwidth]{figure_man/discrete/marginalization-5.png}}
       \only<3>{\includegraphics[width=0.4\textwidth]{figure/discrete/example_marginalization_10.pdf}\includegraphics[width=0.5\textwidth]{figure_man/discrete/marginalization-more.png}}

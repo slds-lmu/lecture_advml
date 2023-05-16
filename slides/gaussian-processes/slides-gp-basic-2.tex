@@ -168,7 +168,7 @@ $$
 
 \framebreak
 
-Covariance controls the \enquote{shape} of the drawn function. Consider cases of varying correlation size
+Covariance controls the \enquote{shape} of the drawn function. Consider cases of varying correlation structure
 \vspace{10pt}
 
 \begin{enumerate}
@@ -179,7 +179,7 @@ Covariance controls the \enquote{shape} of the drawn function. Consider cases of
   \includegraphics[width=0.45\linewidth]{figure/discrete/example_extreme_50_1.pdf}
 \end{figure}
 
-Points are uncorrelated. We sample random noise around 0 mean Gaussian.
+Points are uncorrelated. We sample white noise.
 
 \end{vbframe}
 
@@ -196,7 +196,7 @@ Points are uncorrelated. We sample random noise around 0 mean Gaussian.
 \begin{figure}\includegraphics[width=0.45\linewidth]{figure/discrete/example_extreme_50_2.pdf}
 \end{figure}
 
-Points are highly correlated. Functions become roughly smooth.
+Points are highly correlated. Functions become very smooth and flat.
 
 \framebreak
 
@@ -215,7 +215,8 @@ Points are highly correlated. Functions become roughly smooth.
 \end{itemize}
 
 \begin{footnotesize}
-\textbf{Note}: $k(\cdot,\cdot)$ is known as the \textbf{covariance function} or \textbf{kernel}. It will be studied in more detail later on.
+Function exhibit interesting, variable shape. \\
+\textbf{NB}: $k(\cdot,\cdot)$ is called \textbf{covar. function} or \textbf{kernel}, we will study it more later.
 \end{footnotesize}
 
 \end{vbframe}
