@@ -78,7 +78,7 @@ $$
 
 \begin{frame}{Discrete Functions}
 
-\textbf{Example 1 (continued):} Let $f: \Xspace \to \R$ be a function that is defined on \textbf{two} points $\Xspace$. We sample functions by sampling from a two-dimensional normal variable
+Let $f: \Xspace \to \R$. Sample functions by sampling from a two-dimensional normal variable.
 
 $$
 \bm{f} = [f(1), f(2)] \sim \mathcal{N}(\bm{m}, \bm{K})
@@ -99,7 +99,7 @@ In this example, $m = (0, 0)$ and $K = \begin{pmatrix} 1 & 0.5 \\ 0.5 & 1 \end{p
 
 \begin{frame}{Discrete Functions}
 
-\textbf{Example 2 (continued):} Let us consider $f: \Xspace \to \R$ where the input space consists of \textbf{five} points. We sample functions by sampling from a five-dimensional normal variable
+Let $f: \Xspace \to \R$. Sample functions by sampling from a five-dimensional normal variable.
 
 
 $$
@@ -134,22 +134,6 @@ $$
 % This idea is extended to infinite domain size via \textbf{Gaussian processes}.
 
 % \end{vbframe}
-
-\begin{frame}{Discrete Functions}
-
-\textbf{Example 3 (continued):} Let us consider $f: \Xspace \to \R$ where the input space consists of \textbf{ten} points. We sample functions by sampling from ten-dimensional normal variable
-
-$$
-\bm{f} = [f(1), f(2), \dots, f(10)] \sim \mathcal{N}(\bm{m}, \bm{K})
-$$
-
-%\begin{figure}[h]
-\foreach \x in{1,2,3} {
-  \includegraphics<\x>[width=0.4\linewidth]{figure/discrete/example_norm_10_\x_a.pdf}  \includegraphics<\x>[width=0.4\linewidth]{figure/discrete/example_norm_10_\x_b.pdf}
-}
-%\end{figure}
-
-\end{frame}
 
 
 \begin{vbframe}{Role of the Covariance Function}
