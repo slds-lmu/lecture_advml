@@ -53,15 +53,16 @@
 % reference: https://www.csie.ntu.edu.tw/~htlin/talk/doc/csovo.acml14.handout.pdf
 
 \begin{vbframe}{Binary Instance-specific cost Learning}
-    \footnotesize
     \begin{itemize}
-        \footnotesize
-        \item Assumes instance-specific costs for every observation:  $\D^{(n)} = \{(\xi, \yi, \cv^{(i)})\}_{i=1}^n$, where $(\xi, \yi, \cv^{(i)}) \in \mathbb{R}^d \times \{0,1\} \times \mathbb{R}^2$.
+        \item Assumes instance-specific costs for every observation:  $\D^{(n)} = \{(\xi, \cv^{(i)})\}_{i=1}^n$, where $(\xi, \cv^{(i)}) \in \mathbb{R}^d \times \mathbb{R}^2$.
+        \vspace{5pt}
 
         \item Define ``true class'' as cost minimal class
+        \vspace{5pt}
         
-        \item Define observation weights: 
+        \item Define observation weights: $|\cv^{(i)}[1] - \cv^{(i)}[0]|$
         % Consider four instances, where $\cv^{(i)}[0]$ and $\cv^{(i)}[1]$ denote the instance-wise cost of classifying an example as 0 or 1 respectively, $\yi$ the true label and 
+        \vspace{5pt}
 
         \begin{center}
                             \begin{tabular}{cc|cccc}\
@@ -73,6 +74,8 @@
 
                 \end{tabular}
         \end{center}
+                \vspace{5pt}
+
         \item Now solve weighted ERM:
         \begin{equation*}
             \mathcal{R}_{emp}(\boldsymbol{\theta}) = \sum_{i=1}^{n}w^{(i)} \Lxyit
@@ -85,10 +88,8 @@
 
 \begin{vbframe}{Multiclass Costs}
     \begin{itemize}
-        \footnotesize
-        \item Now $g > 2$
 
-        \item Vanilla CSL is special case of instance specific,\\use $\cv^{(i)}$ same for all $\xi$ of the same class
+        \item Consider $g > 2$. Vanilla CSL is special case of instance specific,\\use $\cv^{(i)}$ same for all $\xi$ of the same class
         %straightforward to see that class-specific cost-sensitive learning is a special case of instance-specific cost learning: 
         
         %\item Now consider a multiclass label space $\mathcal{Y}=\{1,2,3\}$. For class-specific cost sensitive learning, we may define the following cost matrix: 
@@ -96,24 +97,28 @@
         \begin{center}
                             \begin{tabular}{cc|ccc}
         			& &\multicolumn{3}{c}{True class} \\
-        			& & $y=1$ & $y=2$ & $y=3$  \\
+        			& & $y=1$ & \textcolor{blue}{$y=2$} & \textcolor{green}{$y=3$}  \\
         			\hline
-        			\multirow{3}{*}{\parbox{0.6cm}{Pred.  class}} & $\hat y=1$ & 0 & 1 & 3\\
-        			& $\hat y=2$ & 1 & 0 & 1\\
-                        & $\hat y=3$ & 7 & 1 & 0\\
+        			\multirow{3}{*}{\parbox{0.6cm}{Pred.  class}} & $\hat y=1$ & 0 & \textcolor{blue}{1} & \textcolor{green}{3}\\
+        			& $\hat y=2$ & 1 & \textcolor{blue}{0} & \textcolor{green}{1}\\
+                        & $\hat y=3$ & 7 & \textcolor{blue}{1} & \textcolor{green}{0}\\
                 \end{tabular}
         \end{center}
         \vspace{5pt}
         
-        \item For two $\xi$ with $y=2$ and $y = 3$: %instances of class 2 and 3 respectively, we have that 
+        \item For two $\xi$ with $y=2$ and $y = 3$: %instances of class 2 and 3 respectively, we have that
+                \vspace{5pt}
+
                 \begin{center}
                             \begin{tabular}{cc|cccc}\
         			& & $\cv^{(i)}[1]$ & $\cv^{(i)}[2]$ & $\cv^{(i)}[3]$ & $\yi$ \\
-        			\hline & $\xv^{(1)}$ & 1 & 0 & 1 & 2\\
-        			& $\xv^{(2)}$ & 3 & 1 & 0 & 3\\
+        			\hline & $\xv^{(1)}$ & \textcolor{blue}{1} & \textcolor{blue}{0} & \textcolor{blue}{1} & \textcolor{blue}{2}\\
+        			& $\xv^{(2)}$ & \textcolor{green}{3} & \textcolor{green}{1} & \textcolor{green}{0} & \textcolor{green}{3}\\
+                        & $\xv^{(3)}$ & \textcolor{blue}{1} & \textcolor{blue}{0} & \textcolor{blue}{1} & \textcolor{blue}{2}\\
                 \end{tabular}
         \end{center}
-        
+                \vspace{5pt}
+
         \item Set $\cv^{(i)}[\yi] = 0$, i.e. zero-cost for correct prediction.
         \vspace{5pt}
         
@@ -124,11 +129,9 @@
 
 \begin{vbframe}{CSOVO \href{https://proceedings.mlr.press/v39/lin14.pdf}{\beamergotobutton{Lin et al. 2014}}}
     
-    \footnotesize
-    \begin{itemize}
-        \footnotesize
 
-        \item Let $\D^{(n)} = \{(\xi, \yi, \cv^{(i)})\}_{i=1}^n$, $(\xi, \yi, \cv^{(i)}) \in \mathbb{R}^d \times \{1, 2, \ldots, g\} \times \mathbb{R}^g$. 
+    \begin{itemize}
+        \item Let $\D^{(n)} = \{(\xi, \cv^{(i)})\}_{i=1}^n$, $(\xi, \cv^{(i)}) \in \mathbb{R}^d \times \mathbb{R}^g$. 
         \vspace{5pt}    
         \item Example:
        % Consider instance-specific costs for three observations of the form $(\xi, \yi, \cv^{(i)})$, with some label space $\mathcal{Y}=\{1, 2, \ldots, g\}$:
@@ -155,23 +158,22 @@
         \item For class $j$ vs. $k$:
         %, consider two problems:
         \begin{itemize}
-            \footnotesize
             \item How to deal with the label $\yi$? $\yi$ can be neither $j$ nor $k$.
             \vspace{5pt}
             
             \item How to deal with the costs $\cv^{(i)}[j]$ and $\cv^{(i)}[k]$?
+            
         \end{itemize}
             
     \end{itemize}
+
 \end{vbframe}
 
 
 \begin{vbframe}{CSOVO}
-    \footnotesize
     \begin{itemize}
         \item When training a binary classifier $f^{(j, k)}$ for class $j$ vs. $k$,
         \begin{itemize}
-            \footnotesize
             \item Choose cost min class from pair $\argmin_{l \in \{j, k\}} \cv^{(i)}[l]$ as ground truth 
             \vspace{5pt}
             
@@ -184,7 +186,7 @@
         
         \item Example continued:
 \begin{center}
-    
+    \footnotesize
                             \begin{tabular}{cc|ccc|ccc}\
         			& & $\cv^{(i)}[1]$ & $\cv^{(i)}[2]$ & $\cv^{(i)}[3]$ & $\cv^{(i)}[1 \ \text{vs} \ 2]$ & $\tilde{y}^{( i)}[1 \ \text{vs} \ 2]$ & $w^{(i)}[1 \ \text{vs} \ 2]$\\
         			\hline & $\xv^{(1)}$ & 0 & 2 & 3 & 0/2 & 1 & 2\\
@@ -206,23 +208,23 @@
 
 
 \begin{vbframe}{CSOVO}
-    \footnotesize
     \begin{itemize}
     \item Example continued
-            \begin{center}                                       
+            \begin{center}  
+            \footnotesize{
         \begin{tabular}{cc|ccc|ccc}\
         			& & $\cv^{(i)}[1]$ & $\cv^{(i)}[2]$ & $\cv^{(i)}[3]$ & $\cv^{(i)}[1 \ \text{vs} \ 3]$ & $\tilde{y}^{( i)}[1 \ \text{vs} \ 3]$ & $w^{(i)}[1 \ \text{vs} \ 3]$\\
         			\hline & $\xv^{(1)}$ & 0 & 2 & 3 & 0/3 & 1 & 3\\
         			& $\xv^{(2)}$ & 1 & 0 & 1 & -/- & - & 0 \\
                  	& $\xv^{(3)}$ & 2 & 0 & 3 & 2/3 & 1 & 1\\
                 \end{tabular}
+                }
     \end{center}
             \vspace{5pt}
 
     \item Wrap everything up:
     \begin{enumerate}
-        \footnotesize
-        \item For class $j$ vs. $k$, transform all $(\xi, \yi, \cv^{(i)})$ to $(\xi, \argmin_{l \in \{j, k\}} \cv^{(i)}[l])$ with sample-wise weight $|\cv^{(i)}[j] - \cv^{(i)}[k]|$.
+        \item For class $j$ vs. $k$, transform all $(\xi, \cv^{(i)})$ to $(\xi, \argmin_{l \in \{j, k\}} \cv^{(i)}[l])$ with sample-wise weight $|\cv^{(i)}[j] - \cv^{(i)}[k]|$.
         \vspace{5pt}
         
         \item Train a weighted binary classifier $f^{(j, k)}$ using the above
