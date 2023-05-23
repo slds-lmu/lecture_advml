@@ -158,15 +158,17 @@ Cost-Sensitive Learning Part 2}
 				\State \textbf{Input:} 
 				$\D = \{(\xi,\yi)\}_{i=1}^n$ training data, $B$ number of bagging iterations,
 				$\pix$ probabilistic classifier,
-				$\mathbf{C}$ cost matrix 
-				  \State \# Bagging:
+				$\mathbf{C}$ cost matrix \\
+				 \textcolor{teal}{\# Bagging: Classifier is trained on different bootstrap samples}
 \textcolor{teal}{
 \For{$b=1,\ldots,B$}
     \State $\D_b \leftarrow $ Bootstrap version of $\D$
     \State $\pi_b \leftarrow $ train classifier on $\D_b$ 
 \EndFor
 } 
-\State \# Relabeling:
+\\
+\textcolor{blue}{\# Relabeling: Find set of classifiers for which $\xi$ is OOB. Compute $\pi_b$ by averaging over predictions of those classifiers.
+Determine new label $\tilde y^{(i)}$ w.r.t. the class that minimizes the sum of the weighted costs over the $g$ classes}
 \textcolor{blue}{
 \For{$i=1,\ldots,n$}
 % 	 \State $\tilde M \leftarrow \bigcup_{m: \xi \notin \D_m} \{m\}$
@@ -177,8 +179,9 @@ Cost-Sensitive Learning Part 2}
 %                 \textcolor{blue}{\State $\tilde y^{(i)} \leftarrow \argmin_{i} \sum_{j=1}^g \pi_j(\xi) C(i,j) $
 \State $\tilde D \leftarrow \tilde D \cup \{(\xi,\tilde y^{(i)})\} $
 \EndFor
-}    
-\State \# Cost Sens: Train on relabeled data
+}  
+\\
+\textcolor{orange}{\# Cost Sensitivity: Train on relabeled data}
 \textcolor{orange}{\State $f_{meta} \leftarrow$ train $f$ on $\tilde D$}
 \end{algorithmic}
 
