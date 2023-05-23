@@ -29,8 +29,9 @@
 
 \newcommand{\titlefigure}{figure/cost_matrix}
 \newcommand{\learninggoals}{
-  \item Learn cost matrix modelling in cost-sensitive learning
-  \item Understand Minimum Expected Cost Principle
+  \item Cost matrix
+  \item Minimum Expected Cost Principle
+  \item Optimal theoretical threshold
 }
 
 \title{Advanced Machine Learning}
@@ -38,7 +39,8 @@
 
 \begin{document}
 
-\lecturechapter{Imbalanced Learning: Cost-Sensitive Learning Part 1}
+\lecturechapter{Imbalanced Learning:\\
+Cost-Sensitive Learning Part 1}
 \lecture{Advanced Machine Learning}
 
 
@@ -55,19 +57,18 @@
     		\item Cost-sensitive learning: 
                 \begin{itemize}
                     \scriptsize
-                    \item Different (mis-)classification costs are taken into consideration.
-                    \item The learner seeks to minimize the total costs in expectation.
-                    \item Classical learning assumes that the data sets are balanced, and all errors have the same cost.
+                    \item Classical learning: data sets are balanced, and all errors have equal costs
+                    \item We now assume given, unequal cost
+                    \item And try to minimize them in expectation
+
                 \end{itemize}
     		
-    		\item Real-world applications, where different costs between misclassifications are present:
+    		\item Applications:
       
     		\begin{itemize}
     			\scriptsize	
-    			\item Medicine --- Misdiagnosing a cancer patient as healthy vs.\ misdiagnosing a healthy patient as having cancer (and then check again).
-       
-    			\item (Extreme) Weather prediction ---  Incorrectly predicting that no hurricane occurs vs.\ predicting a strong wind as a hurricane.
-    	
+    			\item Medicine --- Misdiagnosing as healthy vs. having a disease
+    			\item (Extreme) Weather prediction ---  Incorrectly predicting that no hurricane occurs 
     			\item Credit granting --- Lending to a risky client vs. not lending to a trustworthy client.
     		\end{itemize}
          
@@ -80,10 +81,10 @@
                 \centering
                 \begin{tabular}{p{1cm}c|cc}
                     & &\multicolumn{2}{c}{Truth} \\
-                    & & With Tumor & No Tumor  \\
+                    & & Default & Pays Back  \\
                     \hline
-                    \multirow{2}{*}{\parbox{1cm}{Diagnosis}} & Malignent & 0 & $ 1 $\\
-                    & Benign & $10000$ & $0$   \\
+                    \multirow{2}{*}{\parbox{1cm}{Pred.}} & Default & 0 & $ 10 $\\
+                    & Pays Back & $1000$ & $0$   \\
                 \end{tabular}
             \end{table}
         \end{minipage}
@@ -104,12 +105,10 @@
 
 \begin{vbframe}{Cost matrix}
 %	
-\scriptsize{
 %	
 	\begin{itemize}
 %		
-		\item In cost-sensitive learning we are provided with a cost matrix $\mathbf{C}$ of the form
-%		
+		\item Input: cost matrix $\mathbf{C}$ 
 	\end{itemize}
 	%	
 	\begin{center}
@@ -128,45 +127,38 @@
 	%	
 	\begin{itemize}
 		%		
-		\item $C(i,j)$ is the cost of classifying $j$ as $i,$ which in the cost-insensitive learning case is simply $C(i,j) = \mathds{1}_{[ i \neq j ]},$ i.e., each misclassification has the same cost of 1.
-		\vspace{10pt}
+		\item $C(j,k)$ is the cost of classifying class $k$ as $j,$ 
+  \item 0-1-loss would simply be: $C(j,k) = \mathds{1}_{[ j \neq k ]}$
 		
-		\item Cost matrix is usually designed by experts with domain knowledge.
-        \vspace{10pt}
+		\item $\mathbf{C}$ designed by experts with domain knowledge
 		\begin{enumerate}
-			\scriptsize	
-            \item Too low costs: might not change the decision boundaries significantly, leading to (still) costly predictions.
-            \vspace{10pt}
-            \item Too high costs: might harm the generalization capability of the classifier on costly classes.
-            \vspace{10pt}
+            \item Too low costs: not enough change in model, still costly errors
+            \item Too high costs: might never predict costly classes
 		\end{enumerate}
 		
 	\end{itemize}
 
-}
+
 \end{vbframe}
 
 
 \begin{vbframe}{Cost matrix for Imbalanced Learning}
-	\footnotesize{
 		\begin{itemize}			
 	 
-			\item A common heuristic for imbalanced data sets is to use 
+			\item Common heuristic for imbalanced data sets: 
 	
 			\begin{itemize}
-				\footnotesize 
-                \item $C(i,j) = \frac{n_i}{n_j}$ for classes $i$ and $j$ such that $n_j  \ll n_i$, i.e. for misclassifying a minority class $j$ as a majority class $i$.
-                \vspace{10pt}
+                \item $C(j,k) = \frac{n_j}{n_k}$ with $n_k  \ll n_j$,\\
+                misclassifying a minority class $k$ as a majority class $j$
 		
-				\item $C(i,j) = 1$ for classes $i$ and $j$ such that $n_i \ll n_j$, i.e. for misclassifying a majority class $j$ as a minority class $i$.
-                \vspace{10pt}
+				\item $C(j,k) = 1$ with $n_j \ll n_k$,\\
+    misclassifying a majority class $k$ as a minority class $j$
 			
-				\item 0 for a correct classification (a theoretical reason will be explained later).
-                \vspace{10pt}
+				\item 0 for a correct classification 
 			
 			\end{itemize}
-
-    		\item In an imbalanced binary classification we get: \\
+\vspace{1cm}
+    		\item Imbalanced binary classification: \\
             \begin{table}[]
                 \centering
                 \begin{tabular}{cc|cc}
@@ -179,128 +171,114 @@
             \end{table}
     		
 
-            \item Thus, this heuristic is consistent with the general real case that the cost of false negatives is much higher than the cost of false positives.	
+            \item So: much higher costs for FNs
         \end{itemize}
 		
-	}
 \end{vbframe}
 
 
-\begin{vbframe}{Minimum expected Cost Principle (MECP)}
-
-	\footnotesize{
+\begin{vbframe}{Minimum expected Cost Principle}
 
 
-		\begin{itemize}\footnotesize
+		\begin{itemize}
 		
 			\item Suppose we have:
             \begin{itemize}
-                \footnotesize
-                \item a cost matrix $\mathbf{C}$,
-                \vspace{10pt}
+                \item a cost matrix $\mathbf{C}$
                 
-                \item knowledge of the true posterior distribution $p(\cdot ~|~ \xv).$
-                \vspace{10pt}
+                \item knowledge of the true posterior $p(\cdot ~|~ \xv)$
             \end{itemize}
 
-            \item Idea for classifying a given feature $\xv$: 
-            \begin{itemize}
-                \footnotesize
-                \item Compute the cost for classifying $\xv$ as $i$. (infeasible to directly compute.)
-                \vspace{10pt}
+            % \item How to classify given $\xv$: 
+            % \begin{itemize}
+            %     \footnotesize
+            %     \item Compute cost for classifying $\xv$ as $i$. (infeasible to directly compute.)
+            %     \vspace{10pt}
                 
-                \item $\leadsto$ Marginalize over ``true'' class $j$.
-                \vspace{10pt}
-            \end{itemize}
+            %     \item $\leadsto$ Marginalize over ``true'' class $j$.
+            %     \vspace{10pt}
+            % \end{itemize}
 
-			\item \emph{Minimum expected cost principle}: Use the class for prediction with the smallest expected costs, where the expected costs of a class $i\in\{1,\ldots,g\}$ is
+			\item Predict class j with smallest expected costs when marginalizing over true classes:
+   %, where the expected costs of a class $i\in\{1,\ldots,g\}$ is
 	
-			$$ 	\E_{J \sim p(\cdot ~|~ \xv)}( C(i,J) ) = \sum_{j=1}^g 	p(j ~|~ \xv) C(i,j).	$$
-
-			
-				
+			$$ 	\E_{K \sim p(\cdot ~|~ \xv)}( C(j,K) ) = \sumkg p(k ~|~ \xv) C(j,k)	$$
+	
 		\end{itemize}
-	}
-\end{vbframe}
 
-\begin{vbframe}{MECP}
-    \footnotesize
     \begin{itemize}
-        \item Thus, if we have a classifier $f$ which uses a probabilistic score function $\pi:\Xspace \to [0,1]^g$ with $\pi(\xv) = (\pi(\xv)_1,\ldots,\pi(\xv)_g)^\top$ and $\sum_{j=1}^g \pi(\xv)_j = 1$ for the classification, then one can easily modify $h$ to take the expected costs into account:
-		$$  \tilde h(\xv) = \argmin_{i=1,\ldots,g} \sum_{j=1}^g 	\pi(\xv)_j C(i,j). $$
-        \vspace{10pt}
-
-        \item For $\xv$, making prediction $i$ means \textbf{acting as if $i$ is the true class of $\xv$.}
-        \vspace{10pt}
+        \item If we trust we trust a probabilistic classifier, we can convert its scores to labels:
+        % $f$ which uses a probabilistic score function $\pi:\Xspace \to [0,1]^g$ with $\pi(\xv) = (\pi(\xv)_1,\ldots,\pi(\xv)_g)^\top$ and $\sum_{j=1}^g \pi(\xv)_j = 1$ for the classification, then one can easily modify $h$ to take the expected costs into account:
+		$$  \hx := \argminlim_{j=1,\ldots,g} \sumkg 	\pikx C(j,k). $$
+ 
+%        \item For $\xv$, making prediction $i$ means \textbf{acting as if $i$ is the true class of $\xv$.}
         
-        \item The essence of cost-sensitive decision-making: it can be optimal to act as if class $i$ is true even when $j$ is more probable. (\href{https://dl.acm.org/doi/10.5555/1642194.1642224}{\beamergotobutton{Elkan et. al. 2001}})
-        \vspace{10pt}
+        \item Can be better to take a less probable class (\href{https://dl.acm.org/doi/10.5555/1642194.1642224}{\beamergotobutton{Elkan et. al. 2001}})
 
-        \item Now consider: 
-        \begin{itemize}
-            \footnotesize
-            \item If we learnt a binary classifier: $p(1 ~|~ \xv) = \pi(\xv)_1$ and $p(-1 ~|~ \xv) = \pi(\xv)_2$,
-            \item Under what condition should we predict $\xv$ as class $1$?
-        \end{itemize}
+        % \item Now consider: 
+        % \begin{itemize}
+        %     \footnotesize
+        %     \item If we learnt a binary classifier: $p(1 ~|~ \xv) = \pi(\xv)_1$ and $p(-1 ~|~ \xv) = \pi(\xv)_2$,
+        %     \item Under what condition should we predict $\xv$ as class $1$?
+        % \end{itemize}
     \end{itemize}
 \end{vbframe}
 
 
-\begin{vbframe}{MECP: Binary Case}
-	%	
-	\footnotesize{
-		%		
+\begin{vbframe}{Optimal Threshold for Binary Case}
 		\begin{itemize}
-            \footnotesize
-            \item Preliminary knowledge: the optimal decisions do NOT change if 
+            \item Optimal decisions do not change if 
             \begin{itemize}
-                \footnotesize
-                \item $\mathbf{C}$ is multipled by a positive constant.
-                \item $\mathbf{C}$ is added with a constant shift.
+                \item $\mathbf{C}$ is multiplied by positive constant
+                \item $\mathbf{C}$ is added with constant shift
             \end{itemize}
 
-            \item Hence, we scale and shift $\mathbf{C}$ to eliminate some entries, obtaining a simpler $\mathbf{C}^\prime$: 
+            \item Scale and shift $\mathbf{C}$ to get simpler $\mathbf{C}^\prime$: 
             \begin{table}[]
                 \centering
                     \begin{tabular}{cc|cc}
         			& &\multicolumn{2}{c}{True class} \\
         			& & $y=1$ & $y=-1$  \\
         			\hline
-        			\multirow{2}{*}{\parbox{0.3cm}{Pred.  class}} & $\hat y$ = 1 & $C^\prime(1,1)$ & $1$ \\
+        			\multirow{2}{*}{\parbox{0.5cm}{Pred.  class}} & $\hat y$ = 1 & $C^\prime(1,1)$ & $1$ \\
         			& $\hat y$ = -1 & $C^\prime(-1, 1)$ & 0\\
                 \end{tabular}
             \end{table}
             where 
             \begin{itemize}
                 \footnotesize
-                \item $C^\prime (-1, 1) = [C(-1, 1) - C(-1, -1)] / [C(1, -1) - C(-1, -1)]$,
-                \item $C^\prime (1, 1) = [C(1, 1) - C(-1, -1)] / [C(1, -1) - C(-1,-1)]$.
+                \item $C^\prime (-1, 1) = \frac{C(-1, 1) - C(-1, -1)}{C(1, -1) - C(-1, -1)}$
+                \item $C^\prime (1, 1) = \frac{C(1, 1) - C(-1, -1)}{C(1, -1) - C(-1,-1)}$
             \end{itemize}
+
+\footnotesize{
 
             \item We predict $\xv$ as class $1$ if \\
             \begin{align*}
-                \E_{J \sim p(\cdot ~|~ \xv)}( C^\prime(1,J) )  \leq \E_{J \sim p(\cdot ~|~ \xv)}( C^\prime(-1,J) ) \\
+                \E_{K \sim p(\cdot ~|~ \xv)}( C^\prime(1,K) )  \leq \E_{K \sim p(\cdot ~|~ \xv)}( C^\prime(-1,K) ) \\
             \end{align*}
 
-			\item Plugging $\mathbf{C}^\prime$ into the inequality above, we obtain:	
+
+
+			\item Let's unroll the expected value and use $\mathbf{C}^\prime$:
 			\begin{align*}	
                 & p(-1 ~|~ \xv ) C^\prime(1,-1)  + 	p(1 ~|~ \xv ) C^\prime(1,1) \leq  p(-1 ~|~ \xv ) C^\prime(-1,-1)  + 	p(1 ~|~ \xv ) C^\prime(-1,1)  \\ 
                 &\Rightarrow [1 - p(1 ~|~ \xv)] \cdot 1 + p(1 ~|~ \xv) C^\prime(1, 1) \leq p(1 ~|~ \xv) C^\prime(-1, 1) \\
                 &\Rightarrow p(1 ~|~ \xv) \geq \frac{1}{C^\prime(-1, 1) - C^\prime(1, 1) + 1} \\
-                &\Rightarrow p(1 ~|~ \xv) \geq \frac{C(1, -1) - C(-1, -1)}{C(-1, 1) - C(1, 1) + C(1, -1) - C(-1, -1)}
+                &\Rightarrow p(1 ~|~ \xv) \geq \frac{C(1, -1) - C(-1, -1)}{C(-1, 1) - C(1, 1) + C(1, -1) - C(-1, -1)} = c^*
 			\end{align*}
 		
-            \item By further assuming that $C(1, 1) = C(-1, -1) = 0 $, this can by simplied to 
+            \item If even $C(1, 1) = C(-1, -1) = 0 $, we get:
             \begin{align*}
                 p(1 ~|~ \xv) \geq \frac{C(1, -1)}{C(-1, 1) + C(1, -1)} = c^{*}
             \end{align*}	
             
-            \item This yields the optimal threshold value $c^*$ for probabilistic score classifiers, so that any probabilistic classifier $h$ using a probabilistic score $\pi:\Xspace \to [0,1]$ can be modified to 
+            \item Optimal threshold $c^*$ for probabilistic classifier 
             
-            $$   \tilde h(\xv) = 2 \cdot \mathds{1}_{[ \pi(\xv) \geq c^*]} -1. $$
+            $$   \hx := 2 \cdot \mathds{1}_{[ \pi(\xv) \geq c^*]} -1 $$
 							
 		\end{itemize}
-	}
+}
 \end{vbframe}
 
 

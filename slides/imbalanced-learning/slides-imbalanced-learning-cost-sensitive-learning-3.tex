@@ -56,7 +56,9 @@
     \footnotesize
     \begin{itemize}
         \footnotesize
-        \item Assumes instance-specific costs for every observation. Formally, we can write $\D^{(n)} = \{(\xi, \yi, \cv^{(i)})\}_{i=1}^n$, where $(\xi, \yi, \cv^{(i)}) \in \mathbb{R}^d \times \{0,1\} \times \mathbb{R}^2$.
+        \item Assumes instance-specific costs for every observation:  $\D^{(n)} = \{(\xi, \yi, \cv^{(i)})\}_{i=1}^n$, where $(\xi, \yi, \cv^{(i)}) \in \mathbb{R}^d \times \{0,1\} \times \mathbb{R}^2$.
+
+        \item Define ``true class'' as cost minimal class
         
         \item Define observation weights: 
         % Consider four instances, where $\cv^{(i)}[0]$ and $\cv^{(i)}[1]$ denote the instance-wise cost of classifying an example as 0 or 1 respectively, $\yi$ the true label and 
@@ -73,8 +75,9 @@
         \end{center}
         \item Now solve weighted ERM:
         \begin{equation*}
-            \mathcal{R}_{emp}(\boldsymbol{\theta}) = \sum_{i=1}^{n}w^{(i)}L(\yi,f(\xi))
+            \mathcal{R}_{emp}(\boldsymbol{\theta}) = \sum_{i=1}^{n}w^{(i)} \Lxyit
         \end{equation*}
+        
         \item NB: Instances with equal costs are effectively ignored.
         \end{itemize}
             
@@ -85,7 +88,7 @@
         \footnotesize
         \item Now $g > 2$
 
-        \item Vanilla CSL is special case of instance specific, use $\cv^{(i)}$ same for all $\xi$
+        \item Vanilla CSL is special case of instance specific,\\use $\cv^{(i)}$ same for all $\xi$ of the same class
         %straightforward to see that class-specific cost-sensitive learning is a special case of instance-specific cost learning: 
         
         %\item Now consider a multiclass label space $\mathcal{Y}=\{1,2,3\}$. For class-specific cost sensitive learning, we may define the following cost matrix: 
@@ -119,7 +122,8 @@
     \end{itemize}
 \end{vbframe}
 
-\begin{vbframe}{CSOVO with instance-specific costs}
+\begin{vbframe}{CSOVO \href{https://proceedings.mlr.press/v39/lin14.pdf}{\beamergotobutton{Lin et al. 2014}}}
+    
     \footnotesize
     \begin{itemize}
         \footnotesize
@@ -162,16 +166,16 @@
 \end{vbframe}
 
 
-\begin{vbframe}{CSOVO with instance-specific costs \href{https://proceedings.mlr.press/v39/lin14.pdf}{\beamergotobutton{Lin et al. 2014}}}
+\begin{vbframe}{CSOVO}
     \footnotesize
     \begin{itemize}
         \item When training a binary classifier $f^{(j, k)}$ for class $j$ vs. $k$,
         \begin{itemize}
             \footnotesize
-            \item It is natural to select $\argmin_{l \in \{j, k\}} \cv^{(i)}[l]$ as the ground truth class.
+            \item Choose cost min class from pair $\argmin_{l \in \{j, k\}} \cv^{(i)}[l]$ as ground truth 
             \vspace{5pt}
             
-            \item The costs $\cv^{(i)}[j]$ and $\cv^{(i)}[k]$ can be transformed to a \textbf{sample-wise} weight $|\cv^{(i)}[j] - \cv^{(i)}[k]|$.
+            \item Sample weight is simply diff between the 2 costs      $|\cv^{(i)}[j] - \cv^{(i)}[k]|$
             \vspace{5pt}
 
             %\item After cost transformation, the misclassification costs across classes are equal to 1. $\leadsto$ Sample-wise weighted binary classification problem.
@@ -201,7 +205,7 @@
 \end{vbframe}
 
 
-\begin{vbframe}{CSOVO with instance-specific costs}
+\begin{vbframe}{CSOVO}
     \footnotesize
     \begin{itemize}
     \item Example continued
@@ -221,17 +225,17 @@
         \item For class $j$ vs. $k$, transform all $(\xi, \yi, \cv^{(i)})$ to $(\xi, \argmin_{l \in \{j, k\}} \cv^{(i)}[l])$ with sample-wise weight $|\cv^{(i)}[j] - \cv^{(i)}[k]|$.
         \vspace{5pt}
         
-        \item Train a binary classifier $f^{(j, k)}$ using the transformed samples.
+        \item Train a weighted binary classifier $f^{(j, k)}$ using the above
         \vspace{5pt}
         
-        \item Repeat step 1 and 2 for different $(i, j)$.
+        \item Repeat step 1 and 2 for different $(j, k)$.
         \vspace{5pt}
         
-        \item Predict using the votes from all $f^{(i, j)}$.
+        \item Predict using the votes from all $f^{(j, k)}$.
     \end{enumerate}
     \vspace{5pt}
 
-    \item Theoretical guarantee: test of final classifier $\leq 2\sum_{j < k}$ test cost of $f^{(i, j)}$. 
+    \item Theoretical guarantee: test of final classifier $\leq 2\sum_{j < k}$ test cost of $f^{(j, k)}$. 
     \end{itemize}
 \end{vbframe}
 

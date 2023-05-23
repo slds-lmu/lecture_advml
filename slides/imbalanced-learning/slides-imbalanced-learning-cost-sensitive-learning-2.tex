@@ -29,8 +29,8 @@
 
 \newcommand{\titlefigure}{figure/cost_matrix}
 \newcommand{\learninggoals}{
-  \item Learn threshold adjusting in cost-sensitive learning
-  \item Get to know MetaCost as a general approach to make classifiers cost-sensitve
+  \item Empirical thresholding
+  \item Model-agnostic MetaCost 
 }
 
 \title{Advanced Machine Learning}
@@ -38,7 +38,8 @@
 
 \begin{document}
 
-\lecturechapter{Imbalanced Learning: Cost-Sensitive Learning Part 2}
+\lecturechapter{Imbalanced Learning:\\
+Cost-Sensitive Learning Part 2}
 \lecture{Advanced Machine Learning}
 
 
@@ -47,31 +48,28 @@
 
 
 
-\begin{vbframe}{Threshold adjusting: binary case}
-    \footnotesize 
+\begin{vbframe}{Empirical Thresholding: binary case}
     \begin{itemize}
-        \footnotesize
-        \item Motivation: The threshold provided by Minimum Expected Cost is not always the truly optimal due to e.g. wrong model class, finite data, etc.
-        \item Key idea: model the mis-classification cost $M_C$ as a function $M_C = g(T)$ of \textbf{probability threshold} $T \in [0, 1]$.
-        \item By adjusting $T$, we can plot a curve of $M_C$ versus $T$ as the following figure (copied from Fig.1 in \href{https://www.aaai.org/Library/AAAI/2006/aaai06-076.php}{\beamergotobutton{Sheng et al. 2006}}):
+        \item Theoretical threshold from MECP not always best, due to e.g. wrong model class, finite data, etc.
+        \item Simply measure costs on data with different thresholds
+        \item Then pick best threshold (Fig.1 in \href{https://www.aaai.org/Library/AAAI/2006/aaai06-076.php}{\beamergotobutton{Sheng et al. 2006}}):
         \begin{figure}[h]
             \centering
-            \includegraphics[width=0.6\textwidth]{slides/imbalanced-learning/figure/threshold_adjusting.png}
+            \includegraphics[width=0.95\textwidth]{slides/imbalanced-learning/figure/threshold_adjusting.png}
         \end{figure}
 
-        \item The optimal threshold $T^{*}$ corresponds to the point with the smallest $M_C$.
+        %\item The optimal threshold $T^{*}$ corresponds to the point with the smallest $M_C$.
 
-        \item What if two local minima? We prefer the one whose ``valley'' has a wider span (e.g. $T_2$ in the 3rd subfigure). Because it is less sensitive to small changes in $T$.
+        \item What if two equal local minima? We prefer the one with wider span %(e.g. $T_2$ in the 3rd subfigure). Because it is less sensitive to small changes in $T$.
 
-        \item Search the best $T$ on \textbf{validation} sets, and do $K$-fold cross-validation to avoid overfitting!
+        \item Do this on validation data / over cross-val to avoid overfitting!
     \end{itemize}
 \end{vbframe}
 
-\begin{vbframe}{Threshold adjusting: binary case}
-    \footnotesize 
+\begin{vbframe}{Empirical Thresholding: binary case}
     \begin{itemize}
-        \scriptsize
-        \item Example: German Credit Task, where customers are classified as "good" or "bad".
+        \item Example: German Credit task
+        \footnotesize{
         \begin{center}
                             \begin{tabular}{cc|cc}
         			& &\multicolumn{2}{c}{True class} \\
@@ -81,66 +79,58 @@
         			& $\hat y$ = bad & 1 & 0\\
                 \end{tabular}
         \end{center}
-        \item $C(good,bad)/(C(bad,good)+C(good,bad))=3/4=c^{*}$ is the optimal theoretical threshold value.
+        }
+        \item Theoretical: $C(good,bad)/(C(bad,good)+C(good,bad))=3/4=c^{*}$ 
 
-        \item Train three classifiers with threefold cv. Find best empirical threshold $T$ on validation sets. For XGBoost, the empirical minimum deviates substantially from the theoretical minimum.
+        \item Empirical version with 3-CV: For XGBoost, empirical minimum deviates substantially from theoretical version
 
                 \begin{figure}[h]
             \centering
-            \includegraphics[width=1\textwidth]{slides/imbalanced-learning/figure_man/threshold_plots.pdf}
+            \includegraphics[width=0.95\textwidth]{slides/imbalanced-learning/figure_man/threshold_plots.pdf}
         \end{figure}
 
     \end{itemize}
 \end{vbframe}
 
 
-\begin{vbframe}{Threshold Adjusting: Multi-class Case}
-    \footnotesize
+\begin{vbframe}{Empirical Thresholding: Multiclass}
     \begin{itemize}
-        \footnotesize
-        \item It is also possible to perform threshold adjusting in multi-class classifcation.
+ %        \item It is also possible to perform threshold adjusting in multi-class classifcation.
         
-        \item Here, we present a simple approach for classifiers that output scores $\pi(\xv) = (\pi(\xv)_1,\ldots,\pi(\xv)_g)^\top$ in multi-class classification:
+  %      \item Here, we present a simple approach for classifiers that output scores $\pi(\xv) = (\pi(\xv)_1,\ldots,\pi(\xv)_g)^\top$ in multi-class classification:
         
-        \begin{itemize}
-            \footnotesize
-            \item In the standard setting, we predict class $h(\xv) = \argmax_{j} \pi(\xv)_j$.
-            \vspace{10pt}
+            \item In the standard setting, we predict class $h(\xv) = \argmaxlim_{k} \pikx$.
             
-            \item Now, we model the miss-classification costs $M_C$ as a function $M_C = g(\mathbf{T})$ where $\mathbf{T} \in \R^{g}$.
-            \vspace{10pt}
+            \item Let's use $g$ thresholds $c_k$ now 
             
-            \item At step 1, we re-scale the scores $\tilde{\pi}(\xv) = (\frac{\pi(\xv)_1}{\mathbf{T}_1},\ldots, \frac{\pi(\xv)_g}{ \mathbf{T}_g})^\top$, and predict class $\tilde{h}(x) = \argmax_j \tilde{\pi}(\xv)_j$.
-            \vspace{10pt}
+            \item Re-scale scores $ \mathbf{s} = (\frac{\pi(\xv)_1}{c_1},\ldots, \frac{\pi(\xv)_g}{ c_g})^\top$, 
+            \item Predict class $\argmaxlim_k \pikx $.
 
-            \item At step 2, we compute $M_C$ using the cost matrix $C$ and $\tilde{h}(x)$.
-            \vspace{10pt}
+            \item Compute empirical costs over cross-validation
 
-            \item Similar to the binary case, we adjust $\mathbf{T}$ for $g$ classes to achieve the minimal mis-classification cost $M_C$.
-            \vspace{10pt}
+            \item Optimize over $g$ (actually: $g-1$) dimensional threshold vector $(c_1, \ldots, c_g)^T$ to produce minimal costs
 
-        \end{itemize}
     \end{itemize}
 \end{vbframe}
 
 \begin{vbframe}{MetaCost: Overview}
 
         \begin{itemize}
-        \small
             \item Model-agnostic wrapper technique                      
             \item General idea: 
                 \begin{enumerate}
                 \small
-                    \item Relabel training examples with their ``optimal'' classes, i.e., with low expected costs;
+                    \item Relabel train obs with their low expected cost classes
                    
-                    \item Apply the classifier on the relabeled data set.
+                    \item Apply classifier to relabeled data
                 \end{enumerate} 
-                \item Example German Credit Task:
+                \item Example German Credit task:
                                 \begin{figure}[h]
             \centering
             \includegraphics[width=0.5\textwidth]{figure_man/relabeling_viz.pdf}
         \end{figure}
-                \item Relabeled instances colored red. Relabeling from good to bad more common because of misclassification cost.
+                \item Relabeled instances colored red\
+                \item Relabeling from good to bad more common because of costs
         \end{itemize}
 
 \end{vbframe}
@@ -148,98 +138,51 @@
 
 \begin{vbframe}{MetaCost: Algorithm}
 	
-	\scriptsize{
-%		
- 	The procedure of MetaCost is divided into three phases:
-			%			
-		\begin{minipage}{0.53\textwidth} 
-%				
-				\begin{enumerate}
-%					
-					\scriptsize
-					\item \textcolor{teal}{Bagging --- The underlying classifier is used (trained) $L$ times on different bootstrapped samples of the training data, respectively.}
-%					
-
-     				\item \textcolor{blue}{Relabeling --- The index set is the union of the classifier indices for which $\xi$ is OOB.}
-
-                        \item \textcolor{magenta}{ Relabeling --- Compute $\pi_j(\xi)$ by averaging over the predictions of the OOB classifiers.}
-
-                        \item \textcolor{red}{ Relabeling --- Determine new label $\tilde y^{(i)}$ w.r.t. the class that minimzes the sum of the weighted costs over the $g$ classes.}
-%					
-					\item \textcolor{orange}{Cost-sensitivity ---  The classifier is trained on the relabeled data set, resulting in a cost-sensitive classifier.}
-%					
-				\end{enumerate}
-%
-
-%		
 		
-		\end{minipage}
-		\begin{minipage}{0.45\textwidth} 
+% 	The procedure of MetaCost is divided into three phases:
+			%			
+		% \begin{minipage}{0.59\textwidth} 
+		% 		\begin{itemize}
+		% 			\item \textcolor{teal}{Bagging --- Train $B$ times on bootstrapped data}
+  %    				\item \textcolor{blue}{Relabel --- Predict $\xi$ with classifiers that had it OOB and average}
+
+  %                       \item \textcolor{blue}{ Relabel --- Get new class by MECP}
+		% 			\item \textcolor{orange}{Cost-sens ---  Train on relabeled data}
+		% 		\end{itemize}
+		
+		% \end{minipage}
 			\begin{algorithmic}
 				
-				\tiny
+				\footnotesize
 %				
-				\State \textbf{MetaCost}  
 				\State \textbf{Input:} 
-				$\D = \{(\xi,\yi)\}_{i=1}^n$ training data, \\
-				$M \in \N$ number of bagging iterations, \\
-				$B \in \N$ bootstrap size, \\
-				$f$ probabilistic (black-box) classifier, 
-				$\mathbf{C}$ cost matrix \\
-				  \# 1st Bagging:
-				\textcolor{teal}{\For{$m=1,\ldots,M$}
-					\State $\D_m  \leftarrow $ Bootstrap sample ($\D,B$)
-					\State $f_m  \leftarrow $ train $f$ on $\D_m$ 
-                    \EndFor} \\
-				 \# 2nd Relabeling:
-				 \textcolor{blue}{\For{$i=1,\ldots,n$}
-					 \State $\tilde M \leftarrow \bigcup_{m: \xi \notin \D_m} \{m\}$
-				\EndFor}
-				\textcolor{magenta}{\For{$j=1,\ldots,g$} (relabel for binary case)
-				   \State $\pi_j(\xi)  \leftarrow \frac{1}{|\tilde M| } \sum_{m \in \tilde M}   \pi_j(\xi~|~ f_m) $
-				\EndFor}
-                    \textcolor{red}{\State $\tilde y^{(i)} \leftarrow \argmin_{i} \sum_{j=1}^g \pi_j(\xi) C(i,j) $
-				   \State $\tilde D \leftarrow \tilde D \cup \{(\xi,\tilde y^{(i)})\} $}
-    
-			   \State \# 3rd Cost Sensitivity:
-%				
-				\textcolor{orange}{\State $f_{meta} \leftarrow$ train $f$ on $\tilde D$}
-%			
-			\end{algorithmic}
-		\end{minipage}
-		%
-	}
-	%	
-\end{vbframe}
-
-
-\begin{vbframe}{MetaCost: Example Continued}
-
-
-        \begin{itemize}
-            \item Binary Classification: German Credit Task                     
-            \item Train random forest with threefold cv
-            \item Use OOB-predictions to calculate new labels by
-            \begin{equation*}
-                \tilde y^{(i)} \leftarrow \argmin_{i \in \{\text{good, bad}\}} \sum_{j \in \{\text{good, bad}\}} \pi_j(\xi) C(i,j)
-            \end{equation*}
-            \item Binary case: $\pi(\xi)$ probability of classifying a customer as good.
-            \item Hence, select the better of the two classes, w.r.t.:
-             \begin{itemize}
-               \item $i = \text{good}: (1-\pi(\xi)) C(\text{good, bad})$
-               \vspace{5pt}
-               \item $i = \text{bad}: \pi(\xi) C(\text{bad, good})$
-               \vspace{5pt}
-             \end{itemize}
-               \vspace{5pt}
-            if $C(\text{good, good}) = C(\text{bad, bad}) = 0$.
-        \end{itemize}
+				$\D = \{(\xi,\yi)\}_{i=1}^n$ training data, $B$ number of bagging iterations,
+				$\pix$ probabilistic classifier,
+				$\mathbf{C}$ cost matrix 
+				  \State \# Bagging:
+\textcolor{teal}{
+\For{$b=1,\ldots,B$}
+    \State $\D_b \leftarrow $ Bootstrap version of $\D$
+    \State $\pi_b \leftarrow $ train classifier on $\D_b$ 
+\EndFor
+} 
+\State \# Relabeling:
+\textcolor{blue}{
+\For{$i=1,\ldots,n$}
+% 	 \State $\tilde M \leftarrow \bigcup_{m: \xi \notin \D_m} \{m\}$
+% \textcolor{blue}{\For{$j=1,\ldots,g$} 
+%    \State $\pi_j(\xi)  \leftarrow \frac{1}{|\tilde M| } \sum_{m \in \tilde M}   \pi_j(\xi~|~ f_m) $
+% \EndFor
+%                 }
+%                 \textcolor{blue}{\State $\tilde y^{(i)} \leftarrow \argmin_{i} \sum_{j=1}^g \pi_j(\xi) C(i,j) $
+\State $\tilde D \leftarrow \tilde D \cup \{(\xi,\tilde y^{(i)})\} $
+\EndFor
+}    
+\State \# Cost Sens: Train on relabeled data
+\textcolor{orange}{\State $f_{meta} \leftarrow$ train $f$ on $\tilde D$}
+\end{algorithmic}
 
 \end{vbframe}
-%%%%%
 
-
-
-%
 \endlecture
 \end{document}

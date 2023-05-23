@@ -24,9 +24,9 @@
 
 \newcommand{\titlefigure}{figure_man/imbalanced_data_plot_title}
 \newcommand{\learninggoals}{
-  \item What are imbalanced data sets
-  \item Disadvantage of accuracy on imbalanced data sets
-  \item Overview of techniques for handling imbalanced data sets
+  \item Know what an imbalanced data set is
+  \item Understand disadvantage of accuracy on imbalanced data
+  \item Know techniques for handling imbalanced data sets
 }
 
 \title{Advanced Machine Learning}
@@ -34,7 +34,7 @@
 
 \begin{document}
 
-\lecturechapter{Introduction to Imbalanced Learning}
+\lecturechapter{Imbalanced Learning: Introduction}
 \lecture{Advanced Machine Learning}
 
 
@@ -44,34 +44,15 @@
 \begin{vbframe}{Imbalanced Data Sets}
 %		    
             \begin{itemize}
-		        \item Class imbalance: the occurrences of the classes are significantly different. 		     
-		        \item Consequence: undesirable predictive behavior.	    
-		        \item 	Example:
-		        \begin{itemize}
-                \small    
-		            \item Sampling from two Gaussian distributions 
-		        \end{itemize}		    
+		        \item Class imbalance: Ratio of classes is significantly different. 		     
+		        \item Consequence: Undesirable predictive behavior for smaller class.	    
+		        \item Example: Sampling from two Gaussian distributions 
 		    \end{itemize}
 		   
 			\begin{figure}
 				\centering
-				\includegraphics[width=0.7\linewidth]{figure_man/combined_data_plots.jpg}
+				\includegraphics[width=\linewidth]{figure_man/combined_data_plots.jpg}
 			\end{figure}
-%
-\end{vbframe}
-
-\begin{vbframe}{Imbalanced Data Sets: Benchmark}
-%
-			\begin{figure}
-				\centering
-				\includegraphics[width=0.8\linewidth]{figure_man/benchmark_plots.pdf}
-			\end{figure}
-			
-			\begin{itemize}
-			\footnotesize
-                \item Train classifiers with 10-fold cv (stratified). Hold negative class constant at 10000. For the positive class, consider sizes of 10000, 1000, 100 and 50. Performance measures are calculated on the aggregated predictions of the testsets.
-			\end{itemize}
-
 %
 \end{vbframe}
 
@@ -80,7 +61,7 @@
     \begin{table}[h]
         \scriptsize
         \centering
-        \begin{tabular}{cccc}
+        \begin{tabular}{llll}
             \toprule
             \textbf{Domain} & \textbf{Task} & \textbf{Majority Class} & \textbf{Minor Class} \\ [5pt]
             \hline
@@ -93,9 +74,8 @@
     \end{table}
     
 	\begin{itemize}
-        \item In binary classification, the minority class is usually the positive class, while the majority class is the negative. 
-        \item The positive class is oftentimes the more important one in real-world applications.
-        \item Recall that imbalanced data sets can also be a source of bias related to the concept of fairness in ML, e.g.\ more data on white recidivism outcomes than for blacks.
+        \item Often, the minority class is the more important class.
+        \item Imbalanced data can be a source of bias related to concept of fairness. % in ML, e.g.\ more data on white recidivism outcomes than for blacks.
 	\end{itemize}
 
 \end{vbframe}
@@ -105,41 +85,47 @@
 
 \begin{itemize}
     \item Ideal case: correctly classify as many instances as possible \\ $\Rightarrow$ High accuracy,	preferably $100\%$.
-    \vspace{10pt}
+   % \vspace{10pt}
     
-	\item In practice, we often obtain on imbalanced data sets:
-	\begin{itemize}
-		\small	
-		\item a \textbf{good} accuracy on the \textbf{majority} class(es),		
-		\item a \textbf{poor} accuracy on the \textbf{minority} class(es). 	
-	\end{itemize}
-    \vspace{10pt}
+	\item In practice, we often obtain on imbalanced data sets: \textbf{good} performance on the \textbf{majority} class(es), a \textbf{poor} performance on the \textbf{minority} class(es). 	
+    %\vspace{10pt}
 
 	\item Reason: the classifier is biased towards the \textbf{majority} class(es), as predicting the majority class pays off in terms of accuracy.
-    \vspace{10pt}
+    %\vspace{10pt}
 
-	\item Focusing only on the overall accuracy can have serious consequences. 
-    \vspace{10pt}
-
+	\item Focusing only on accuracy can lead to bad performance on minority class. 
+    %\vspace{10pt}
+        \item Example:
+		\begin{itemize}
+			\small
+			\item Assume that only 0.5\% of the patients have a disease,	
+			\item Always predicting ``no disease'' leads to accuracy of 99.5\% %\\	$\Rightarrow$ Optimal policy would be no treating anybody		
+		\end{itemize}
 \end{itemize}
 %
 }
 
 \begin{vbframe}{Issues with Evaluating Classifiers}
+%
+			\begin{figure}
+				\centering
+				\includegraphics[width=0.8\linewidth]{figure_man/benchmark_plots.pdf}
+			\end{figure}
+			
+			
+			\footnotesize
+                In each scenario, we have 10.000 obs in the negative class. Number of obs in positive class varies between 10.000, 1.000, 100, and 50. Train classifiers with 10-fold stratified cv. Evaluate via aggregated predictions on test set.
+			
+
+%
+\end{vbframe}
+
+\begin{vbframe}{Possible Solutions}
 	%
 	\begin{itemize}
         
-        \item Example:
-		\begin{itemize}
-			\small
-			\item Assume that only 0.5\% of the patients have the disease,	
-			\item Always predicting ``no disease'' $\leadsto$ accuracy of 99.5\% \\	
-			$\leadsto$ Every patient is sent back home!		
-		\end{itemize}
-        \vspace{20pt}
-        
 		\item Ideal performance metric: the learning is \emph{properly} biased towards the minority class(es).	
-        \vspace{20pt}
+        %\vspace{20pt}
 
         \item Imbalance-aware performance metrics:
         \begin{itemize}
@@ -152,17 +138,18 @@
 \end{vbframe} 
 
 
-\begin{vbframe}{Training Classifiers on Imbalanced Datasets}
-\small
+\begin{vbframe}{Possible Solutions}
+%\small
 \begin{table}[h]
+\footnotesize
     \centering
-    \begin{tabular}{p{0.2\textwidth} p{0.35\textwidth} p{0.35\textwidth}}
+    \begin{tabular}{p{0.2\textwidth} p{0.4\textwidth} p{0.35\textwidth}}
         \toprule
         \textbf{Approach} & \textbf{Main idea} & \textbf{Remark} \\ [5pt]
         \hline
         Algorithm-level & Bias classifiers towards minority & Special knowledge about classifiers is needed \\ [5pt]
         \hline
-        Data-level & Rebalance the classes by resampling & No modification of classifiers is needed \\ [5pt]
+        Data-level & Rebalance classes by resampling & No modification of classifiers is needed \\ [5pt]
         \hline
         Cost-sensitive Learning & Introduce different costs for misclassification when learning & Between algorithm- and data-level approaches \\ [15pt]
         \hline
