@@ -29,8 +29,8 @@
 
 \newcommand{\titlefigure}{figure/cost_matrix}
 \newcommand{\learninggoals}{
-  \item Learn threshold adjusting in cost-sensitive learning
-  \item Get to know MetaCost as a general approach to make classifiers cost-sensitve
+  \item Instance specific costs
+  \item Cost-Sensitive OVO
 }
 
 \title{Advanced Machine Learning}
@@ -38,7 +38,8 @@
 
 \begin{document}
 
-\lecturechapter{Imbalanced Learning: Cost-Sensitive Learning Part 3}
+\lecturechapter{Imbalanced Learning:\\
+Cost-Sensitive Learning Part 3}
 \lecture{Advanced Machine Learning}
 
 
@@ -54,7 +55,7 @@
 
 \begin{vbframe}{Binary Instance-specific cost Learning}
     \begin{itemize}
-        \item Assumes instance-specific costs for every observation:  $\D^{(n)} = \{(\xi, \cv^{(i)})\}_{i=1}^n$, where $(\xi, \cv^{(i)}) \in \mathbb{R}^d \times \mathbb{R}^2$.
+        \item Assumes instance-specific costs for every observation:  $\D^{(n)} = \{(\xi, \cv^{(i)})\}_{i=1}^n$, where $(\xi, \cv^{(i)}) \in \mathbb{R}^p \times \mathbb{R}^2$.
         \vspace{5pt}
 
         \item Define ``true class'' as cost minimal class
@@ -131,7 +132,7 @@
     
 
     \begin{itemize}
-        \item Let $\D^{(n)} = \{(\xi, \cv^{(i)})\}_{i=1}^n$, $(\xi, \cv^{(i)}) \in \mathbb{R}^d \times \mathbb{R}^g$. 
+        \item Let $\D^{(n)} = \{(\xi, \cv^{(i)})\}_{i=1}^n$, $(\xi, \cv^{(i)}) \in \mathbb{R}^p \times \mathbb{R}^g$. 
         \vspace{5pt}    
         \item Example:
        % Consider instance-specific costs for three observations of the form $(\xi, \yi, \cv^{(i)})$, with some label space $\mathcal{Y}=\{1, 2, \ldots, g\}$:
@@ -237,7 +238,8 @@
     \end{enumerate}
     \vspace{5pt}
 
-    \item Theoretical guarantee: test of final classifier $\leq 2\sum_{j < k}$ test cost of $f^{(j, k)}$. 
+    \item Theoretical guarantee:\\ 
+    test costs of final classifier $\leq 2\sum_{j < k}$ test cost of $f^{(j, k)}$. 
     \end{itemize}
 \end{vbframe}
 
