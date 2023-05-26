@@ -44,7 +44,7 @@
 \begin{vbframe}{Recap: performance measures for binary classification}
     \footnotesize{
         \begin{itemize}
-            \item We encourage readers to first go throuth \href{https://slds-lmu.github.io/i2ml/chapters/04_evaluation/04-08-measures-classification/}{\beamergotobutton{Chapter 04.08 in I2ML }}.
+            \item We encourage readers to first go through \href{https://slds-lmu.github.io/i2ml/chapters/04_evaluation/04-08-measures-classification/}{\beamergotobutton{Chapter 04.08 in I2ML }}.
             \item In binary classification  (i.e., $\Yspace = \{-1,+1\}$):
 
 		\end{itemize}
@@ -68,7 +68,7 @@
             \item $F_1$ score balances Recall ($\rho_{TPR}$) and Precision ($\rho_{PPV}$):
             $$\rho_{F_1} = 2 \cdot \cfrac{\rho_{PPV} \cdot \rho_{TPR}}{\rho_{PPV} + \rho_{TPR}}$$
             
-            \item Note $\rho_{F_1}$ does not account for the number of true negatives.
+            \item Note $\rho_{F_1}$ does not account for TN.
             
             \item Question: does $F_1$ score suffer from data imbalance as accuracy?
         \end{itemize}
@@ -79,174 +79,161 @@
 
 
 \begin{vbframe}{$F_1$ Score in Binary classification}
-	\footnotesize
+	\footnotesize{
 	
-	\begin{minipage}[c]{0.5\textwidth}
-		\footnotesize
-		$F_1$ is the \textbf{harmonic mean} of $\rho_{PPV}$ \& $\rho_{TPR}$. \\
-		$\rightarrow$ Property of harmonic mean: tends more towards the \textbf{lower} of the two combined values.
-	\end{minipage}%
-	\begin{minipage}[c]{0.5\textwidth}
-		\centering
-		\includegraphics[width=0.8\textwidth]{figure/f1_score_plot.pdf}
-	\end{minipage}
+    	\begin{minipage}[c]{0.5\textwidth}
+    		$F_1$ is the \textbf{harmonic mean} of $\rho_{PPV}$ \& $\rho_{TPR}$. \\
+    		$\rightarrow$ Property of harmonic mean: tends more towards the \textbf{lower} of two combined values.
+    	\end{minipage}%
+    	\begin{minipage}[c]{0.5\textwidth}
+    		\centering
+    		\includegraphics[width=0.8\textwidth]{figure/f1_score_plot.pdf}
+    	\end{minipage}
 	
-	\begin{itemize}
-		\item A model with $\rho_{TPR} = 0$ (no positive instance predicted as 
-		positive) or 
-		$\rho_{PPV} = 0$ (no true positives among the predicted) has $\rho_{F_1} = 0$.
-  
-		\item Always predicting \enquote{negative}: $\rho_{F_1} = 0$
-  
-		\item Always predicting \enquote{positive}: $\rho_{F_1} = 2 \cdot \rho_{PPV} / 
-		(\rho_{PPV} + 1) = 2 \cdot \np / (\np + n)$,\\ 
-		$\leadsto$ small when $\np$ is small.
-
-        \item Hence, $F_1$ score is more robust to data imbalance than accuracy.
-  
-	\end{itemize}
-	
+    	\begin{itemize}
+    		\item A model with $\rho_{TPR} = 0$ (no pos. instance predicted as 
+    		pos.) or 
+    		$\rho_{PPV} = 0$ (no TP among the predicted) has $\rho_{F_1} = 0$.
+      
+    		\item Always predicting \enquote{negative}: $\rho_{F_1} = 0$
+      
+    		\item Always predicting \enquote{positive}: $\rho_{F_1} = 2 \cdot \rho_{PPV} / 
+    		(\rho_{PPV} + 1) = 2 \cdot \np / (\np + n)$,\\ 
+    		$\leadsto$ small when $\np$ is small.
+    
+            \item Hence, $F_1$ score is more robust to data imbalance than accuracy.
+      
+    	\end{itemize}
+	}
 \end{vbframe}
 
 \begin{vbframe}{$F_\beta$ in Binary classification}
-    \footnotesize
+    \footnotesize{
 	
-	\begin{minipage}[c]{0.5\textwidth}
-		\footnotesize
-        \begin{itemize}
-            \item $F_1$ puts equal weights to $\frac{1}{\rho_{PPV}}$ \& $\frac{1}{\rho_{TPR}}$ because $F_1 = \frac{2}{\frac{1}{\rho_{PPV}} + \frac{1}{\rho_{TPR}}}$.
-            \item $F_\beta$ puts $\beta^2$ times of weight to $\frac{1}{\rho_{TPR}}$:
-                \begin{equation*}
-                    \begin{aligned}
-                        F_\beta &= \frac{1}{\frac{\beta^2}{1 + \beta^2} \cdot \frac{1}{\rho_{TPR}} + \frac{1}{1 + \beta^2} \cdot \frac{1}{\rho_{PPV}}} \\
-                        &= (1 + \beta^2) \cdot \frac{\rho_{PPV} \cdot \rho_{TPR}}{\beta^2 \rho_{PPV} + \rho_{TPR}}
-                    \end{aligned}
-                \end{equation*}
-        \end{itemize}
-	\end{minipage}%
-	\begin{minipage}[c]{0.5\textwidth}
-		\centering
-		\includegraphics[width=0.8\textwidth]{figure/f1_score_plot.pdf}
-	\end{minipage}
-	
-	\begin{itemize}
-		\item $\beta \gg 1 \ \leadsto \ F_\beta \approx \rho_{TPR}$;
-        \item $\beta \ll 1 \ \leadsto \ F_\beta \approx \rho_{PPV}$.
-  
-	\end{itemize}
+    	\begin{minipage}[c]{0.49\textwidth}
+            \begin{itemize}
+                \item $F_1$ puts equal weights to $\frac{1}{\rho_{PPV}}$ \& $\frac{1}{\rho_{TPR}}$ because $F_1 = \frac{2}{\frac{1}{\rho_{PPV}} + \frac{1}{\rho_{TPR}}}$.
+                
+                \item $F_\beta$ puts $\beta^2$ times of weight to $\frac{1}{\rho_{TPR}}$:
+                    \begin{equation*}
+                        \begin{aligned}
+                            F_\beta &= \frac{1}{\frac{\beta^2}{1 + \beta^2} \cdot \frac{1}{\rho_{TPR}} + \frac{1}{1 + \beta^2} \cdot \frac{1}{\rho_{PPV}}} \\
+                            &= (1 + \beta^2) \cdot \frac{\rho_{PPV} \cdot \rho_{TPR}}{\beta^2 \rho_{PPV} + \rho_{TPR}}
+                        \end{aligned}
+                    \end{equation*}
+            \end{itemize}
+    	\end{minipage}
+    	\begin{minipage}[c]{0.49\textwidth}
+    		\centering
+    		\includegraphics[width=0.8\textwidth]{figure/f1_score_plot.pdf}
+    	\end{minipage}
+    	
+    	\begin{itemize}
+    		\item $\beta \gg 1 \ \leadsto \ F_\beta \approx \rho_{TPR}$;
+            \item $\beta \ll 1 \ \leadsto \ F_\beta \approx \rho_{PPV}$.
+      
+    	\end{itemize}
 
-    
+    }
     
 \end{vbframe}
 
 
 \begin{vbframe}{G Score and G Mean}
-	\footnotesize
-	
-	\begin{minipage}[c]{0.5\textwidth}
-	\footnotesize
-	\begin{itemize}
-		\item G score uses geometric mean: 
-		%	
-		$$\rho_{G} = \sqrt{\rho_{PPV} \cdot \rho_{TPR}}$$
-		%	
-		\item Geometric mean tends more towards the \textbf{lower} of the two combined values.
-        \item Geometric mean is \textbf{larger} than harmonic mean.
-		%	
-	\end{itemize}
-\end{minipage}%
-\begin{minipage}[c]{0.5\textwidth}
-	\centering
-	\includegraphics[width=0.8\textwidth]{figure/g_score_plot.pdf}
-\end{minipage}
+	\footnotesize{
+    	\begin{minipage}[c]{0.49\textwidth}
+        	\begin{itemize}
+        		\item G score uses geometric mean: 
+        		$$\rho_{G} = \sqrt{\rho_{PPV} \cdot \rho_{TPR}}$$
 
-\begin{itemize}
-	\item Closely related is the G mean:
+        		\item Geometric mean tends more towards the \textbf{lower} of the two combined values.
+                \item Geometric mean is \textbf{larger} than harmonic mean.
+        	\end{itemize}
+        \end{minipage}
+        \begin{minipage}[c]{0.49\textwidth}
+        	\centering
+        	\includegraphics[width=0.8\textwidth]{figure/g_score_plot.pdf}
+        \end{minipage}
 
-	$$\rho_{Gm} = \sqrt{\rho_{TNR} \cdot \rho_{TPR}}.$$
-
-	It also considers the \textbf{true negatives}.
-	
-	\item Always predicting \enquote{negative}: $\rho_{G} = \rho_{Gm}  = 0 \leadsto$ Robust to data imbalance!
-
-\end{itemize}
-	
+        \begin{itemize}
+        	\item Closely related is the G mean:
+        	$$\rho_{Gm} = \sqrt{\rho_{TNR} \cdot \rho_{TPR}}.$$
+        	It also considers \textbf{TN}.
+    
+        	\item Always predicting \enquote{negative}: $\rho_{G} = \rho_{Gm}  = 0 \leadsto$ Robust to data imbalance!
+        \end{itemize}
+}
 \end{vbframe}
 
 
 
 \begin{vbframe}{Balanced Accuracy}
-	\footnotesize
+	\footnotesize{
 	
-	\begin{minipage}[c]{0.5\textwidth}
-		\footnotesize
-		\begin{itemize}
-			\item Similar to $G$ mean, Balanced accuracy (BAC) balances $\rho_{TNR}$ and $\rho_{TPR}$: 
-			%	
-			$$\rho_{BAC} = \frac{\rho_{TNR} + \rho_{TPR}}{2}$$
-			%	
-			\item  It tends more towards the \textbf{higher} of the two combined values.
-			%	
-		\end{itemize}
-	\end{minipage}%
-	\begin{minipage}[c]{0.5\textwidth}
-		\centering
-		\includegraphics[width=0.7\textwidth]{figure/bac_plot.pdf}
-	\end{minipage}
-	%
-	\begin{itemize}
-		\item If a classifier attains high accuracy on both classes or the data set is almost balanced, then $\rho_{BAC} \approx \rho_{ACC}$.
-        \vspace{20pt}
-        
-		\item However, if a classifier always predicts ``negative'' for an imbalanced data set, i.e. $n_+  \ll n_-,$ then $\rho_{BAC} \ll \rho_{ACC}$. It also considers true negatives.
+    	\begin{minipage}[c]{0.49\textwidth}
+    		\begin{itemize}
+    			\item Balanced accuracy (BAC) balances $\rho_{TNR}$ and $\rho_{TPR}$: 
+    			$$\rho_{BAC} = \frac{\rho_{TNR} + \rho_{TPR}}{2}$$
 
-	\end{itemize}
-	
+    			\item  It tends more towards the \textbf{higher} of two combined values.
+    		\end{itemize}
+    	\end{minipage}
+    	\begin{minipage}[c]{0.49\textwidth}
+    		\centering
+    		\includegraphics[width=0.8\textwidth]{figure/bac_plot.pdf}
+    	\end{minipage}
+
+    	\begin{itemize}
+    		\item If a classifier attains high accuracy on both classes or the data set is almost balanced, then $\rho_{BAC} \approx \rho_{ACC}$.
+            \vspace{20pt}
+            
+    		\item However, if a classifier always predicts ``negative'' for an imbalanced data set, i.e. $n_+  \ll n_-,$ then $\rho_{BAC} \ll \rho_{ACC}$. It also considers TN.
+    
+    	\end{itemize}
+    }
 \end{vbframe}
 
 
 \begin{vbframe}{Matthews Correlation Coefficient}
-	%	
-	\footnotesize{
-	\begin{itemize}
-		%
-        \item Recall: Pearson correlation coefficient (PCC): 
-            $$\corr(X, Y) = \frac{\cov(X, Y)}{\sigma_{X} \sigma_{Y}}$$
-		\item We can view the ``predicted'' classes and the ``true'' classes as two binary random variables.
-        \vspace{20pt}
-  
-        \item Using the entries in confusion matrix to estimate the PCC, we obtain MCC:
-	
-		$$   \rho_{MCC} = \frac{TP\cdot TN - FP \cdot FN}{\sqrt{(TP+FN)(TP+FP)(TN+FN)(TN+FP)}}$$
-        \vspace{20pt}
 
-        \item In contrast to other metrics: 
-        \begin{itemize}
-            \footnotesize
-            \item MCC uses all entries of the confusion matrix;
-            \item MCC has value in $[-1,1]$.
+	\small{
+    	\begin{itemize}
+    
+            \item Recall: Pearson correlation coefficient (PCC): 
+                $$\corr(X, Y) = \frac{\cov(X, Y)}{\sigma_{X} \sigma_{Y}}$$
+    		\item View ``predicted'' and ``true'' classes as two binary random variables.
+      
+            \item Using entries in confusion matrix to estimate the PCC, we obtain MCC:
+    	
+    		$$   \rho_{MCC} = \frac{TP\cdot TN - FP \cdot FN}{\sqrt{(TP+FN)(TP+FP)(TN+FN)(TN+FP)}}$$
+    
+            \item In contrast to other metrics: 
+            \begin{itemize}
+                \footnotesize
+                \item MCC uses all entries of the confusion matrix;
+                \item MCC has value in $[-1,1]$.
+            \end{itemize}
+    		
         \end{itemize}
-		
-    \end{itemize}
-	
+    	
 	}
 \end{vbframe}
 
 \begin{vbframe}{Matthews Correlation Coefficient}
-    \footnotesize{
+    \small{
         $$   \rho_{MCC} = \frac{TP\cdot TN - FP \cdot FN}{\sqrt{(TP+FN)(TP+FP)(TN+FN)(TN+FP)}}$$
 
         \begin{itemize}
             \item $\rho_{MCC} \approx 1$ $\leadsto$ nearly zero error $\leadsto$ good classification, i.e., strong correlation between predicted and true classes.
             \vspace{10pt}
     	
-            \item $\rho_{MCC} \approx 0$ $\leadsto$ no correlation, i.e., the classification is no better than random guessing.
+            \item $\rho_{MCC} \approx 0$ $\leadsto$ no correlation, i.e., no better than random guessing.
             \vspace{10pt}
     	
-            \item $\rho_{MCC} \approx -1$ $\leadsto$ reversed classification, i.e., the classifier is essentially switching the labels.
+            \item $\rho_{MCC} \approx -1$ $\leadsto$ reversed classification, i.e., essentially switching the labels.
             \vspace{10pt}
     
-            \item For the previous measures, it is important which class is the positive one (especially in light of imbalanced data). But MCC does not depend on which class is the positive one.
+            \item Previous measures requires defining positive class. But MCC does not depend on which class is the positive one.
             
         \end{itemize}
          
@@ -256,8 +243,7 @@
 
 
 \begin{vbframe}{Performance Measures for Multiclass Classification}
-	%	
-	\footnotesize{
+	\small{
 		\begin{center}
 			\tiny
 			\begin{tabular}{cc|>{\centering\arraybackslash}p{8em}>{\centering\arraybackslash}p{8em}>{\centering\arraybackslash}p{5em}>{\centering\arraybackslash}p{8em}}
@@ -276,24 +262,20 @@
 		
 		\begin{itemize}
 			\item $n_{ij}$: the number of $j$ instances classified as $i$.
-            \vspace{5pt}
 
             \item $n_i = \sum_{j=1}^g n_{ji}$ the total number of $i$ instances.
-            \vspace{5pt}
 
             \item \textbf{Class-specific} metrics:
-            \begin{itemize}
-                \footnotesize 
-                
-                \item True positive rate (\textbf{Recall}): $\rho_{TPR_i} = \frac{n_{ii}}{n_i}$
-                \vspace{5pt}
-
-                \item True negative rate $\rho_{TNR_i} = \frac{\sum_{j\neq i}n_{jj}}{n-n_i}$ 
-                \vspace{5pt}
-
-                \item Positive predictive value (\textbf{Precision}) $\rho_{PPR_i} = \frac{n_{ii}}{\sum_{j=1}^g n_{ij}}$.
-                
-            \end{itemize}
+                \begin{itemize}
+                    \small
+                    
+                    \item True positive rate (\textbf{Recall}): $\rho_{TPR_i} = \frac{n_{ii}}{n_i}$
+    
+                    \item True negative rate $\rho_{TNR_i} = \frac{\sum_{j\neq i}n_{jj}}{n-n_i}$ 
+    
+                    \item Positive predictive value (\textbf{Precision}) $\rho_{PPR_i} = \frac{n_{ii}}{\sum_{j=1}^g n_{ij}}$.
+                    
+                \end{itemize}
 
 		\end{itemize}
 	}
@@ -302,66 +284,58 @@
 
 \begin{vbframe}{Macro $F_1$ Score}
 	
-	\footnotesize{
+	\small{
 
-	\begin{itemize}
+    	\begin{itemize}
+    
+    		\item Average over classes to obtain a single value:
+            $$\rho_{mMETRIC} = \frac{1}{g}\sum_{i=1}^g \rho_{METRIC_i},$$
+            where $METRIC_i$ is a class-specific metric such as $PPV_i$, $TPR_i$ of class $i$.
+    		
+    	
+    		\item With this, one can simply define a \textbf{macro} $F_1$ score:
+    	
+    		$$\rho_{mF_1} = 2 \cdot \cfrac{\rho_{mPPV} \cdot \rho_{mTPR}}{\rho_{mPPV} + 
+    			\rho_{mTPR}}$$
+    
+    		\item Problem: each class equally weighted $\leadsto$ class sizes are not considered.
+    
+            \item How about applying different weights to the class-specific metrics?
 
-		\item To obtain a single metric value, we can average the class-specific metrics over classes:
-        $$\rho_{mMETRIC} = \frac{1}{g}\sum_{i=1}^g \rho_{METRIC_i},$$
-        where $METRIC_i$ is a class-specific metric such as $PPV_i$, $TPR_i$ of class $i$.
-		
-	
-		\item With this, one can simply define a \textbf{macro} $F_1$ score:
-	
-		$$\rho_{mF_1} = 2 \cdot \cfrac{\rho_{mPPV} \cdot \rho_{mTPR}}{\rho_{mPPV} + 
-			\rho_{mTPR}}$$
-
-		\item Problem: each class gets an equal weight $\leadsto$ the class sizes are not considered.
-
-        \item How about applying different weights to the class-specific metrics?
-%
-	\end{itemize}
+    	\end{itemize}
 	}
 \end{vbframe}
 
 \begin{vbframe}{Weighted Macro $F_1$ Score}
 
-	\footnotesize{
+	\small{
 
-	\begin{itemize}
-
-		\item For imbalanced data sets, give \textbf{more weights} to \textbf{minority} classes.
-        \vspace{10pt}
-  
-        \item $w_1,\ldots,w_g \in[0,1]$  such that $w_i > w_j$ iff $n_i < n_j$ and $\sum_{i=1}^g w_i = 1.$
-
-        $$\rho_{wmMETRIC} = \frac{1}{g}\sum_{i=1}^g \rho_{METRIC_i} w_i,$$
-        where $METRIC_i$ is a class-specific metric such as $PPV_i$, $TPR_i$ of class $i$.
-        \vspace{10pt}
-
-	 
-		\item Example: $w_i = \frac{n - n_i}{(g-1)n}$ are suitable weights.
-        \vspace{10pt}
-
-		\item This leads to the weighted macro $F_1$ score:
-			
-		$\rho_{wmF_1} = 2 \cdot \cfrac{\rho_{wmPPV} \cdot \rho_{wmTPR}}{\rho_{wmPPV} + 
-			\rho_{wmTPR}}$
-		\vspace{10pt}
-  
-		\item Following this idea, we also obtain a weighted macro G score or weighted BAC.
-        \vspace{10pt}
-	
-		\item \textbf{Usually} the weighted $F_1$ score is used with weights $w_i = n_i/n$. However, for imbalanced data sets this would \textbf{overweight} majority classes.
-
-	\end{itemize}
+    	\begin{itemize}
+    
+    		\item For imbalanced data sets, give \textbf{more weights} to \textbf{minority} classes.
+      
+            \item $w_1,\ldots,w_g \in[0,1]$  such that $w_i > w_j$ iff $n_i < n_j$ and $\sum_{i=1}^g w_i = 1.$
+    
+            $$\rho_{wmMETRIC} = \frac{1}{g}\sum_{i=1}^g \rho_{METRIC_i} w_i,$$
+            where $METRIC_i$ is a class-specific metric such as $PPV_i$, $TPR_i$ of class $i$.
+    	 
+    		\item Example: $w_i = \frac{n - n_i}{(g-1)n}$ are suitable weights.
+    
+    		\item Weighted macro $F_1$ score:	
+    		$$\rho_{wmF_1} = 2 \cdot \frac{\rho_{wmPPV} \cdot \rho_{wmTPR}}{\rho_{wmPPV} + \rho_{wmTPR}}$$
+      
+    		\item This idea gives rise to a weighted macro G score or weighted BAC.
+    	
+    		\item \textbf{Usually}, weighted $F_1$ score uses $w_i = n_i/n$. However, for imbalanced data sets this would \textbf{overweight} majority classes.
+    
+    	\end{itemize}
 	}
 \end{vbframe}
 
 
 \begin{vbframe}{Other Performance Measures}
 
-	\footnotesize{
+	\small{
 
 		\begin{itemize}
 		
@@ -376,7 +350,7 @@
             \vspace{10pt}
         
 		
-			\item Other performance measures which treat the "predicted" classes and the "true" classes as two discrete random variables, e.g.\ Cohen's Kappa or Cross Entropy (see Grandini et al.\ (2021)).
+			\item Cohen's Kappa or Cross Entropy (see Grandini et al.\ (2021)) treat "predicted" and "true" classes as two discrete random variables.
 		
 		\end{itemize}
 	}
@@ -390,16 +364,12 @@
 		\begin{itemize}
 
             \item Since different measures focus on different characteristics $\leadsto$ No golden answer to this question.
-            \vspace{20pt}
 	
 			\item Depends on the application, which characteristic is more important than another.
-            \vspace{20pt}
 
 			\item However, it is clear that the usage of accuracy is inappropriate if the data set is imbalanced. $\leadsto$ Use altenative ones.
-            \vspace{20pt}
 
 			\item Be careful with comparing the absolute values of the different measures, as these can be on different ``scales'', e.g.\ MCC and BAC. 
-            \vspace{20pt}
 	
 		\end{itemize}
 	}
