@@ -33,263 +33,196 @@
 
 \begin{document}
 	
-	\lecturechapter{Imbalanced Learning: Sampling Methods Part 2}
-	\lecture{Advanced Machine Learning}
+\lecturechapter{Imbalanced Learning: Sampling Methods Part 2}
+\lecture{Advanced Machine Learning}
+
+\sloppy
 	
-	
-	
-	\sloppy
-	
-	
-	
-	\begin{frame}{Sampling Methods: Overview}
-		\footnotesize
-		\begin{itemize}
+\begin{frame}{Sampling Methods: Overview}
+    \begin{itemize}
 
-			\item Main idea: manipulate the distribution of the training examples (make it more balanced) to improve the performance on the minority classes.
-			
-			\item Advantage: independent of the underlying classifier $\leadsto$ very flexible and general.
-   
-			\item Three groups: 
-            \vspace{10pt}
-		
-			\begin{minipage}{0.5\textwidth}
-		
-				\begin{itemize} 
-                    \footnotesize
-                    
-					\item Undersampling --- Eliminating/Removing instances of the majority class(es) in the original data set.
-                    \vspace{10pt}
-			
-					\item Oversampling --- Adding/Creating new instances of the minority class(es) to the original data set.
-                    \vspace{10pt}
+        \item Balance training data distribution to perform better on minority classes.
+        
+        \item Independent of classifier $\leadsto$ very flexible and general.
 
-                    \item Oversampling is slower than undersampling, but oversampling usually works better.
-                    \vspace{10pt}
-
-					\item Hybrid approaches --- Combining undersampling and oversampling.
-                    \vspace{10pt}
-			
-				\end{itemize}
-		
-			\end{minipage}
-			\begin{minipage}{0.4\textwidth}
-					\begin{figure}
-					\centering
-					\scalebox{0.8}{\includegraphics{figure/under_oversampling.png}}
-				\end{figure}
-			\end{minipage}
-	
-		\end{itemize}
-		
-	\end{frame}
-
-	
-	\begin{frame}{Oversampling: SMOTE}
-		%	
-		\footnotesize
-		\begin{itemize}
-			%			
-			\item The Synthetic Minority Oversampling Technique (SMOTE) operates by creating \textbf{new synthetic examples} of minority class.
-
-			\item Idea: interpolate between several closely located minority examples.
-
-			\item Note that the examples are created in the feature space $\Xspace$ rather than in the data space $\Xspace\times\Yspace.$
-	
-			\item Algorithm: For each minority class example 
-
-			\begin{itemize} 
-                \footnotesize
-
-				\item Find its $k$ nearest minority neighbors.
-		
-				\item Randomly select $j$ of these neighbors.
-		
-				\item Randomly generate new instances along the lines connecting the minority example and its $j$ selected neighbors.
-		
-			\end{itemize}
-
-		\end{itemize}
-%	
-		\includegraphics{figure/SMOTE.png} 
-		%	
-	\end{frame}
-	
-	\begin{frame}{SMOTE: Generating new examples}
-		%	
-		\footnotesize
-		
-			\begin{itemize}
-	
-				\item Let $\xi$ be the feature of the minority instance and let $\xv^{(j)}$ be its nearest neighbor. The line connecting the two examples is
-				
-				$$		(1-\lambda) \xi + \lambda\xv^{(j)} = \xi + \lambda(\xv^{(j)} - \xi)	$$
-%				
-				where $\lambda \in [0,1].$
-				%			
-				\item Thus, by sampling randomly a $\lambda \in [0,1],$ say $\tilde{\lambda},$ we can create a new example on the connecting line via
-%				
-				$$   \tilde{\xv}^{(i)} =  \xi + \tilde{\lambda}(\xv^{(j)} - \xi)	 $$
-				%	
-			\end{itemize}		
-				
-				Example: Let $\xi = (1,2)^\top$ and $\xv^{(j)} = (3,1)^\top.$ Assume we draw $\tilde{\lambda} \approx 0.25.$
-				%
-			\begin{figure}
-				\centering
-				\includegraphics[width=0.8\linewidth]{figure_man/coordinate_system}
-			\end{figure}
-		%			
-		
-		%	
-	\end{frame}
-
-
-	\begin{frame}{SMOTE: Visualization}
-		%	
-		\footnotesize
-		
-			\begin{itemize}
-	
-				\item For an imbalanced data situation, take four instances of the minority class. Let $K=2$ be the number of nearest neighbors.
-
-				%	
-			\end{itemize}		
-
-				%
-			\begin{figure}
-				\centering
-				\foreach \x in{1,2,3,4,5,6,7,8,9,10} {
-				\includegraphics<\x>[width=0.8\linewidth]{figure_man/smote_viz_\x.pdf}\par
-				}
-			\end{figure}
-		%			
-		
-		%	
-	\end{frame}
-	
-		\begin{frame}{SMOTE: Visualization continued}
-		%	
-		\footnotesize
-		
-			\begin{itemize}
-	
-				\item After 100 iterations of SMOTE for $K=2$ we get the following data situation.
-
-				%	
-			\end{itemize}		
-
-				%
-			\begin{figure}
-				\centering
-				\includegraphics[width=0.8\linewidth]{figure_man/smote_viz_11.pdf}
-			\end{figure}
-		%			
-		
-		%	
-	\end{frame}
-	
-		\begin{frame}{SMOTE: Visualization continued}
-		%	
-		\footnotesize
-		
-			\begin{itemize}
-	
-				\item For 100 iterations of SMOTE with $K=3$ we basically select neighbors at random.
-
-				%	
-			\end{itemize}		
-
-				%
-			\begin{figure}
-				\centering
-				\includegraphics[width=0.8\linewidth]{figure_man/smote_viz_12.pdf}
-			\end{figure}
-		%			
-		
-		%	
-	\end{frame}
-		
-	\begin{frame}{SMOTE: Example}
-		%	
-		\footnotesize
-		
-		\begin{itemize}
-			%			
-			\item Let us consider the iris data set with $\Yspace=\{ \texttt{setosa},\texttt{versicolor},\texttt{virginica}  \}$ with 50 examples for each class.
-			
-			\item Make the data set ``imbalanced'': 
-            \begin{itemize}
-                \footnotesize
-                \item relabel one class as positive
-                \item relabel two other classes as negative
-            \end{itemize}
-            
-			\item Running SMOTE with different $k$'s leads to the following:
-			%	
-		\end{itemize}		
-%		
-		%
-		\begin{figure}
-			\centering
-			\includegraphics[width=0.9\linewidth]{figure_man/smoted_iris_data_ggplot.pdf}
-		\end{figure}
-		%			
-		We created now (minority) data points which make it now slightly harder to separate the two classes with a separating hyperplane.
-		%	
-	\end{frame}
-
-
-	\begin{frame}{SMOTE: Dis-/Advantages}
-
-		\small
-
-		\begin{itemize}
-		
-			\item SMOTE generalizes the decision region for the minority class instead of making it quite specific, such as by random oversampling. 
-            \vspace{10pt}
-		
-			\item SMOTE is, however, prone to overgeneralizing as it generalizes the minority area without paying attention to the majority class(es).
-            \vspace{10pt}
-
-		
-			\item Nevertheless, SMOTE is still well-performed among the oversampling techniques and is the basis for many oversampling methods: Borderline-SMOTE, LN-SMOTE, $\ldots$ (over 90 extensions!)
-            \vspace{10pt}
-
-			\item A quite common approach is also to combine SMOTE with undersampling techniques such as Tomek link or NCL.
-
-		\end{itemize}		
-
-	\end{frame}
-
- 	\begin{frame}{Comparison of Sampling Techniques}
-
-		\small
-
-		\begin{itemize}
-		
-			\item Compare different sampling techniques on the Optdigits dataset for optical recognition of handwritten digits.
-		
-			\item Use random forest classifier with 100 trees, five-fold cv and the F1-Score as metric. The positive/negative class-ratios are 0.11, 0.68, 0.68 and 0.79:
-               \begin{center}
-                 \begin{tabular}{lr}
-                 \toprule
-                 Learner & F1-Score\\
-                 \midrule
-                 Base RF & 0.9239\\
-                 Undersample RF & 0.9538\\
-                 Oversample RF & 0.9538\\
-                 SMOTE RF & 0.9576\\
-                 \bottomrule
-                 \end{tabular}    
-                \end{center}
+        \item Three groups: 
+    
+        \begin{minipage}{0.5\textwidth}
+    
+            \begin{itemize} 
                 
-			\item The sampling techniques perform better than the regular base learner. Notice that SMOTE achieves the best performance, although the differences are rather minimal in comparision to the other techniques.
+                \item Undersampling --- Removing majority instances.
+        
+                \item Oversampling --- Adding/Creating new minority instances.
 
-		\end{itemize}		
+                \item Oversampling is slower than undersampling but usually works better.
 
-	\end{frame}
+                \item Hybrid approaches --- Combining undersampling and oversampling.
+        
+            \end{itemize}
+    
+        \end{minipage}
+        \begin{minipage}{0.4\textwidth}
+                \begin{figure}
+                \centering
+                \scalebox{0.8}{\includegraphics{figure/under_oversampling.png}}
+            \end{figure}
+        \end{minipage}
+
+    \end{itemize}
+    
+\end{frame}
 
 
-	\endlecture
+\begin{frame}{Oversampling: SMOTE}
+    \begin{itemize}
+        %			
+        \item SMOTE operates by creating \textbf{new synthetic instances} of minority class.
+
+        \item Interpolate between neighboring minority instances.
+
+        \item Instances are created in $\Xspace$ rather than in $\Xspace\times\Yspace.$
+
+        \item Algorithm: For each minority class instance: 
+
+        \begin{itemize} 
+
+            \item Find its $k$ nearest minority neighbors.
+    
+            \item Randomly select $j$ of these neighbors.
+    
+            \item Randomly generate new instances along the lines connecting the minority example and its $j$ selected neighbors.
+    
+        \end{itemize}
+    \end{itemize}
+    
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.8\textwidth]{figure/SMOTE.png} 
+    \end{figure}
+
+
+\end{frame}
+
+\begin{frame}{SMOTE: Generating new examples}
+    
+    \begin{itemize}
+
+        \item Let $\xi$ be the feature of the minority instance and let $\xv^{(j)}$ be its nearest neighbor. The line connecting the two instances is
+        $$		(1-\lambda) \xi + \lambda\xv^{(j)} = \xi + \lambda(\xv^{(j)} - \xi)	$$
+        where $\lambda \in [0,1].$		
+        
+        \item By sampling a $\lambda \in [0,1],$ say $\tilde{\lambda},$ we create a new instance		
+        $$   \tilde{\xv}^{(i)} =  \xi + \tilde{\lambda}(\xv^{(j)} - \xi)	 $$
+
+    \end{itemize}		
+        
+        Example: Let $\xi = (1,2)^\top$ and $\xv^{(j)} = (3,1)^\top.$ Assume $\tilde{\lambda} \approx 0.25.$
+        %
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.8\linewidth]{figure_man/coordinate_system}
+    \end{figure}
+
+\end{frame}
+
+
+\begin{frame}{SMOTE: Visualization}
+    
+    For an imbalanced data situation, take four instances of the minority class. Let $K=2$ be the number of nearest neighbors.		
+
+        \begin{figure}
+            \centering
+            \foreach \x in{1,2,3,4,5,6,7,8,9,10} {
+            \includegraphics<\x>[width=0.8\linewidth]{figure_man/smote_viz_\x.pdf}\par
+            }
+        \end{figure}
+\end{frame}
+
+\begin{frame}{SMOTE: Visualization continued}
+
+    After 100 iterations of SMOTE for $K=2$ we get:		
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.8\linewidth]{figure_man/smote_viz_11.pdf}
+    \end{figure}
+
+\end{frame}
+
+\begin{frame}{SMOTE: Visualization continued}	
+
+    For 100 iterations of SMOTE with $K=3$ and randomly selecting neighbors:
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.8\linewidth]{figure_man/smote_viz_12.pdf}
+    \end{figure}
+	
+\end{frame}
+    
+\begin{frame}{SMOTE: Example}
+    
+    \begin{itemize}
+        \item Iris data set with $\Yspace=\{ \texttt{setosa},\texttt{versicolor},\texttt{virginica}  \}$, and 50 instances for each class.
+        
+        \item Make the data set ``imbalanced'': 
+        \begin{itemize}
+            \item relabel one class as positive
+            \item relabel two other classes as negative
+        \end{itemize}
+    \end{itemize}		
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.9\linewidth]{figure_man/smoted_iris_data_ggplot.pdf}
+    \end{figure}
+		
+    The new minority instances slightly increase the difficulty of separating the two classes with a hyperplane.
+	
+\end{frame}
+
+
+\begin{frame}{SMOTE: Dis-/Advantages}
+
+    \begin{itemize}
+    
+        \item Generalize decision region for minority class instead of making it quite specific, such as by random oversampling. 
+        
+        \item Well-performed among the oversampling techniques and is the basis for many oversampling methods: Borderline-SMOTE, LN-SMOTE, $\ldots$ (over 90 extensions!)
+    
+        \item Prone to overgeneralizing as it pays no attention to the majority class.
+
+    \end{itemize}		
+
+\end{frame}
+
+\begin{frame}{Comparison of Sampling Techniques}
+
+    \begin{itemize}
+    
+        \item Compare different sampling techniques on the Optdigits dataset for optical recognition of handwritten digits.
+    
+        \item Use random forest with 100 trees, 5-fold cv and employ $F_1$-Score. The pos./neg. class-ratios are 0.11, 0.68, 0.68 and 0.79:
+           \begin{center}
+             \begin{tabular}{lr}
+             \toprule
+             Learner & F1-Score\\
+             \midrule
+             Base RF & 0.9239\\
+             Undersample RF & 0.9538\\
+             Oversample RF & 0.9538\\
+             SMOTE RF & 0.9576\\
+             \bottomrule
+             \end{tabular}    
+            \end{center}
+            
+        \item Sampling techniques outperform base learner. \item SMOTE leads sampling techniques, although by a small margin.
+
+    \end{itemize}		
+
+\end{frame}
+
+
+\endlecture
 \end{document}
