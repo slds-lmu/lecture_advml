@@ -45,39 +45,36 @@
 
 
 \begin{frame}{Kronecker kernel ridge regression}
-	\footnotesize
 	\begin{itemize}
-%		
-	\item In the case of multi-target prediction with target features one typically uses kernel methods for learning.
-%		
-	\item In particular, one considers the following pairwise model representation in the primal: 
-		\begin{equation*}
-			\label{eq:pairwise}
-			f(\xv,\tv) = \bm\omega^\top \left(\phi(\xv) \otimes \psi(\tv) \right) ,
-		\end{equation*}
-%	
-	where $\phi$ is some feature map for the features and $\psi$ is a feature map for the target (features) and $\otimes$ is the Kronecker product. \textbf{TODO: Define $\tv$}
-%
-	\item This leads to the Kronecker product pairwise kernel in the dual:
-%	
-	\begin{eqnarray*} 
-		f(\xv,\tv)= \sum_{(\xv',\tv') \in \D} \alpha_{(\xv',\tv')}  \cdot  k(\xv,\xv') \cdot g(\tv,\tv')  = \sum_{(\xv',\tv') \in \D} \alpha_{(\xv',\tv')} \Gamma((\xv,\tv),(\xv',\tv')),
-	\end{eqnarray*}
-%
-	where $k$ is the kernel for the feature map $\phi,$  $g$ the kernel for the feature map $\psi$  and $\alpha_{(\xv',\tv')}$ are the dual parameters, which can be found by least-squares minimization:
-%	 
-	$$ \min_{\bm{\alpha}} \, ||\bm{\Gamma}\bm{\alpha} -\bm{z} ||^2_2 +\lambda\bm{\alpha }^\top \bm{\Gamma}\bm{\alpha}, $$
-%	
-	where $\bm{z} = \mathrm{vec}{(Y)}.$
-%
-%	\item Idea: Model the joint kernel as a product of an instance kernel $k(\cdot,\cdot)$ and a target kernel $g(\cdot,\cdot)$: 
-%		$$\Gamma((\xv,\tv),(\xv',\tv')) = k(\xv,\xv') \cdot g(\tv,\tv')$$
-%
-	\item This approach is commonly used in the zero-shot learning framework.
 
-%
+    	\item In MTP with target features, we often use kernel methods.
+    
+    	\item Consider the following pairwise model representation in the primal: 
+    		\begin{equation*}
+    			\label{eq:pairwise}
+    			f(\xv,\tv) = \bm\omega^\top \left(\phi(\xv) \otimes \psi(\tv) \right) ,
+    		\end{equation*}
+    
+    	where $\phi$ is feature mapping for features and $\psi$ is feature mapping for target (features) and $\otimes$ is Kronecker product. \textbf{TODO: Define $\tv$}
+    
+    	\item This yields Kronecker product pairwise kernel in the dual:
+    	
+    	\begin{eqnarray*} 
+    		f(\xv,\tv)= \sum_{(\xv',\tv') \in \D} \alpha_{(\xv',\tv')}  \cdot  k(\xv,\xv') \cdot g(\tv,\tv')  = \sum_{(\xv',\tv') \in \D} \alpha_{(\xv',\tv')} \Gamma((\xv,\tv),(\xv',\tv')),
+    	\end{eqnarray*}
+    
+    	where $k$ is kernel for feature map $\phi,$  $g$ kernel for feature map $\psi$  and $\alpha_{(\xv',\tv')}$ are dual parameters determined by:
+    
+    	$$ \min_{\bm{\alpha}} \, ||\bm{\Gamma}\bm{\alpha} -\bm{z} ||^2_2 +\lambda\bm{\alpha }^\top \bm{\Gamma}\bm{\alpha}, \text{ where } \bm{z} = \mathrm{vec}{(Y)}$$
+    
+    
+    %	\item Idea: Model the joint kernel as a product of an instance kernel $k(\cdot,\cdot)$ and a target kernel $g(\cdot,\cdot)$: 
+    %		$$\Gamma((\xv,\tv),(\xv',\tv')) = k(\xv,\xv') \cdot g(\tv,\tv')$$
+    
+    	\item Commonly used in zero-shot learning.
+
 \end{itemize}
-%	
+
 	{\tiny Stock et al., A comparative study of pairwise learning methods based on kernel ridge regression, Neural Computation 2018.}
 %	
 \end{frame}
@@ -85,78 +82,53 @@
 
 
 \begin{frame}{Exploiting relations in regularization terms}
-	\footnotesize
-%
+
 	\begin{center}
-		\includegraphics[width=\textwidth]{figure/targetrelations}
+		\includegraphics[width=0.65\textwidth]{figure/targetrelations}
 	\end{center} 
-%	
+
 	\begin{itemize}
-%		
-		\item 	Graph-based regularization is an approach that can be applied to the tree types of relations in the targets: 
-		%
+		\item Graph-based regularization for tree-type relations in targets: 
+
 		\begin{equation*}
 			\min_\Theta \|Y - \Phi \Theta \|^2_F + \lambda \sum_{m=1}^l \sum_{m' \in \mathcal{N}(m)} \|\thetab_m - \ \thetab_{m'}\|^2,
 		\end{equation*}
-		%
-		where $\mathcal{N}(j)$ is the set of targets that are related to target $j.$
-        \item Recall that the graph or tree is given as prior information.
-%		
-		\item Can also be used in a weighted version taking the similarities (or correlations) into account.
-%		
-	\end{itemize}
+
+		where $\mathcal{N}(j)$ is the set of targets related to target $j.$
+        \item The graph or tree is given as prior information.
+		
+		\item Can be extended to a weighted version aware of the similarities (or correlations).
 	
-%
+	\end{itemize}
+
 	{\tiny Gopal and Yang, Recursive regularization for large-scale classification with hierarchical and graphical dependencies, KDD 2013.}
 \end{frame}
 
 \begin{frame}{Hierarchical multi-label classification}
-	\small
-	\vspace{-0.2cm}
-	\begin{center}
-		\includegraphics[width=\textwidth]{figure/hloss}
-	\end{center}
 	
-	\vspace{-0.2cm}
-	\begin{minipage}{0.75\textwidth}   
-	\begin{itemize}
-%		
-		\item %	
-		Hierarchies can also be used to define specific loss functions, such as the Hierarchy-loss: 
-		%	
-		$$L_{Hier}(\yv, f) = \sum_{m: y_m \neq \hat{y}_m} c_m \, \mathds{1}_{ [\textit{anc}(y_m) = \textit{anc}(\hat{y}_m)]  },$$
-		%	
-		where $c_m$ are costs depending on the depth of node $m$, and $\hat{y}_m$ are the predicted labels.
-		%	
-%		
-	\end{itemize}
-\end{minipage}
-\begin{minipage}{0.2\textwidth}    
-	\begin{center}
-		%    	
-		\includegraphics[width=0.99\textwidth,trim = 0 0 100 20,clip]{figure/Slide5}
-		%    	
-	\end{center}
-\end{minipage}
-\begin{itemize}
-%	
-	\item This is rather common in multi-label classification problems.
-%	
-\end{itemize}
-
+	\begin{minipage}{0.60\textwidth}  
+        \centering
+        \includegraphics[width=\textwidth]{figure/hloss}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.39\textwidth}    
+        \centering
+		\includegraphics[width=\textwidth,trim = 0 0 100 20,clip]{figure/Slide5}
+    \end{minipage}
+    
+    \begin{itemize}
+        \item  Hierarchies can also be used to define specific loss functions, such as the Hierarchy-loss: $$L_{Hier}(\yv, f) = \sum_{m: y_m \neq \hat{y}_m} c_m \, \mathds{1}_{ [\textit{anc}(y_m) = \textit{anc}(\hat{y}_m)]  },$$
+        % where $c_m$ are costs depending on the depth of node $m$, and $\hat{y}_m$ are the predicted labels.
+        \item This is rather common in multi-label classification problems.
+    \end{itemize}
+    
 	{\tiny Bi and Kwok, Bayes-optimal hierarchical multi-label classification, IEEE Transactions on Knowledge and Data Engineering, 2014.}
-%
+
 \end{frame}
-
-
 
 \section{Similarity-constructing methods}
 
-
-
-
-\begin{frame}
-	\frametitle{Probabilistic classifier chains}
+\begin{frame}{Probabilistic classifier chains}
 	
 	\begin{itemize}
 		\item Estimate the \alert{joint} conditional distribution $\P(\yv ~|~  \xv)$. 
@@ -178,12 +150,10 @@
 	\end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]
-	\frametitle{Probabilistic classifier chains}
+\begin{frame}[fragile]{Probabilistic classifier chains}
 	\begin{itemize}
 		\item Inference relies on exploiting a probability tree:
 	\end{itemize}
-	\vspace{0.1cm}
 	\begin{center}
 		\begin{tikzpicture}[scale = 0.85,every node/.style={scale=0.85},
 			regnode/.style={circle,draw,minimum width=1.5ex,inner sep=0pt},
@@ -219,7 +189,6 @@
 		\end{tikzpicture}
 	\end{center}
 	
-	\vspace{0.1cm}
 	\begin{itemize}\small
 		\item For subset 0/1 loss one needs to find $
 		\fbayes(\xv) = \argmax_{\yv} \P(\yv ~|~ \xv)
@@ -228,8 +197,6 @@
 %		\footnote{Kumar et al., Beam search algorithms for multilabel
 %	learning, Machine Learning 2013}
 		\item Other losses: compute the prediction on a sample from $\P(\yv ~|~  \xv).$
-%		\footnote}
-		%\item[]
 	\end{itemize}
 {\tiny Dembczynski et al., An analysis of chaining in multi-label classification, ECAI 2012.}
 	
@@ -244,27 +211,15 @@
 	\end{center}
 
 	\begin{itemize}
-%		
 		\item Low rank materializes the idea that some structure is shared across different targets.
-%
-		\item 	Typically perform a low-rank approximation of the parameter matrix:
+		\item Typically perform a low-rank approximation of the parameter matrix:
 		$$\min_\Theta \|Y - \Phi \Theta \|^2_F + \lambda \, \mathrm{rank}(\Theta)$$
-%		
 	\end{itemize}
 	{\tiny Chen et al., A convex formulation for learning shared structures from
 	multiple tasks, ICML 2009.}
 \end{frame}
 
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
-\frame{
-	\frametitle{Low-rank approximation}
-	
+\begin{frame}{Low-rank approximation}
 	
 	
 	\begin{itemize}
@@ -272,23 +227,18 @@
 		\item $p$: the number of (projected) features
 		\item $l$: the number of targets
 		\item Assume a low-rank structure of $A$:\\
-%		
 		$ \qquad  \qquad\qquad \quad  U  \quad \times \qquad  V \qquad \quad  =  \qquad  A$
-		\begin{center}
-%					
+		\begin{center}		
 			\includegraphics[width=0.6\textwidth,trim = 0 0 0 0,clip]{figure/uv_decomp}
-%
 		\end{center}
 		
 		\item We can write $\Theta=UV$ and $\Theta \xv = UV \xv$
 		\item $V$ is a $p \times \hat{l}$ matrix
-		\item  $U$ is an $\hat{l} \times l$ matrix
-		
+		\item  $U$ is an $\hat{l} \times l$ matrix	
 		\item $\hat{l}$ is the rank of $\Theta$
-		
 	\end{itemize}
 	
-}
+\end{frame}
 
 \begin{frame}{Low-rank approximation: Overview of methods}
 	
@@ -314,7 +264,6 @@
 %	classification tasks, NIPS 2013}
 % 	\footnote{Wicker et al., A nonlinear label compression and transformation
 %	method for multi-label classification using autoencoders, PAKDD 2016}
-	\vspace{0.3cm}
 \end{frame}
 
 

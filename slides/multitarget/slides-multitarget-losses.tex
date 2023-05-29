@@ -29,43 +29,25 @@
 \sloppy
 
 
-\begin{frame}
-	\frametitle{Multivariate Loss Functions}
+\begin{frame}{Multivariate Loss Functions}
 	\begin{itemize}
-%		
-		\small
-%		
-		\item In multi-target prediction: For a feature vector $\xv$, predict a tuple of score vectors $f(\xv) = (f(x)_1, f(x)_2, \ldots, f(x)_l)^\top$ for $l$ tasks with a function (hypothesis) $f: \Xspace \rightarrow \R^{g_1} \times \cdots \times \R^{g_l} $.
-        \vspace{15pt}
-%		
-		\item If we want to follow the machine learning paradigm based on loss minimization, we need a \emph{multivariate loss functions} 
+		\item In MTP: For a feature vector $\xv$, predict a tuple of score vectors $f(\xv) = (f(x)_1, f(x)_2, \ldots, f(x)_l)^\top$ for $l$ tasks with a function (hypothesis) $f: \Xspace \rightarrow \R^{g_1} \times \cdots \times \R^{g_l} $.
+        
+		\item Following loss minimization in machine learning , we need a \emph{multivariate loss function} 
 		$$
 		L: \, (\Yspace_1 \times \cdots \times \Yspace_l) \times (\R^{g_1} \times \cdots \times \R^{g_l}) \rightarrow \mathbb{R}.
 		$$ 
-        \vspace{15pt}
 
         \item In multi-target regression: $\Yspace_1 = \ldots = \Yspace_l = \R$, and $g_1 = \ldots = g_l = 1$.
-        \vspace{15pt}
 
         \item In multi-label classification: $\Yspace_1 =  \ldots = \Yspace_l = \{0, 1\}$, and $g_1 = \ldots = g_l = 1$. \\ $\leadsto$ I.e., each task is a binary classification.
-
-%				
-%		\item Can we achieve this goal through simple reduction, i.e., by training one model for each target independently? Or can we do better with more sophisticated methods?  
-%		
-%		\item There are \emph{two views:} the individual target and joint target view.
-%
 	\end{itemize}
 	
 \end{frame}
 
-\begin{frame}
-	\frametitle{Multivariate loss functions}
-	\small
+\begin{frame}{Multivariate loss functions}
 	\begin{itemize}
-%		
-%		\item 
-%
-		\item A loss $L$ is decomposable over examples if it can be written in the form
+		\item $L$ is decomposable over instances if
 		$$
 		L = \sum_{i=1}^n L(\yv^{(i)}, f(\xi)) 
 		%\quad \text{vs.} \quad L \ne \sum_{i=1}^n \ell(\yv^{(i)}, f(\xi)) 
@@ -74,17 +56,17 @@
 		i.e., as a sum of losses over all examples. 
 		
 		
-		\item A multivariate loss $L$ is decomposable over targets if it can be written as
+		\item $L$ is decomposable over targets if
 		$$
 		L(\yv, f) = \sum_{m=1}^l L_m(y_m, f(\xv)_m) 
 		$$
-		with suitable single-target losses $L_m$. 
+		with single-target losses $L_m$. 
 		
 %		
 
 		\begin{minipage}{0.45\textwidth}
 %			
-			\item  In general, we distinguish between two categories of losses: micro- and instance-wise-losses. 
+			\item Two categories: micro- and instance-wise-losses. 
 %			
 		\end{minipage}
 %	
@@ -93,9 +75,9 @@
 				\includegraphics[width=0.75\textwidth]{figure/fmeasure}
 			\end{center}
 		\end{minipage}
-%		
+
 	\end{itemize}
-%
+
 \end{frame}
 
 
@@ -104,42 +86,35 @@
 \begin{frame}
 	\frametitle{Micro Losses}
 	\begin{itemize}
-		
 
-            \item Micro-losses: The overall loss corresponds to aggregating the pointwise losses over the targets and instances.
-                    \vspace{5pt}
-
-            \item Thus, we have	
-	$$
-	L =  \frac{1}{n \cdot l} \sum_{i,m} L_m(y_m^{(i)} , f(\xv)_m^{(i)}),
-	$$
-	where $L_m: \Yspace_m \times \R^{g_m} \to \R$ in this case.
-                    \vspace{5pt}            
+        \item Micro-losses: $L$ corresponds to aggregating the pointwise losses over the targets and instances.
+    	$$
+    	L =  \frac{1}{n \cdot l} \sum_{i,m} L_m(y_m^{(i)} , f(\xv)_m^{(i)}),
+    	$$
+    	where $L_m: \Yspace_m \times \R^{g_m} \to \R$ in this case.      
+     
 		\item Example \emph{Squared error loss} (i.e. used in multivariate regression):
 		$$
 		L(\yv, f) = \sum_{m=1}^l (y_m - f(\xv)_m)^2.
 		$$
-            \item Can also be used for cases with missing entries.
-
+        \item Can also be used for cases with missing entries.
 		
 	\end{itemize}
 \end{frame}
 
-\begin{frame}
-	\frametitle{Instance-wise Losses}
+\begin{frame}{Instance-wise Losses}
 	\begin{itemize}
 		
-            \item Inputs one label vector $\yv$ and computes the loss with respect to the instance-wise predictions.
-                    \vspace{5pt}            
+        \item Given a label vector $\yv$, it computes the loss on single instance. 
 
-		\item The \emph{Hamming loss} averages over mistakes on individual scores:    
+		\item \emph{Hamming loss} averages over mistakes on individual scores:    
 		$$
 		\displaystyle L_H(\yv, \mathbf{h}) = \frac{1}{l}  \, \sum_{m=1}^l \, \mathds{1}_{[y_m \neq h_m(x)]},
 		$$
         where $h_m(x) := [f(\xv)_m \geq c_m]$ is the threshold function for task $m$ with threshold $c_m$. 
-        \vspace{5pt}
+        
         \item Hamming loss is identical to the average \emph{0/1 loss} if computed on the entire dataset.
-        \vspace{5pt}
+
 		
 		\item The \emph{subset 0/1 loss} simply checks for entire correctness:  
 		\begin{align*}
@@ -150,8 +125,7 @@
 \end{frame}
 
 
-\begin{frame}
-	\frametitle{Hamming vs.\ subset 0/1 loss}
+\begin{frame}{Hamming vs.\ subset 0/1 loss}
 	\begin{itemize}
 		\item The risk minimizer for the Hamming loss is the  \emph{marginal mode}:
 		$$
