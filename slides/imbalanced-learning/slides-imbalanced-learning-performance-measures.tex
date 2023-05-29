@@ -2,23 +2,7 @@
 \input{../../style/preamble}
 \input{../../latex-math/basic-math}
 \input{../../latex-math/basic-ml}
-
-\newcommand{\sens}{\mathbf{A}} % vector x (bold)
-\newcommand{\ba}{\mathbf{a}}
-\newcommand{\batilde}{\tilde{\mathbf{a}}}
-\newcommand{\Px}{\mathbb{P}_{x}} % P_x
-\newcommand{\Pxj}{\mathbb{P}_{x_j}} % P_{x_j}
-\newcommand{\indep}{\perp \!\!\! \perp} % independence symbol
-% ml - ROC
-\newcommand{\np}{n_{+}} % no. of positive instances
-\newcommand{\nn}{n_{-}} % no. of negative instances
-\newcommand{\rn}{\pi_{-}} % proportion negative instances
-\newcommand{\rp}{\pi_{+}} % proportion negative instances
-% true/false pos/neg:
-\newcommand{\tp}{\# \text{TP}} % true pos
-\newcommand{\fap}{\# \text{FP}} % false pos (fp taken for partial derivs)
-\newcommand{\tn}{\# \text{TN}} % true neg
-\newcommand{\fan}{\# \text{FN}} % false neg
+\input{../../latex-math/ml-eval}
 
 \usepackage{multicol}
 
@@ -56,10 +40,10 @@
 			& & \multicolumn{2}{c|}{\bfseries True Class $y$} & \\
 			& & $+$ & $-$ & \\ 
 			\hline \hline
-			\bfseries Classification     & $+$ & TP & FP & $\rho_{PPV} = \frac{\text{TP}}{\text{TP} + \text{FP}}$\\
-			$\yh$ & $-$ & FN & TN & $\rho_{NPV} = \frac{\text{TN}}{\text{FN} + \text{TN}}$\\
+			\bfseries Classification     & $+$ & TP & FP & $\rho_{PPV} = \frac{\tp}{\tp + \fap}$\\
+			$\yh$ & $-$ & FN & TN & $\rho_{NPV} = \frac{\tn}{\fan + \tn}$\\
 			\hline
-			& & $\rho_{TPR} = \frac{\text{TP}}{\text{TP} + \text{FN}}$ & $\rho_{TNR} = \frac{\text{TN}}{\text{FP} + \text{TN}}$ & $\rho_{ACC} = \frac{\text{TP}+ \text{TN}}{\text{TOTAL}}$
+			& & $\rho_{TPR} = \frac{\tp}{\tp + \fan}$ & $\rho_{TNR} = \frac{\tn}{\fap + \tn}$ & $\rho_{ACC} = \frac{\tp+ \tn}{\text{TOTAL}}$
 		\end{tabular}
 		\renewcommand{\arraystretch}{1}
         \end{center}
