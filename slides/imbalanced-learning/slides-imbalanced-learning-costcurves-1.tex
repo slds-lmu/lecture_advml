@@ -6,8 +6,9 @@
 
 \newcommand{\titlefigure}{figure_man/cost-curves-2}
 \newcommand{\learninggoals}{
-\item Understand cost curves
-\item As alternative to ROC curves
+\item Cost curves for misclassification error
+\item CCs vs ROC curves 
+\item CCs as envelopes
 }
 
 
@@ -24,7 +25,7 @@
 \begin{vbframe}{Cost curves}
 
 \begin{itemize}
-  \item Directly plot the misclassif costs / error
+  \item Directly plot the misclassif costs / error (in terms of prior probs) 
   % to determine the best classifier.
   %(ROC isometrics allow this only indirectly).
   %\item Determining the superiority of a classifier can be difficult using the ROC isometrics.
@@ -184,7 +185,7 @@ With law of total prob, we write error rate as function of $\rp$:
 \begin{itemize}
   % \item Simplifying assumption: equal misclassification costs, i.e.,
   % $cost_{FN} = cost_{FP}$.
-  \item Expected misclassif costs (or error rate if $cost_{FN} = cost_{FP}$) is plotted as function of proportion of positive instances, $\rp = \P(y = 1)$
+  \item Cost line of a classifier with slope $(FNR - FPR)$ and intercept $FPR$: $$\rho_{MCE}(\rp) = (FNR - FPR) \cdot \rp + FPR$$
   \item Cost curves are point–line duals of ROC curves, i.e., a single classifier is represented by a point in the ROC space and by a line in cost space
 \end{itemize}
 
@@ -327,10 +328,11 @@ Confusion matrix
 
     \begin{itemize}
         \footnotesize
-        \item<1-> Left: TPR $\&$ FPR of a classifier for different prob thresholds
+        \item<1-> Left: ROC = TPR $\&$ FPR of a classifier for different prob thresholds
         \item<1-> Right: Corresponding cost lines
-        \item<1-> Duality: line in primal space $\rho_{MCE} = (FNR - FPR) \cdot \rp + FPR$ $\Leftrightarrow$ point in dual space: $(FNR - FPR, - FPR)$
-		\item<4-> \textbf{Cost curve} (right: black line) is lower envelope of \textbf{cost lines} \\
+        \item<1-> Duality:
+        For every ROC point we can construct the CC line, and vice versa.
+		\item<4-> \textbf{Cost curve} (right, black) is lower envelope of \textbf{cost lines} \\
 		$\hat{=}$ pointwise minimum of error rate (as function of $\rp$)
 		%\item The bold curve in the right figure below is the lower envelope of the cost lines
 		%\item The lower envelope is a way to visualize the cost curve
