@@ -19,14 +19,15 @@
 
 \begin{document}
 
-\lecturechapter{Evaluation: Cost Curves Part 2}
+\lecturechapter{Imbalanced Learning:\\
+Cost Curves Part 2}
 \lecture{Introduction to Machine Learning}
 \sloppy
 
 
 % ------------------------------------------------------------------------------
 
-\begin{vbframe}{consider costs}
+\begin{vbframe}{CCs with true costs}
 
 Assume unequal misclassif costs, i.e., $cost_{FN} \neq cost_{FP}$ and generalize error rate to \textbf{expected costs} (as function of $\rp$): %consider expected costs as fucntion of $\rp$ as general form of error rate:
 $$Costs(\rp) = (1 - \rp) \cdot FPR \cdot cost_{FP} + \rp \cdot FNR \cdot cost_{FN}$$
@@ -144,22 +145,22 @@ Costs_{norm}(PC(+)) &= (1-PC(+))\cdot FPR + PC(+)\cdot FNR \\
 
 % ------------------------------------------------------------------------------
 
-\begin{vbframe}{ROC curves vs. cost curves}
+% \begin{vbframe}{ROC curves vs. cost curves}
 
-\begin{itemize}
-  \item A point/line in ROC space is represented by a line/point in cost space, and vice versa
-  \item Area under an ROC curve is a ranking measure while area under a cost curve is the expected cost of the classifier (assuming that all possible $PC(+)$ values are equally likely)
-  \item ROC curves do not indicate for which prob threshold classifier A is superior to another classifier B, cost curves can do exactly that!\\
-  $\Rightarrow$ Cost curves practically more useful than ROC curves
-  %therefore provide practically more relevant information than ROC curves.
-  \item Cost curves allows users to measure quantitative performance difference between multiple classifiers at any given operating point \\
-  $\Rightarrow$ Not so easy to do that with ROC curve
-  %($\rightarrow$ only the axes will change to account for the costs).
-  % ($\rightarrow$ simple modification where the identity of the axes is changed).
-  %\item Then, the y-axis represents the normalized expected cost (NEC) or relative expected misclassification cost.
-  \end{itemize}
+% \begin{itemize}
+%   \item A point/line in ROC space is represented by a line/point in cost space, and vice versa
+%   \item Area under an ROC curve is a ranking measure while area under a cost curve is the expected cost of the classifier (assuming that all possible $PC(+)$ values are equally likely)
+%   \item ROC curves do not indicate for which prob threshold classifier A is superior to another classifier B, cost curves can do exactly that!\\
 
-\end{vbframe}
+%   %therefore provide practically more relevant information than ROC curves.
+%   \item Cost curves allows users to measure quantitative performance difference between multiple classifiers at any given operating point \\
+%   $\Rightarrow$ Not so easy to do that with ROC curve
+%   %($\rightarrow$ only the axes will change to account for the costs).
+%   % ($\rightarrow$ simple modification where the identity of the axes is changed).
+%   %\item Then, the y-axis represents the normalized expected cost (NEC) or relative expected misclassification cost.
+%   \end{itemize}
+
+% \end{vbframe}
 
 % ------------------------------------------------------------------------------
 

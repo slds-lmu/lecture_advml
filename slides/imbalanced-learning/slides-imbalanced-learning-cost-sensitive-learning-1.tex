@@ -227,27 +227,25 @@ Cost-Sensitive Learning Part 1}
             \end{table}
             where 
             \begin{itemize}
-                \footnotesize
                 \item $C^\prime (-1, 1) = \frac{C(-1, 1) - C(-1, -1)}{C(1, -1) - C(-1, -1)}$
                 \item $C^\prime (1, 1) = \frac{C(1, 1) - C(-1, -1)}{C(1, -1) - C(-1,-1)}$
             \end{itemize}
 
-\footnotesize{
-
-            \item We predict $\xv$ as class $1$ if \\
+            \item We predict $\xv$ as class $1$ if 
             \begin{align*}
                 \E_{K \sim p(\cdot ~|~ \xv)}( C^\prime(1,K) )  \leq \E_{K \sim p(\cdot ~|~ \xv)}( C^\prime(-1,K) ) \\
             \end{align*}
 
-
-
 			\item Let's unroll the expected value and use $\mathbf{C}^\prime$:
-			\begin{align*}	
-                & p(-1 ~|~ \xv ) C^\prime(1,-1)  + 	p(1 ~|~ \xv ) C^\prime(1,1) \leq  p(-1 ~|~ \xv ) C^\prime(-1,-1)  + 	p(1 ~|~ \xv ) C^\prime(-1,1)  \\ 
-                &\Rightarrow [1 - p(1 ~|~ \xv)] \cdot 1 + p(1 ~|~ \xv) C^\prime(1, 1) \leq p(1 ~|~ \xv) C^\prime(-1, 1) \\
-                &\Rightarrow p(1 ~|~ \xv) \geq \frac{1}{C^\prime(-1, 1) - C^\prime(1, 1) + 1} \\
-                &\Rightarrow p(1 ~|~ \xv) \geq \frac{C(1, -1) - C(-1, -1)}{C(-1, 1) - C(1, 1) + C(1, -1) - C(-1, -1)} = c^*
-			\end{align*}
+            % need this footnotsize operation, otherwise the first line will be very long.
+            \footnotesize{
+    			\begin{align*}	
+                    & p(-1 ~|~ \xv ) C^\prime(1,-1)  + 	p(1 ~|~ \xv ) C^\prime(1,1) \leq  p(-1 ~|~ \xv ) C^\prime(-1,-1)  + 	p(1 ~|~ \xv ) C^\prime(-1,1)  \\ 
+                    &\Rightarrow [1 - p(1 ~|~ \xv)] \cdot 1 + p(1 ~|~ \xv) C^\prime(1, 1) \leq p(1 ~|~ \xv) C^\prime(-1, 1) \\
+                    &\Rightarrow p(1 ~|~ \xv) \geq \frac{1}{C^\prime(-1, 1) - C^\prime(1, 1) + 1} \\
+                    &\Rightarrow p(1 ~|~ \xv) \geq \frac{C(1, -1) - C(-1, -1)}{C(-1, 1) - C(1, 1) + C(1, -1) - C(-1, -1)} = c^*
+    			\end{align*}
+            }
 		
             \item If even $C(1, 1) = C(-1, -1) = 0 $, we get:
             \begin{align*}
@@ -259,7 +257,6 @@ Cost-Sensitive Learning Part 1}
             $$   \hx := 2 \cdot \mathds{1}_{[ \pi(\xv) \geq c^*]} -1 $$
 							
 		\end{itemize}
-}
 \end{vbframe}
 
 
