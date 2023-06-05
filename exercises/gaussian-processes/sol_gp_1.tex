@@ -251,6 +251,9 @@
 \input{../../latex-math/basic-ml.tex}
 \input{../../latex-math/ml-svm.tex}
 \input{../../latex-math/ml-gp.tex}
+\newcommand{\xvp}{\mathbf{x}^\prime}
+\newcommand{\vv}{\mathbf{v}}
+\newcommand{\dv}{\mathbf{d}}
 
 \kopfaml{7}{Gaussian Processes}
 
@@ -396,136 +399,25 @@ since $\log$ is a monotonically increasing function, so the maximizer is the sam
 %
 }
 
-\loesung{Gaussian Posterior Process}{
-
+\loesung{Covariance Functions}{
 
 \begin{enumerate}
-\item Prior distribution (assuming the same notation as in the lecture): $$\bm{f} \sim \mathcal{N}(\bm{m}, \bm{K})$$ with $\bm{m} = m(\bm{x})$ and $\bm{K}$ defined by the entries $\bm{K}_{ij} = k(x_i,x_j)$. NB: Note the (in-)finite Gaussian property of a GP. 
-\item Note that the posterior distribution $\bm{f}|\bm{y},\bm{x}$ in this case is different from the one of $\bm{f}_* | \bm{x}_*, \bm{x}, \bm{y}$ and also from the marginal distribution of $\bm{y} \sim \mathcal{N}(\bm{m},\bm{K} + \sigma^2 \bm{I})$! We have: 
-\begin{equation}
-\begin{split}
-p(\bm{f}|\bm{y}) &\propto p(\bm{y}|\bm{f}) \cdot p(\bm{f}) \\
-&\propto \exp(-\frac{1}{2} (\bm{y}-\bm{f})^\top (\sigma^{2} \bm{I})^{-1}(\bm{y}-\bm{f})) \cdot \exp(-\frac{1}{2}(\bm{f}-\bm{m})^\top \bm{K}^{-1} (\bm{f}-\bm{m}))\\
-&\propto \exp(-\frac{1}{2} \{ \bm{f}^\top \underbrace{((\sigma^{2} \bm{I})^{-1} + \bm{K}^{-1})}_{=: \bm{K}^{-1}_{post}} \bm{f} -2 \bm{f}^\top \underbrace{((\sigma^{2} \bm{I})^{-1} \bm{y} + \bm{K}^{-1} \bm{m})}_{=: \tilde{\bm{f}}} \})\\
-&\propto \exp(-\frac{1}{2} \{ \bm{f}^\top \bm{K}^{-1}_{post} \bm{f} - 2 \bm{f}^\top\tilde{\bm{f}}  \})
-\end{split}
-\end{equation}
-by removing all constant factors that do not depend on $\bm{f}$ as we only need to know the density up to a constant of proportionality. By extending the proportionality, we can get a quadratic form in $\bm{f}$:
-\begin{equation}
-\begin{split}
-p(\bm{f}|\bm{y}) &\propto \exp(-\frac{1}{2} \{ \bm{f}^\top \bm{K}^{-1}_{post} \bm{f} - 2 \bm{f}^\top\tilde{\bm{f}}  \})\\
-&\propto \exp(-\frac{1}{2} \{ \bm{f}^\top \bm{K}^{-1}_{post} \bm{f} - 2 \bm{f}^\top \bm{K}^{-1}_{post} \underbrace{\bm{K}_{post} \tilde{\bm{f}}}_{:=\bm{f}_{post}}  \}) \\
-&\propto \exp(-\frac{1}{2}  (\bm{f}-\bm{f}_{post})^\top \bm{K}^{-1}_{post} (\bm{f}-\bm{f}_{post}))
-\end{split}
-\end{equation}
-which is the so-called \emph{kernel} of a multivariate normal distribution $\mathcal{N}(\bm{f}_{post},\bm{K}_{post} )$, i.e., $\bm{f}|\bm{y} \sim \mathcal{N}(\bm{f}_{post},\bm{K}_{post} )$. 
-\item In order to get the posterior predictive distribution for a new sample $x_*$ from the same data-generating process, we could derive $$p(y_* | x_*, \bm{y}, \bm{x}) = \int p(y_*|x_*, \bm{x}, \bm{y}, \bm{f}) \cdot p(\bm{f}|\bm{y},\bm{x}) \,d\bm{f}.$$ This is feasible but cumbersome. Alternatively, we can make use of the fact that the joint distribution of $\bm{y}$ and $y_*$ is known (cf. slides on noisy GP): 
-$$\begin{pmatrix} \bm{y} \\ y_* \end{pmatrix} \sim \mathcal{N}\left( \begin{pmatrix} \bm{m} \\ m_* \end{pmatrix}, 
-\begin{pmatrix} 
-\bm{K} + \sigma^2 \bm{I} & \bm{K}_*\\
-\bm{K}^\top_* & K_{**}\\
-\end{pmatrix}
-\right),$$
-with $m_* = m(x_*)$, $\bm{K}_* = k(x_*, \bm{x})$ and $K_{**} = k(x_*,x_*)$.
-The conditional distribution can then be derived using the rule of conditioning for Gaussian distributions: $$y_* | x_*, \bm{x}, \bm{y} \sim \mathcal{N}(m_* + \bm{K}^\top_* (\bm{K} + \sigma^2 \bm{I})^{-1}(\bm{y}-\bm{m}), K_{**} - \bm{K}^\top_* (\bm{K} + \sigma^2 \bm{I})^{-1} \bm{K}_*).$$
-\item To implement a GP with squared exponential kernel and $\ls = 1$, we need the inverse of $\bm{K}$. $\bm{x}$ being a vector implies that we have only one feature and thus the entries of our matrix $\bm{K}$ are 
-$$
-\bm{K} = \begin{pmatrix} 1 & \exp(-0.5 (x^{(1)} - x^{(2)})^2) \\ \exp(-0.5 (x^{(2)} - x^{(1)})^2) & 1 \end{pmatrix}.
-$$
-The inverse of $\bm{K}$ is then given by $$
-\frac{1}{1-\exp(-(x^{(1)} - x^{(2)})^2)} \begin{pmatrix} 1 & -\exp(-0.5 (x^{(1)} - x^{(2)})^2) \\ -\exp(-0.5 (x^{(2)} - x^{(1)})^2) & 1 \end{pmatrix}.
-$$
-If we have a noisy GP, we would have to add $\sigma^2 \bm{I}_2$ to $\bm{K}$ with resulting inverse 
-
-$$
-\bm{K}_y^{-1} = \frac{1}{(1+\sigma^2)^2-\exp(-(x^{(1)} - x^{(2)})^2)} \begin{pmatrix} 1+\sigma^2 & -\exp(-0.5 (x^{(1)} - x^{(2)})^2) \\ -\exp(-0.5 (x^{(2)} - x^{(1)})^2) & 1+\sigma^2 \end{pmatrix}.
-$$
-Assuming a zero mean GP, we can derive $\frac{\partial \bm{K}_y}{\partial \theta}$ with $\theta = \sigma^2$, which gives us the identity matrix. We can thus maximize the marginal likelihood (slide on \emph{Gaussian Process Training}), by finding $\sigma^2$ that yields 
-$$\text{tr}\left( \bm{K}_y^{-1} \bm{y} \bm{y}^\top \bm{K}_y^{-1} - \bm{K}_y^{-1} \right) = 0.$$
-This can be solved analytically (though quite tedious). We will use a root-finding function for this. For the posterior predictive distribution we can make use of the results from the previous exercise.
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{library}\hlstd{(kernlab)}
-
-\hlcom{# set seed, define n, true (unknown) sigma}
-\hlkwd{set.seed}\hlstd{(}\hlnum{4212}\hlstd{)}
-\hlstd{n} \hlkwb{<-} \hlnum{2}
-\hlstd{sigma} \hlkwb{<-} \hlnum{1}
-
-\hlcom{# define kernel with l = 1}
-\hlstd{kernel_fun} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)}
-  \hlkwd{kernelMatrix}\hlstd{(}\hlkwc{kernel} \hlstd{=} \hlkwd{rbfdot}\hlstd{(}\hlkwc{sigma} \hlstd{=} \hlnum{1}\hlopt{/}\hlnum{2}\hlstd{),}
-               \hlkwc{x} \hlstd{= x)}
-\hlstd{kernel_fun_pred} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{,}\hlkwc{y}\hlstd{)}
-  \hlkwd{kernelMatrix}\hlstd{(}\hlkwc{kernel} \hlstd{=} \hlkwd{rbfdot}\hlstd{(}\hlkwc{sigma} \hlstd{=} \hlnum{1}\hlopt{/}\hlnum{2}\hlstd{),}
-               \hlkwc{x} \hlstd{= x,} \hlkwc{y} \hlstd{= y)}
-
-\hlcom{# draw data according to the generating process:}
-\hlstd{x} \hlkwb{<-} \hlkwd{rnorm}\hlstd{(n)}
-\hlstd{K} \hlkwb{<-} \hlkwd{kernel_fun}\hlstd{(x)}
-\hlstd{K_y} \hlkwb{<-} \hlstd{K} \hlopt{+} \hlkwd{diag}\hlstd{(}\hlkwd{rep}\hlstd{(sigma}\hlopt{^}\hlnum{2}\hlstd{,}\hlnum{2}\hlstd{))}
-\hlstd{(y} \hlkwb{<-} \hlkwd{t}\hlstd{(mvtnorm}\hlopt{::}\hlkwd{rmvnorm}\hlstd{(}\hlnum{1}\hlstd{,} \hlkwc{sigma} \hlstd{= K_y)))}
-\end{alltt}
-\begin{verbatim}
-##          [,1]
-## [1,] 2.012317
-## [2,] 1.866819
-\end{verbatim}
-\begin{alltt}
-\hlcom{# function to find the best sigma^2}
-\hlstd{root_fun} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{sigmaSq}\hlstd{)\{}
-  \hlstd{K_y_inv} \hlkwb{<-} \hlkwd{solve}\hlstd{(K} \hlopt{+} \hlkwd{diag}\hlstd{(}\hlkwd{rep}\hlstd{(sigmaSq,}\hlnum{2}\hlstd{)))}
-  \hlnum{0.5}\hlopt{*}\hlkwd{sum}\hlstd{(}\hlkwd{diag}\hlstd{(K_y_inv}\hlopt{%*%}\hlstd{y}\hlopt{%*%}\hlkwd{t}\hlstd{(y)}\hlopt{%*%}\hlstd{K_y_inv} \hlopt{-} \hlstd{K_y_inv))}
-\hlstd{\}}
-
-\hlcom{# get the best sigma}
-\hlstd{(bestSigmaSq} \hlkwb{<-} \hlkwd{uniroot}\hlstd{(}\hlkwc{f} \hlstd{= root_fun,} \hlkwc{interval} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{20}\hlstd{)))}\hlopt{$}\hlstd{root}
-\end{alltt}
-\begin{verbatim}
-## [1] 1.943684
-\end{verbatim}
-\begin{alltt}
-\hlcom{# plot the optimization problem and best sigma}
-\hlstd{possible_sigvals} \hlkwb{<-} \hlkwd{seq}\hlstd{(}\hlnum{0.001}\hlstd{,}\hlnum{20}\hlstd{,}\hlkwc{l}\hlstd{=}\hlnum{1000}\hlstd{)}
-\hlkwd{plot}\hlstd{(possible_sigvals,} \hlkwd{sapply}\hlstd{(possible_sigvals, root_fun),}
-     \hlkwc{xlab} \hlstd{=} \hlkwd{expression}\hlstd{(sigma}\hlopt{^}\hlnum{2}\hlstd{),} \hlkwc{ylab} \hlstd{=} \hlstr{"marginal likelihood derivative"}\hlstd{,}
-     \hlkwc{pch} \hlstd{=} \hlnum{20}\hlstd{)}
-\hlkwd{abline}\hlstd{(}\hlkwc{h}\hlstd{=}\hlnum{0}\hlstd{,} \hlkwc{lty}\hlstd{=}\hlnum{2}\hlstd{)}
-\hlkwd{abline}\hlstd{(}\hlkwc{v}\hlstd{=bestSigmaSq}\hlopt{$}\hlstd{root,} \hlkwc{lty}\hlstd{=}\hlnum{2}\hlstd{)}
-\end{alltt}
-\end{kframe}
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-3-1} 
-\begin{kframe}\begin{alltt}
-\hlcom{# function to draw samples from the predictive posterior}
-\hlstd{draw_from_pred_posterior} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{number_samples}\hlstd{,} \hlkwc{y}\hlstd{,} \hlkwc{x}\hlstd{,} \hlkwc{xstar}\hlstd{,} \hlkwc{sigmaSq} \hlstd{=} \hlnum{1}\hlstd{)}
-\hlstd{\{}
-
-  \hlcom{# invert noisy K}
-  \hlstd{K_y_inv} \hlkwb{<-} \hlkwd{solve}\hlstd{(}\hlkwd{kernel_fun}\hlstd{(x)} \hlopt{+} \hlkwd{diag}\hlstd{(}\hlkwd{rep}\hlstd{(sigmaSq,}\hlnum{2}\hlstd{)))}
-  \hlcom{# get the other K's for new data}
-  \hlstd{Kstar} \hlkwb{<-} \hlkwd{kernel_fun_pred}\hlstd{(x,xstar)}
-  \hlstd{Kstarstar} \hlkwb{<-} \hlkwd{kernel_fun}\hlstd{(xstar)}
-  \hlcom{# draw samples according to Ex. (d)}
-  \hlkwd{rnorm}\hlstd{(number_samples,}
-        \hlkwc{mean} \hlstd{=} \hlkwd{as.numeric}\hlstd{(}\hlkwd{t}\hlstd{(Kstar)} \hlopt{%*%} \hlstd{K_y_inv} \hlopt{%*%} \hlstd{y),}
-        \hlkwc{sd} \hlstd{=} \hlkwd{sqrt}\hlstd{(}\hlkwd{as.numeric}\hlstd{(Kstarstar} \hlopt{-} \hlkwd{t}\hlstd{(Kstar)} \hlopt{%*%} \hlstd{K_y_inv} \hlopt{%*%} \hlstd{Kstar))}
-  \hlstd{)}
-
-\hlstd{\}}
-
-\hlcom{# draw enough samples to get a feeling for the distribution}
-\hlstd{samples_posterior} \hlkwb{<-}
-       \hlkwd{draw_from_pred_posterior}\hlstd{(}\hlkwc{number_samples} \hlstd{=} \hlnum{1000}\hlstd{,} \hlkwc{sigmaSq} \hlstd{= bestSigmaSq}\hlopt{$}\hlstd{root,}
-                                \hlkwc{y} \hlstd{= y,} \hlkwc{x} \hlstd{= x,} \hlkwc{xstar} \hlstd{=} \hlnum{0}\hlstd{)}
-\hlcom{# plot the distribution}
-\hlkwd{hist}\hlstd{(samples_posterior,} \hlkwc{breaks}\hlstd{=}\hlnum{50}\hlstd{,} \hlkwc{xlab}\hlstd{=}\hlkwd{expression}\hlstd{(y[}\hlstr{"*"}\hlstd{]}\hlopt{^}\hlstd{b))}
-\end{alltt}
-\end{kframe}
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-3-2} 
-\end{knitrout}
-
+    \item Proofs:
+    \begin{enumerate}
+        \item $k(\xv, \xvp) = \sigma_0^2$ is a valid covariance function since the kernel matrix $\Kmat = \sigma_0^2 \cdot \one \one^T$ is a positive semi-definite matrix. This can be proved as follows: first, $\Kmat = \Kmat^T$ is symmetric; second, for all $\vv = (v_1, \ldots, v_n)^T \in \R^n$, $\vv^T \Kmat \vv = \sigma_0^2 \cdot (\sumin v_i, \ldots, \sumin v_i) \cdot (v_1, \ldots, v_n)^T = \sigma_0^2 \cdot [v_1 \sumin v_i + \ldots + v_n \sumin v_n] = \sigma_0^2 \cdot [(\sumin v_i) \cdot (\sumin v_i)] \geq 0$.
+        \item To prove that $k(\xv, \xvp) = \sigma_0^2 + \xv^T \xvp$ is a valid covariance function, we need to notice that $\sigma_0^2$ and $\xv^T \xvp$ are both valid covariance function, and sum operation also yield a valid covariance function.
+        \item $k(\xv, \xvp) = (\sigma_0^2 + \xv^T \xvp)^p$ is a valid covariance function since the linear function is a covariance function, and the only polynomial coefficient $1$ is positive.
+        \item The squared exponential can be written as $k(\xv, \xvp) = \exp(-\frac{\xv^T \xv}{2 \ls^2}) \cdot \exp(\frac{\xv^T \xvp}{\ls^2}) \cdot \exp(-\frac{{\xvp}^T \xvp}{2\ls^2})$. Note that $\exp(\frac{\xv^T \xvp}{\ls^2})$ is a valid covariance function and can be easily proved using the composition rules. We further define $t(\xv) = \exp(-\frac{\xv^T \xv}{2 \ls^2})$. Therefore, $k(\xv, \xvp) = t(\xv) \cdot \exp(\frac{\xv^T \xvp}{\ls^2}) \cdot t(\xvp)$ is a valid covariance function.
+    \end{enumerate}
+    \item $k(\cdot, \cdot)$ is called stationary if $k(\xv, \xv + \dv) = k(\zero, \dv)$; $k(\cdot, \cdot)$ is called isotropic if it is a function of $||\xv - \xvp||$.
+    \begin{enumerate}
+        \item $k(\xv, \xvp) = \sigma_0^2$ is stationary since $k(\xv, \xv + \dv) = k(\zero, \dv) = \sigma_0^2$. It can be written as $k(\xv, \xvp) = \sigma_0^2 ||\xv - \xvp||^0$, so it is isotropic.
+        \item $k(\xv, \xvp) = \sigma_0^2 + \xv^T \xvp$ is not stationary since $k(\xv, \xv + \dv) = \sigma_0^2 + \xv^T \xv + \xv^T \dv$, while $k(\zero, \xv + \dv) = \sigma_0^2$. Furthermore, it can not be written as $k(|| \xv - \xvp||)$, so it is not isotropic.
+        \item Similar to linear covariance function, the polynomial covariance function is neither stationary nor isotropic.
+        \item The squared exponential covariance function is stationary as $k(\xv, \xv + \dv) = k(\zero, \dv) = \exp(-\frac{||d||^2}{2\ls^2})$. It is a function of $||\xv - \xvp||$, so it is isotropic.
+        \item Similar to the argument of squared exponential covariance function, the Mat\'ern covariance function is stationary and isotropic.
+        \item Similar to the argument of squared exponential covariance function, the exponential covariance function is stationary and isotropic.
+    \end{enumerate}
 \end{enumerate}
 }
 \end{document}

@@ -253,78 +253,18 @@
 \input{../../latex-math/ml-gp.tex}
 \newcommand{\xvp}{\mathbf{x}^\prime}
 
-\kopfaml{7}{Gaussian Processes}
+\kopfaml{8}{Gaussian Processes}
 
+\aufgabe{Gaussian Posterior Process}{
 
-
-\aufgabe{Bayesian Linear Model}{
-
-
-In the Bayesian linear model, we assume that the data follows the following law:
-%
-$$
-y = \fx + \epsilon = \thetab^T \xv + \epsilon , 
-$$
-%
-where $\varepsilon \sim \mathcal{N}(0,\sigma^2)$ and independent of $\xv.$
-%
-On the data-level this corresponds to
-%
-\begin{eqnarray*}
-%	
-	\yi &=& \fxi + \epsi = \thetab^T \xi + \epsi, \quad \text{for } i \in \{1, \ldots, n\}
-%	
-\end{eqnarray*}
-%
-where $\epsi \sim \mathcal{N}(0, \sigma^2)$ are iid and all independent of the $\xi$'s.
-%
-In the Bayesian perspective it is assumed that the parameter vector $\thetab$ is stochastic and follows a distribution.
-
-Assume we are interested in the so-called maximum a posteriori estimate of $\thetab,$ which is defined by
-%
-$$		\thetabh = \argmax_{\thetab} p(\thetab | \Xmat, \yv).	$$
-%
-\begin{enumerate}
-%	
-  \item Show that if we choose a uniform distribution over the parameter vectors $\thetab$ as the prior belief, i.e.,
-%  
-	$$  q(\thetab)  \propto 1, $$
-%  
-	then the  maximum a posteriori estimate coincides with the empirical risk minimizer for the L2-loss (over the linear models).
-%
-  \item Show that if we choose a Gaussian distribution over the parameter vectors $\thetab$ as the prior belief, i.e.,
-  %  
-  $$  q(\thetab)  \propto  \exp\biggl[-\frac{1}{2\tau^2}\thetab^\top\thetab\biggr], \qquad \tau>0, $$
-  %  
-  then the maximum a posteriori estimate coincides for a specific choice of $\tau$ with the regularized empirical risk minimizer for the L2-loss with L2 penalty (over the linear models), i.e., the Ridge regression.
-%  
-  \item Show that if we choose a Laplace distribution over the parameter vectors $\thetab$ as the prior belief, i.e.,
-%  
-	$$  q(\thetab)  \propto  \exp\biggl[-\frac{\sum_{i=1}^p |\thetab_i|}{\tau} \biggr], \qquad \tau>0, $$
-	%  
-	then the maximum a posteriori estimate coincides for a specific choice of $\tau$ with the regularized empirical risk minimizer for the L2-loss with L1 penalty (over the linear models), i.e., the Lasso regression.
+Assume your data follows the following law: $$\bm{y} = \bm{f} + \bm{\varepsilon}, \quad \bm{\varepsilon} \sim \mathcal{N}(\bm{0},\sigma^2 \bm{I}),$$
+  with $\bm{f} = f(\bm{x}) \in \mathbb{R}^n$ being a realization of a Gaussian process (GP), for which we a priori assume $$f(\bm{x}) \sim \mathcal{GP}(m(\bm{x}),k(\bm{x},\bm{x}^\prime)).$$ $\bm{x}$ here only consists of 1 feature that is observed for $n$ data points.
+  \begin{enumerate}
+  \item Derive / define the prior distribution of $\bm{f}$.
+  \item Derive the posterior distribution $\bm{f}|\bm{y}$.
+  \item Derive the posterior predictive distribution $y_* | x_*, \bm{x}, \bm{y}$ for a new sample $x_*$ from the same data-generating process.
+\item Implement the GP with squared exponential kernel, zero mean function and $\ls = 1$ from scratch for $n=2$ observations $(\bm{y},\bm{x})$. 
+Do this as efficiently as possible by explicitly calculating all expensive computations by hand. Do the same for the posterior predictive distribution of $y_*$. Test your implementation using simulated data.
 \end{enumerate}
-%
 }
-
-\aufgabe{Covariance Functions}{
-
-    Consider the commonly used covariance functions mentioned in the lecture slides: constant, linear, polynomial, squared exponential, Mat\'ern, exponential covariance functions. 
-    \begin{enumerate}
-        \item Show that they are valid covariance functions. Note that the proofs for the Mat\'ern and exponential covariance functions are out of scope for this exercise. Additionally, you may use the following composition rules. In these rules we assume that $k_0(\cdot, \cdot)$ and $k_1(\cdot, \cdot)$ are valid covariance functions:
-        \begin{enumerate}
-            \item $k(\xv, \xvp) = \xv^T \xvp$ is a valid covariance function;
-            \item $k(\xv, \xvp) = c \cdot k_0(\xv, \xvp)$ is a valid covariance function if if $c \geq 0$ is constant;
-            \item $k(\xv, \xvp) = k_0(\xv, \xvp) + k_1(\xv, \xvp)$ is a valid covariance function;
-            \item $k(\xv, \xvp) = k_0(\xv, \xvp) \cdot k_1(\xv, \xvp)$ is a valid covariance function;
-            \item $k(\xv, \xvp) = g(k_0(\xv, \xvp))$ is a valid covariance function if $g$ is a polynomial function with positive coefficients;
-            \item $k(\xv, \xvp) = t(\xv) \cdot k_0(\xv, \xvp) \cdot t(\xvp)$ is a valid covariance function, where $t$ is any function;
-            \item $k(\xv, \xvp) = \exp(k_1(\xv, \xvp))$ is a valid covariance function;
-            \item $k(\xv, \xvp) = \xv^T\mathbf{A}\xvp$ is a valid covariance function if $\mathbf{A} \succeq 0$.
-        \end{enumerate}
-
-        \item Are these covariance functions stationary or isotropic? Justify your answer.
-    \end{enumerate}
-}
-
 \end{document}
