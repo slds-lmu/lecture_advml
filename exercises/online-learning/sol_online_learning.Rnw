@@ -8,7 +8,7 @@ knitr::set_parent("../../style/preamble_ueb.Rnw")
 \input{../../latex-math/basic-math.tex}
 \input{../../latex-math/basic-ml.tex}
 
-\kopfaml{8}{Online Machine Learning}
+\kopfaml{10}{Online Machine Learning}
 
 \loesung{Online Updates}{
 	<<child="ex_rnw/sol_online_learning_1.Rnw">>=

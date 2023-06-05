@@ -6,7 +6,7 @@ $$
 \underbrace{p(\thetab | \Xmat, \yv)}_{\text{posterior}} = \frac{\overbrace{p(\yv | \Xmat, \thetab)}^{\text{likelihood}}\overbrace{q(\thetab)}^{\text{prior}}}{\underbrace{p(\yv|\Xmat)}_{\text{marginal}}}. 
 $$
 % 
-In the Bayesian linear model we have a Gaussian likelihood: $\yv ~|~ \Xmat, \thetab \sim \mathcal{N}(\Xmat^\top \thetab, \sigma^2 \id_n),$ i.e.,
+In the Bayesian linear model we have a Gaussian likelihood: $\yv ~|~ \Xmat, \thetab \sim \mathcal{N}(\Xmat \thetab, \sigma^2 \id_n),$ i.e.,
 %
 \begin{align*}
 %	
