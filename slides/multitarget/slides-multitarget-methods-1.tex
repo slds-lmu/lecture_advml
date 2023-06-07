@@ -109,7 +109,7 @@
 \end{frame}
 
 
-\section{Similarity-enforcing methods}
+%\section{Similarity-enforcing methods}
 
 \begin{frame}{Mean-regularized multi-task learning}
 \begin{minipage}{0.5\textwidth}
@@ -145,7 +145,7 @@
             \min_\Theta \|Y - \Phi \Theta \|^2_F + \lambda \sum\nolimits_{m=1}^l \|\thetab_m - \frac{1}{l} \sum\nolimits_{m'=1}^l \thetab_{m'} \|^2 \, ,
     \end{equation*}
     
-    \item The assumption that all target models are similar is too strict.
+%    \item The assumption that all target models are similar is too strict.
 \end{itemize}
 {\tiny Evgeniou and Pontil, Regularized multi--task learning, KDD 2004}
 \end{frame}
@@ -296,7 +296,7 @@
 
 \end{frame}
 
-\begin{frame}{Enforcing similarity in (Deep) Neural Networks}
+\begin{frame}{Enforcing similarity in Deep Learning}
 	\begin{center}
 		Commonly-used architecture: weight sharing in the final layer with $m$ nodes, i.e., weight sharing among the targets \\
 		\includegraphics[scale=0.4]{figure/weightsharing}
