@@ -1,0 +1,811 @@
+\documentclass[a4paper]{article}
+\usepackage[]{graphicx}\usepackage[]{xcolor}
+% maxwidth is the original width if it is less than linewidth
+% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+\newcommand{\SweaveOpts}[1]{}  % do not interfere with LaTeX
+\newcommand{\SweaveInput}[1]{} % because they are not real TeX commands
+\newcommand{\Sexpr}[1]{}       % will only be parsed by R
+
+
+
+
+\usepackage[utf8]{inputenc}
+%\usepackage[ngerman]{babel}
+\usepackage{a4wide,paralist}
+\usepackage{amsmath, amssymb, xfrac, amsthm}
+\usepackage{dsfont}
+%\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{xcolor}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{framed}
+\usepackage{multirow}
+\usepackage{bytefield}
+\usepackage{csquotes}
+\usepackage[breakable, theorems, skins]{tcolorbox}
+\usepackage{hyperref}
+\usepackage{cancel}
+\usepackage{bm}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+
+\input{../../style/common}
+
+\tcbset{enhanced}
+
+\DeclareRobustCommand{\mybox}[2][gray!20]{%
+	\iffalse
+	\begin{tcolorbox}[   %% Adjust the following parameters at will.
+		breakable,
+		left=0pt,
+		right=0pt,
+		top=0pt,
+		bottom=0pt,
+		colback=#1,
+		colframe=#1,
+		width=\dimexpr\linewidth\relax,
+		enlarge left by=0mm,
+		boxsep=5pt,
+		arc=0pt,outer arc=0pt,
+		]
+		#2
+	\end{tcolorbox}
+	\fi
+}
+
+\DeclareRobustCommand{\myboxshow}[2][gray!20]{%
+%	\iffalse
+	\begin{tcolorbox}[   %% Adjust the following parameters at will.
+		breakable,
+		left=0pt,
+		right=0pt,
+		top=0pt,
+		bottom=0pt,
+		colback=#1,
+		colframe=#1,
+		width=\dimexpr\linewidth\relax,
+		enlarge left by=0mm,
+		boxsep=5pt,
+		arc=0pt,outer arc=0pt,
+		]
+		#2
+	\end{tcolorbox}
+%	\fi
+}
+
+
+%exercise numbering
+\renewcommand{\theenumi}{(\alph{enumi})}
+\renewcommand{\theenumii}{\roman{enumii}}
+\renewcommand\labelenumi{\theenumi}
+
+
+\font \sfbold=cmssbx10
+
+\setlength{\oddsidemargin}{0cm} \setlength{\textwidth}{16cm}
+
+
+\sloppy
+\parindent0em
+\parskip0.5em
+\topmargin-2.3 cm
+\textheight25cm
+\textwidth17.5cm
+\oddsidemargin-0.8cm
+\pagestyle{empty}
+
+\newcommand{\kopf}[2]{
+\hrule
+\vspace{.15cm}
+\begin{minipage}{\textwidth}
+%akwardly i had to put \" here to make it compile correctly
+	{\sf\bf Introduction to Machine Learning \hfill Exercise sheet #1\\
+	 \url{https://slds-lmu.github.io/i2ml/} \hfill #2}
+\end{minipage}
+\vspace{.05cm}
+\hrule
+\vspace{1cm}}
+
+\newcommand{\kopfic}[2]{
+\hrule
+\vspace{.15cm}
+\begin{minipage}{\textwidth}
+%akwardly i had to put \" here to make it compile correctly
+	{\sf\bf Introduction to Machine Learning \hfill Live Session #1\\
+	 \url{https://slds-lmu.github.io/i2ml/} \hfill #2}
+\end{minipage}
+\vspace{.05cm}
+\hrule
+\vspace{1cm}}
+
+\newcommand{\kopficsl}[2]{
+\hrule
+\vspace{.15cm}
+\begin{minipage}{\textwidth}
+%akwardly i had to put \" here to make it compile correctly
+	{\sf\bf Supervised Learning \hfill Live Session #1\\
+	 \url{https://slds-lmu.github.io/i2ml/} \hfill #2}
+\end{minipage}
+\vspace{.05cm}
+\hrule
+\vspace{1cm}}
+
+\newcommand{\kopfaml}[2]{
+\hrule
+\vspace{.15cm}
+\begin{minipage}{\textwidth}
+%akwardly i had to put \" here to make it compile correctly
+	{\sf\bf Advanced Machine Learning \hfill Exercise sheet #1\\
+	 \url{https://slds-lmu.github.io/i2ml/} \hfill #2}
+\end{minipage}
+\vspace{.05cm}
+\hrule
+\vspace{1cm}}
+
+
+\newcommand{\kopfdive}[1]{
+\hrule
+\vspace{.15cm}
+\begin{minipage}{\textwidth}
+%akwardly i had to put \" here to make it compile correctly
+	{\sf\bf Supervised Learning \hfill Deep Dive\\
+	 \url{https://slds-lmu.github.io/i2ml/} \hfill #1}
+\end{minipage}
+\vspace{.05cm}
+\hrule
+\vspace{1cm}}
+
+\newcommand{\kopfsl}[2]{
+\hrule
+\vspace{.15cm}
+\begin{minipage}{\textwidth}
+%akwardly i had to put \" here to make it compile correctly
+	{\sf\bf Supervised Learning \hfill Exercise sheet #1\\
+	 \url{https://slds-lmu.github.io/i2ml/} \hfill #2}
+\end{minipage}
+\vspace{.05cm}
+\hrule
+\vspace{1cm}}
+
+\newenvironment{allgemein}
+	{\noindent}{\vspace{1cm}}
+
+\newcounter{aufg}
+\newenvironment{aufgabe}[1]
+	{\refstepcounter{aufg}\textbf{Exercise \arabic{aufg}: #1}\\ \noindent}
+	{\vspace{0.5cm}}
+
+\newcounter{loes}
+\newenvironment{loesung}[1]
+	{\refstepcounter{loes}\textbf{Solution \arabic{loes}: #1}\\\noindent}
+	{\bigskip}
+
+\newenvironment{bonusaufgabe}
+	{\refstepcounter{aufg}\textbf{Exercise \arabic{aufg}*\footnote{This
+	is a bonus exercise.}:}\\ \noindent}
+	{\vspace{0.5cm}}
+
+\newenvironment{bonusloesung}
+	{\refstepcounter{loes}\textbf{Solution \arabic{loes}*:}\\\noindent}
+	{\bigskip}
+
+
+
+\begin{document}
+% !Rnw weave = knitr
+
+
+
+\input{../../latex-math/basic-math.tex}
+\input{../../latex-math/basic-ml.tex}
+
+\kopfaml{8}{Imbalanced Learning}
+
+\loesung{Performance Measures}{
+
+\begin{enumerate}
+	%
+	\item Given the following confusion matrices 
+%	
+	$$	M_1 = \begin{pmatrix}
+		0 & 10 \\
+		0 & 990
+	\end{pmatrix}, \quad 	
+	M_2 = \begin{pmatrix}
+		10 & 0 \\
+		10 & 980
+	\end{pmatrix},  \quad 	
+	M_3 = \begin{pmatrix}
+	10 & 10 \\
+	0 & 980
+	\end{pmatrix},	$$
+%
+	each of which corresponds to a classifier.
+%	
+	Compute the accuracy, $F_1$ score, G measure/mean, BAC and MCC of each classifier.
+	
+	\textbf{Accuracy:}
+	
+	Accuracy is computed by $\rho_{ACC} = \frac{TP+TN}{TP+TN+FN+FP}.$ 
+%	
+	Thus, we get
+%	
+	$$		\rho_{ACC}(M_1) = \frac{990}{1000} = 0.99  , \quad \rho_{ACC} (M_2)   =  \frac{990}{1000} = 0.99  ,\quad \rho_{ACC}(M_3)  =    \frac{990}{1000} = 0.99   .	$$
+	
+	\textbf{$F_1$ score:}
+	
+	$F_1$ score is computed by $ \rho_{F_1} =  2 \cdot \frac{\rho_{PPV} \cdot \rho_{TPR} }{\rho_{PPV} + \rho_{TPR}},$
+	where $\rho_{PPV} = \frac{TP}{TP + FP}$ and $\rho_{TPR} = \frac{TP}{TP + FN}.$
+%	
+	Thus, we get for the precision (PPV)
+%	
+	$$		\rho_{PPV}(M_1) = \frac{0}{10} = 0  , \quad \rho_{PPV} (M_2)   =  \frac{10}{10} = 1 ,\quad \rho_{PPV}(M_3)  =    \frac{10}{20} = 1/2   ,	$$
+%	
+	and the recall (TPR)
+%	
+	$$		\rho_{TPR}(M_1) = \frac{0}{0} = 0  , \quad \rho_{TPR} (M_2)   =  \frac{10}{20} = 1/2  ,\quad \rho_{TPR}(M_3)  =    \frac{10}{10} = 1  ,	$$
+%		
+	so that
+%
+	$$		\rho_{F_1}(M_1) = 0  , \quad \rho_{F_1} (M_2)   =  2 \cdot \frac{1 \cdot 0.5}{1 + 0.5} = 2/3  ,\quad \rho_{F_1}(M_3)  =  2 \cdot \frac{1 \cdot 0.5}{1 + 0.5} = 2/3   .	$$
+	
+	\emph{Note:} Here, we used the convention that $0/0 = 0.$  
+	
+	
+	\textbf{G score:}
+	
+	G score is computed by $ \rho_{G} =  \sqrt{\rho_{PPV} \cdot \rho_{TPR} }.$
+%	
+	Thus, with the above
+%	
+	$$		\rho_{G}(M_1) = 0  , \quad \rho_{G} (M_2)   = \sqrt{1 \cdot 0.5} = \sqrt{0.5} \approx 0.7071  ,\quad \rho_{G}(M_3)  = \sqrt{1 \cdot 0.5} = \sqrt{0.5} \approx 0.7071.	$$
+	
+	
+	\textbf{G mean:}
+	
+	G mean is computed by $ \rho_{G_m} =  \sqrt{\rho_{TNR} \cdot \rho_{TPR} },$ where $\rho_{TNR} = \frac{TN}{TN + FP}$ and $\rho_{TPR} = \frac{TP}{TP + FN}.$
+%	
+	For the TNR we have
+	%	
+	$$		\rho_{TNR}(M_1) = \frac{990}{1000} = 0.99  , \quad \rho_{TNR} (M_2)   =  \frac{980}{980} = 1  ,\quad \rho_{TNR}(M_3)  =    \frac{980}{990} \approx 0.9899  ,	$$
+	%	
+	Thus, with the above
+	%	
+	$$		\rho_{G_m}(M_1) = 0, \quad \rho_{G_m} (M_2)   = \sqrt{1 \cdot 0.5} = \sqrt{0.5} \approx 0.7071  ,\quad \rho_{G_m}(M_3)  = \sqrt{1 \cdot \frac{980}{990} } \approx 0.9949.	$$
+	
+	
+	\textbf{BAC:}
+	
+	BAC is computed by $ \rho_{BAC} =  \frac{\rho_{TNR} + \rho_{TPR} }{2}.$	
+%	
+	Thus, with the above
+	%	
+	$$		\rho_{BAC}(M_1) = \frac{0 + 990/1000}{2} \approx 0.5, \quad \rho_{BAC} (M_2)   = \frac{1 + 0.5}{2} = 0.75,\quad \rho_{BAC}(M_3)  = \frac{1 + \frac{980}{990} }{2} \approx 0.9949.	$$
+%	
+	
+	\textbf{MCC:}
+%	
+	MCC is computed by $ \rho_{MCC} =  \frac{TP\cdot TN - FP\cdot FN}{ \sqrt{(TP+FN)(TP+FP)(TN+FN)(TN+FP)} }.$	
+	%	
+	Thus, with the above
+	%	
+	$$		\rho_{MCC}(M_1) = 0, \quad \rho_{MCC} (M_2)   = \frac{ 10\cdot 980 - 0 }{  \sqrt{20\cdot10\cdot990\cdot980}  } = 0.7035265,\quad \rho_{MCC}(M_3)  = \frac{ 10\cdot 980 - 0 }{  \sqrt{20\cdot10\cdot990\cdot980}  } = 0.7035265.	$$
+	
+	%		
+	\item What are the population counterparts of the class-specific variants in the multiclass setting of true positive rate, positive predictive value and true negative rate?
+	
+	\textbf{True positive rate:}
+	
+	In the multiclass classification setting ($\Yspace=\{1,\ldots,g\}$), the class-specific variant of the true positive rate (or rather recall) is 
+%	
+	$$ \rho_{TPR_i} = \frac{n(i,i)}{n_i} $$
+%	
+	which corresponds to the fraction of correctly classified instances $i$	among all $i$ instances.
+%	
+	Thus, the population counterpart is $\P(  \yh = i ~|~ y=i ),$ where $\yh$ is the prediction random variable (i.e., $\yh=f(\xv)$ for a classifier $f$) and $y$ is the random variable representing the labels.
+	
+	
+	\textbf{Positive predictive value:}
+	
+	In the multiclass classification setting ($\Yspace=\{1,\ldots,g\}$), the class-specific variant of the positive predictive value (or rather precision) is 
+	%	
+	$$ \rho_{PPV_i} = \frac{n(i,i)}{\sum_{j=1}^g  n(i,j) }$$
+	%	
+	which corresponds to the fraction of correctly classified instances $i$	among all $i$ classifications.
+	%	
+	Thus, the population counterpart is $\P(  y= i ~|~  \yh = i).$ 
+	
+	
+	\textbf{True negative rate:}
+	
+	In the multiclass classification setting ($\Yspace=\{1,\ldots,g\}$), the class-specific variant of the true negative rate is 
+	%	
+	$$ \rho_{TNR_i} = \frac{\sum_{j\neq i}  n(j,j) }{ n - n_i }$$
+	%	
+	which corresponds to the fraction of correctly classified non-$i$ instances among all non-$i$ instances.
+	%	
+	Thus, the population counterpart is $\P( \yh \neq i  ~|~  y \neq i ).$ 
+  
+\end{enumerate}
+}
+
+\loesung{PR-curve}{
+
+Draw the PR-curve for the following data set:
+
+
+\begin{center}
+	\begin{tabular}{c|c}
+		
+		\textbf{Truth} & \textbf{Score}  \\
+		\hline
+		Pos & 0.95 \\
+		
+		Pos & 0.86  \\
+		
+		Pos & 0.69  \\
+		
+		Neg &  0.65  \\
+		
+		Pos &  0.59 \\
+		
+		Neg  &  0.52 \\
+		
+		Pos &  0.51  \\
+		
+		Neg  &  0.39 \\
+		
+		Neg  &  0.28 \\
+		
+		Neg  &  0.18 \\
+		
+		Pos  & 0.15  \\
+		
+		Neg  &  0.06 \\
+	\end{tabular}
+\end{center}
+
+Note that $n_+ = 6 = n_-$ and our classification rule is 
+%
+$$\fx = 2 \cdot \mathds{1}_{[ s(\xv) \ge c]} -1.$$
+
+\begin{minipage}{0.5\textwidth}
+	\textbf{Step 1:}
+	We start with a threshold value of $c=0.95,$ then $TP=1,$ $FP=0$ and $FN= n_+ -1.$
+	%
+	Thus, 
+	%
+	%
+	$$  \rho_{TPR} = \frac{TP}{TP+FN} = 1/6 \quad \mbox{and} \quad \rho_{PPV} = \frac{TP}{TP + FP} = 1, $$
+	%
+	so that we first draw a line from $(0,1)$ to $(1/6,1).$
+	%
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+	\centering
+	\scalebox{0.4}{\includegraphics{figures/PR_curve_step_1}}
+\end{minipage}
+
+
+
+\begin{minipage}{0.5\textwidth}
+	\textbf{Step 2:}
+We decrease the threshold value to $c=0.86,$ then $TP=2,$ $FP=0$ and $FN= n_+ - 2.$
+%
+Thus, 
+%
+%
+$$  \rho_{TPR} = \frac{TP}{TP+FN} = 2/6 \quad \mbox{and} \quad \rho_{PPV} = \frac{TP}{TP + FP} =  1, $$
+%
+so that we draw another line from $(1/6,1)$ to $(1/3,1).$
+%
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+\centering
+\scalebox{0.4}{\includegraphics{figures/PR_curve_step_2}}
+\end{minipage}
+
+
+\begin{minipage}{0.5\textwidth}
+	\textbf{Step 3:}
+We decrease the threshold value to $c=0.69,$ then $TP=3,$ $FP=0$ and $FN= n_+ - 3.$
+%
+Thus, 
+%
+%
+$$  \rho_{TPR} = \frac{TP}{TP+FN} = 3/6 \quad \mbox{and} \quad \rho_{PPV} = \frac{TP}{TP + FP} =  1, $$
+%
+so that we draw another line from $(1/3,1)$ to $(1/2,1).$
+%
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+\centering
+\scalebox{0.4}{\includegraphics{figures/PR_curve_step_3}}
+\end{minipage}
+
+\begin{minipage}{0.5\textwidth}
+	\textbf{Step 4:}
+We decrease the threshold value to $c=0.65,$ then $TP=3,$ $FP=1$ and $FN= n_+ - 3.$
+%
+Thus, 
+%
+%
+$$  \rho_{TPR} = \frac{TP}{TP+FN} = 3/6 \quad \mbox{and} \quad \rho_{PPV} = \frac{TP}{TP + FP} =  3/4, $$
+%
+so that we draw another line from $(1/2,1)$ to $(1/2,3/4).$
+%
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+\centering
+\scalebox{0.4}{\includegraphics{figures/PR_curve_step_4}}
+\end{minipage}
+
+
+\begin{minipage}{0.5\textwidth}
+	\textbf{Step 5:}
+We decrease the threshold value to $c=0.59,$ then $TP=4,$ $FP=1$ and $FN= n_+ - 4.$
+%
+Thus, 
+%
+%
+$$  \rho_{TPR} = \frac{TP}{TP+FN} = 4/6 \quad \mbox{and} \quad \rho_{PPV} = \frac{TP}{TP + FP} =  4/5, $$
+%
+so that we draw another line from $(1/2,3/4)$ to $(2/3,4/5).$
+%
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+\centering
+\scalebox{0.4}{\includegraphics{figures/PR_curve_step_5}}
+\end{minipage}
+
+\begin{minipage}{0.5\textwidth}
+	\textbf{Step 6:}
+We decrease the threshold value to $c=0.52,$ then $TP=4,$ $FP=2$ and $FN= n_+ - 4.$
+%
+Thus, 
+%
+%
+$$  \rho_{TPR} = \frac{TP}{TP+FN} = 4/6 \quad \mbox{and} \quad \rho_{PPV} = \frac{TP}{TP + FP} =  4/6, $$
+%
+so that we draw another line from $(2/3,4/5)$ to $(2/3,2/3).$
+%
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+\centering
+\scalebox{0.4}{\includegraphics{figures/PR_curve_step_6}}
+\end{minipage}
+
+\begin{minipage}{0.5\textwidth}
+	\textbf{Step 7:}
+We decrease the threshold value to $c=0.51,$ then $TP=5,$ $FP=2$ and $FN= n_+ - 5.$
+%
+Thus, 
+%
+%
+$$  \rho_{TPR} = \frac{TP}{TP+FN} = 5/6 \quad \mbox{and} \quad \rho_{PPV} = \frac{TP}{TP + FP} =  5/7, $$
+%
+so that we draw another line from $(2/3,2/3)$ to $(5/6,5/7).$
+%
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+\centering
+\scalebox{0.4}{\includegraphics{figures/PR_curve_step_7}}
+\end{minipage}
+
+\begin{minipage}{0.5\textwidth}
+	\textbf{Step 8:}
+We decrease the threshold value to $c=0.39,$ then $TP=5,$ $FP=3$ and $FN= n_+ - 5.$
+%
+Thus, 
+%
+%
+$$  \rho_{TPR} = \frac{TP}{TP+FN} = 5/6 \quad \mbox{and} \quad \rho_{PPV} = \frac{TP}{TP + FP} =  5/8, $$
+%
+so that we draw another line from $(5/6,5/7)$ to $(5/6,5/8).$
+%
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+\centering
+\scalebox{0.4}{\includegraphics{figures/PR_curve_step_8}}
+\end{minipage}
+
+\begin{minipage}{0.5\textwidth}
+	\textbf{Step 9:}
+We decrease the threshold value to $c=0.28,$ then $TP=5,$ $FP=4$ and $FN= n_+ - 5.$
+%
+Thus, 
+%
+%
+$$  \rho_{TPR} = \frac{TP}{TP+FN} = 5/6 \quad \mbox{and} \quad \rho_{PPV} = \frac{TP}{TP + FP} =  5/9, $$
+%
+so that we draw another line from $(5/6,5/8)$ to $(5/6,5/9).$
+%
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+\centering
+\scalebox{0.4}{\includegraphics{figures/PR_curve_step_9}}
+\end{minipage}
+
+\begin{minipage}{0.5\textwidth}
+	\textbf{Step 10:}
+We decrease the threshold value to $c=0.18,$ then $TP=5,$ $FP=5$ and $FN= n_+ - 5.$
+%
+Thus, 
+%
+%
+$$  \rho_{TPR} = \frac{TP}{TP+FN} = 5/6 \quad \mbox{and} \quad \rho_{PPV} = \frac{TP}{TP + FP} =  5/10, $$
+%
+so that we draw another line from $(5/6,5/9)$ to $(5/6,1/2).$
+%
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+\centering
+\scalebox{0.4}{\includegraphics{figures/PR_curve_step_10}}
+\end{minipage}
+
+\begin{minipage}{0.5\textwidth}
+	\textbf{Step 11:}
+We decrease the threshold value to $c=0.15,$ then $TP=6,$ $FP=5$ and $FN= n_+ - 6 = 0.$
+%
+Thus, 
+%
+%
+$$  \rho_{TPR} = \frac{TP}{TP+FN} =  1 \quad \mbox{and} \quad \rho_{PPV} = \frac{TP}{TP + FP} =  6/11, $$
+%
+so that we draw another line from $(5/6,1/2)$ to $(1,6/11).$
+%
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+\centering
+\scalebox{0.4}{\includegraphics{figures/PR_curve_step_11}}
+\end{minipage}
+
+\begin{minipage}{0.5\textwidth}
+	\textbf{Step 12:}
+We decrease the threshold value to $c=0,$ then $TP=6,$ $FP=6$ and $FN= n_+ - 6 = 0.$
+%
+Thus, 
+%
+%
+$$  \rho_{TPR} = \frac{TP}{TP+FN} = 1 \quad \mbox{and} \quad \rho_{PPV} = \frac{TP}{TP + FP} =  6/12, $$
+%
+so that we draw another line from $(1,6/11)$ to $(1,1/2).$
+%
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+\centering
+\scalebox{0.4}{\includegraphics{figures/PR_curve_step_12}}
+\end{minipage}
+
+
+
+
+}
+
+
+\loesung{MetaCost}{
+
+
+Implement the MetaCost algorithm and use it with some classifier of your choice on an imbalanced data set of your choice, where the cost-matrix is given by the cost-sensitive heuristic we saw in the lecture. Compare the confusion matrices of the underlying classifier and the MetaCost classifier as well as their total costs.
+
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## --------------------------------------------}
+
+
+\hlkwd{library}\hlstd{(mlr3)}
+
+\hlkwd{set.seed}\hlstd{(}\hlnum{123}\hlstd{)}
+
+
+\hlcom{# we use the spam data in the mlr3 package (spam=positive)}
+\hlstd{task}        \hlkwb{=} \hlkwd{tsk}\hlstd{(}\hlstr{"spam"}\hlstd{)}
+\hlstd{data}        \hlkwb{=} \hlstd{task}\hlopt{$}\hlkwd{data}\hlstd{()}
+\hlstd{n_vec}       \hlkwb{=} \hlkwd{table}\hlstd{(data[,}\hlnum{1}\hlstd{])}
+\hlstd{g}           \hlkwb{=} \hlkwd{length}\hlstd{(n_vec)} \hlcom{# number of classes (two of course)}
+
+\hlcom{# we make a naive training-test split}
+\hlstd{n}           \hlkwb{=} \hlkwd{round}\hlstd{(}\hlnum{0.8} \hlopt{*} \hlstd{task}\hlopt{$}\hlstd{nrow)}
+\hlstd{train_set}   \hlkwb{=} \hlnum{1}\hlopt{:}\hlstd{n}
+\hlstd{train_set}   \hlkwb{=} \hlkwd{sort}\hlstd{(}\hlkwd{sample}\hlstd{(task}\hlopt{$}\hlstd{nrow, n))}
+\hlcom{#unique(data[train_set,1])}
+
+\hlstd{test_set}    \hlkwb{=} \hlkwd{setdiff}\hlstd{(}\hlkwd{seq_len}\hlstd{(task}\hlopt{$}\hlstd{nrow), train_set)}
+
+\hlcom{# we use a CART as a classifier}
+\hlstd{classifier}  \hlkwb{=} \hlstr{"classif.rpart"}
+
+\hlcom{# Create the cost matrix via the heuristic}
+
+\hlstd{cost_mat} \hlkwb{=} \hlkwd{matrix}\hlstd{(}\hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{,g}\hlopt{*}\hlstd{g),}\hlkwc{ncol}\hlstd{=}\hlnum{2}\hlstd{)}
+
+\hlkwa{for} \hlstd{(i} \hlkwa{in} \hlnum{1}\hlopt{:}\hlstd{g)\{}
+  \hlkwa{for} \hlstd{(j} \hlkwa{in} \hlnum{1}\hlopt{:}\hlstd{g)\{}
+    \hlstd{cost_mat[i,j]} \hlkwb{=} \hlkwd{max}\hlstd{(n_vec[i]}\hlopt{/}\hlstd{n_vec[j],}\hlnum{1}\hlstd{)}
+  \hlstd{\}}
+  \hlstd{cost_mat[i,i]}   \hlkwb{=} \hlnum{0}
+\hlstd{\}}
+
+
+\hlcom{#  we use CART as the black-box classifier}
+\hlstd{classifier}  \hlkwb{=} \hlstr{"classif.rpart"}
+\hlstd{B}           \hlkwb{=} \hlkwd{round}\hlstd{(n}\hlopt{/}\hlnum{4}\hlstd{)}
+\hlstd{L}           \hlkwb{=} \hlnum{10}
+
+\hlcom{# 1st phase: Bagging}
+
+\hlstd{indices}     \hlkwb{=} \hlkwd{matrix}\hlstd{(}\hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{,B}\hlopt{*}\hlstd{L),}\hlkwc{ncol}\hlstd{=L)}
+
+\hlstd{classifiers} \hlkwb{=} \hlkwd{c}\hlstd{()}
+
+\hlkwa{for} \hlstd{(l} \hlkwa{in} \hlnum{1}\hlopt{:}\hlstd{L)\{}
+
+  \hlcom{# bootstrapped data set (or rather the indices)}
+  \hlstd{indices[,l]}         \hlkwb{=} \hlkwd{sort}\hlstd{(}\hlkwd{sample}\hlstd{(train_set,} \hlkwc{size}\hlstd{=B,} \hlkwc{replace} \hlstd{=} \hlnum{FALSE}\hlstd{))}
+  \hlcom{# fit classifier on bootstrapped data set}
+  \hlstd{learner}             \hlkwb{=} \hlkwd{lrn}\hlstd{(classifier,} \hlkwc{predict_type} \hlstd{=} \hlstr{"prob"}\hlstd{)}
+  \hlstd{classifiers}         \hlkwb{=} \hlkwd{c}\hlstd{(classifiers,learner}\hlopt{$}\hlkwd{train}\hlstd{(task,} \hlkwc{row_ids} \hlstd{= indices[,l]))}
+
+\hlstd{\}}
+
+\hlcom{#    2nd phase: Relabeling}
+
+\hlstd{y_tilde}           \hlkwb{=} \hlstd{task}\hlopt{$}\hlkwd{data}\hlstd{()[,}\hlnum{1}\hlstd{]}
+
+\hlkwa{for} \hlstd{(i} \hlkwa{in} \hlstd{train_set)\{}
+
+
+  \hlcom{# compute the proxy probability vector}
+  \hlstd{p}               \hlkwb{=} \hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{,g)}
+
+  \hlstd{tilde_L}         \hlkwb{=} \hlkwd{c}\hlstd{()}
+
+  \hlcom{# get all bootstrapped data sets, where i is not included}
+
+  \hlstd{temp}            \hlkwb{=} \hlkwd{which}\hlstd{(}\hlkwd{colSums}\hlstd{(i}\hlopt{==}\hlstd{indices)}\hlopt{==}\hlnum{0}\hlstd{)}
+
+  \hlkwa{if} \hlstd{(}\hlkwd{length}\hlstd{(temp)}\hlopt{==}\hlnum{0}\hlstd{)\{} \hlcom{# the data point appears in each bootstrapped sample -> use all classifiers}
+    \hlstd{tilde_L}       \hlkwb{=} \hlnum{1}\hlopt{:}\hlstd{L}
+  \hlstd{\}} \hlkwa{else} \hlstd{\{} \hlcom{# only use classifiers which haven't seen the data point during training}
+    \hlstd{tilde_L}       \hlkwb{=} \hlkwd{sort}\hlstd{(temp)}
+  \hlstd{\}}
+
+
+  \hlkwa{for} \hlstd{(l} \hlkwa{in} \hlstd{tilde_L)\{}
+    \hlstd{prediction}    \hlkwb{=} \hlstd{classifiers[[l]]}\hlopt{$}\hlkwd{predict}\hlstd{(task,} \hlkwc{row_ids} \hlstd{= i  )}
+    \hlstd{p}             \hlkwb{=} \hlstd{p} \hlopt{+} \hlstd{prediction}\hlopt{$}\hlstd{prob}
+  \hlstd{\}}
+  \hlcom{# average it}
+  \hlstd{p}               \hlkwb{=} \hlstd{p}\hlopt{/}\hlkwd{length}\hlstd{(tilde_L)}
+
+  \hlcom{# relabeling}
+  \hlcom{# computes the estimated expected costs for predicting class 1,..,g}
+  \hlstd{est_cost}        \hlkwb{=} \hlstd{cost_mat} \hlopt{%*%} \hlkwd{t}\hlstd{(p)}
+  \hlcom{# assign y the class with lowest estimated expected costs}
+  \hlstd{y_tilde[i]}      \hlkwb{=} \hlkwd{which}\hlstd{(est_cost}\hlopt{==}\hlkwd{min}\hlstd{(est_cost))[}\hlnum{1}\hlstd{]}
+
+\hlstd{\}}
+
+\hlcom{# create the relabeled data set}
+\hlstd{data_rel}          \hlkwb{=}  \hlstd{task}\hlopt{$}\hlkwd{data}\hlstd{()}
+\hlstd{data_rel[,}\hlnum{1}\hlstd{]}      \hlkwb{=}  \hlstd{y_tilde}
+\hlstd{task_new}          \hlkwb{=}  \hlstd{TaskClassif}\hlopt{$}\hlkwd{new}\hlstd{(}\hlstr{"rel_data"}\hlstd{,} \hlkwc{backend} \hlstd{= data_rel,} \hlkwc{target} \hlstd{= task}\hlopt{$}\hlstd{target_names )}
+
+\hlkwd{print}\hlstd{(}\hlstr{"Number of relabeled data points"}\hlstd{)}
+\end{alltt}
+\begin{verbatim}
+## [1] "Number of relabeled data points"
+\end{verbatim}
+\begin{alltt}
+\hlkwd{print}\hlstd{(}\hlkwd{sum}\hlstd{(task_new}\hlopt{$}\hlkwd{data}\hlstd{()[,}\hlnum{1}\hlstd{]}\hlopt{!=}\hlstd{task}\hlopt{$}\hlkwd{data}\hlstd{()[,}\hlnum{1}\hlstd{]))}
+\end{alltt}
+\begin{verbatim}
+## [1] 336
+\end{verbatim}
+\begin{alltt}
+\hlcom{# initialize the cost-sensitive classifier}
+\hlstd{meta_classifier} \hlkwb{=} \hlkwd{lrn}\hlstd{(classifier,} \hlkwc{predict_type} \hlstd{=} \hlstr{"prob"}\hlstd{)}
+
+\hlcom{# 3rd phase: make classifier cost-sensitive}
+\hlstd{meta_classifier}\hlopt{$}\hlkwd{train}\hlstd{(task_new,} \hlkwc{row_ids} \hlstd{= train_set)}
+
+\hlcom{# predict with meta}
+
+\hlstd{meta_pred}   \hlkwb{=} \hlstd{meta_classifier}\hlopt{$}\hlkwd{predict}\hlstd{(task_new,} \hlkwc{row_ids} \hlstd{= test_set)}
+
+\hlcom{# train also the cost-insensitive CART}
+\hlstd{learner}     \hlkwb{=} \hlkwd{lrn}\hlstd{(}\hlstr{"classif.rpart"}\hlstd{,} \hlkwc{predict_type} \hlstd{=} \hlstr{"prob"}\hlstd{)}
+\hlstd{learner}\hlopt{$}\hlkwd{train}\hlstd{(task,} \hlkwc{row_ids} \hlstd{= train_set)}
+\hlstd{CART_pred}   \hlkwb{=} \hlstd{learner}\hlopt{$}\hlkwd{predict}\hlstd{(task,} \hlkwc{row_ids} \hlstd{= test_set)}
+
+
+\hlcom{# Confusion Matrices}
+
+\hlstd{meta_pred}\hlopt{$}\hlstd{confusion}
+\end{alltt}
+\begin{verbatim}
+##          truth
+## response  spam nonspam
+##   spam     316      33
+##   nonspam   58     513
+\end{verbatim}
+\begin{alltt}
+\hlstd{CART_pred}\hlopt{$}\hlstd{confusion}
+\end{alltt}
+\begin{verbatim}
+##          truth
+## response  spam nonspam
+##   spam     308      40
+##   nonspam   66     506
+\end{verbatim}
+\begin{alltt}
+\hlcom{# Costs generated}
+
+\hlkwd{sum}\hlstd{(meta_pred}\hlopt{$}\hlstd{confusion}\hlopt{*}\hlstd{cost_mat)}
+\end{alltt}
+\begin{verbatim}
+## [1] 122.1914
+\end{verbatim}
+\begin{alltt}
+\hlkwd{sum}\hlstd{(CART_pred}\hlopt{$}\hlstd{confusion}\hlopt{*}\hlstd{cost_mat)}
+\end{alltt}
+\begin{verbatim}
+## [1] 141.4937
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+}
+\end{document}
