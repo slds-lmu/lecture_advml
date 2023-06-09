@@ -25,9 +25,10 @@
 
 \newcommand{\titlefigure}{figure/mean_relation}
 \newcommand{\learninggoals}{
-  \item Get an overview of the existing groups of methods for MTP
-  \item Know that treating targets independently is often sub-optimal
-%  \item 
+  \item Independent models for targets
+  \item Mean regularization
+  \item Stacking
+  \item Weight sharing in DL 
 }
 
 \title{Advanced Machine Learning}
@@ -72,14 +73,16 @@
 	
 		\item Assume a linear basis function model for the $m$-th target: 
 		\begin{equation*}
-			f(\xv)_m = \thetab_m^\intercal \phi(\xv) \,,
+			\fkx = \thetab_k^\intercal \phi(\xv) \,,
 			\label{eq:binrel}
 		\end{equation*}
 
-		$\thetab_m$ is target-specific parameter and $\phi$ some feature mapping.
-        \item We do this when facing a large number of targets. Otherwise, we can also use normal ML modelling and model selection.
+		$\thetab_k$ is target-specific parameter and $\phi$ some feature mapping.
+        \item Use this with with large nr of targets. 
+        %Otherwise, we can also use normal ML modelling and model selection.
 
-		\item The parameter vectors are determined by solving: 
+		\item We optimize jointly:
+  
 		\begin{equation*}
 			\label{eq:multiridge}
 			\min_\Theta \|Y - \Phi \Theta \|^2_F +  \sum_{m=1}^l \lambda_m \,\|\thetab_m\|^2 \,,
@@ -91,12 +94,13 @@
 			\label{eq:notation}
 			\Phi = \begin{bmatrix} \phi(\xv^{(1)})^\top \\ \vdots \\ \phi(\xv^{(n)})^\top \end{bmatrix} \qquad \Theta = [\thetab_1 \quad \cdots \quad \thetab_l] \,.
 		\end{equation*}
-        Note that each column of $\Theta$ is binded with a specific target.
+  Frobenius norm = sum of SSE-s of all targets
+  %      Note that each column of $\Theta$ is binded with a specific target.
 	\end{itemize}
 
 \end{frame}
 
-\begin{frame}{Independent Models: Practical Performance}
+\begin{frame}{Independent Models}
 
 	The experimental results section of a typical MTP paper: 
 
@@ -104,19 +108,27 @@
 		\includegraphics[scale=0.45, trim = 0 50 0 100,clip]{figure/barplots} \\
 	\end{center}
 
-	$\leadsto$ Independent models do not exploit target dependencies compared to more sophisticated methods, which seems to be a key for better performance in MTP problems.
+	$\leadsto$ Independent models don't exploit target deps, compared to more sophisticated methods, seems to be key for better performance.
 
 \end{frame}
 
+\begin{frame}{Enforcing similarity in Deep Learning}
+	\begin{center}
+		Commonly-used architecture: weight sharing in the final layer with $m$ nodes, i.e., weight sharing among the targets \\
+		\includegraphics[scale=0.4]{figure/weightsharing}
+	\end{center}
+
+    {\tiny Caruana, Multitask learning: A knowledge-based source of inductive bias. Machine	Learning 1997.}
+\end{frame}
 
 %\section{Similarity-enforcing methods}
 
 \begin{frame}{Mean-regularized multi-task learning}
 \begin{minipage}{0.5\textwidth}
     \begin{itemize} 				
-        \item The models for the similar targets should behave similar. How?
+        \item Models for similar targets should behave similarly
         
-        \item Simple solution: parameters of these models should have similar values.
+        \item So params should be similar
     \end{itemize}
     
 \end{minipage}
@@ -139,26 +151,24 @@
 \end{minipage}
 
 \begin{itemize}
-    \item Approach: Bias parameter vectors towards their mean vector:
-    \begin{equation*}
-            \label{eq:meanreg}
-            \min_\Theta \|Y - \Phi \Theta \|^2_F + \lambda \sum\nolimits_{m=1}^l \|\thetab_m - \frac{1}{l} \sum\nolimits_{m'=1}^l \thetab_{m'} \|^2 \, ,
-    \end{equation*}
-    
+    \item Approach: Bias parameter vectors towards mean vector:
+$$
+            \min_\Theta \|Y - \Phi \Theta \|^2_F + \lambda \sum_{m=1}^l \|\thetab_m - \frac{1}{l} \sum_{m'=1}^l \thetab_{m'} \|^2 
+$$    
 %    \item The assumption that all target models are similar is too strict.
 \end{itemize}
 {\tiny Evgeniou and Pontil, Regularized multi--task learning, KDD 2004}
 \end{frame}
 
 
-\begin{frame}{Stacking (Stacked generalization)}
+\begin{frame}{Stacking}
 	
 	\begin{itemize}
 	
-		\item Originally introduced as a general ensemble learning or blending technique.
+		\item Originally, general ensemble learning technique.
 		
-		\item Level 1 learners: apply a series of ML methods on the same dataset (or, one ML method on bootstrap samples of the dataset)
-		\item Level 2 learner: apply an ML method to a new dataset consisting of the predictions obtaining at Level 1 
+		\item Level 1: apply series of ML methods on the same dataset 
+		\item Level 2: apply  ML method to a new dataset consisting of the predictions obtained at level 1 
 	\end{itemize}
 	
 	\begin{center}
@@ -207,11 +217,11 @@
 \begin{frame}{Stacking applied to MTP }
 	\begin{minipage}{0.5\textwidth}
         \begin{itemize}
-            \item Level 1: learn $f(\xv)_1,\ldots,f(\xv)_l$ independently.
+            \item Level 1: learn all $\fkx$ independently
         
-            \item Level 2: learn a model for each target independently, using the predictions of the first step
-            $\leadsto$ $f(\xv) = g(f(\xv)_1,\ldots,f(\xv)_l)$ \\
-            Or: $f(\xv) = g(f(\xv)_1,\ldots,f(\xv)_l,\xv)$  \\ 
+            \item Level 2: learn model for each target independently, using predictions of level 1
+            $\leadsto$ $f(\xv) = g(f_1(\xv),\ldots,f_l(\xv))$ \\
+            Or: $f(\xv) = g(f_1(\xv),\ldots,f_l(\xv),\xv)$  \\ 
         \end{itemize}
 	\end{minipage}
     \hfill
@@ -257,9 +267,9 @@
     \end{minipage}	
 
 	\begin{itemize}
-		\item Advantages: easy to implement and general. 
+		\item Advantages: easy to implement and general
         
-		\item Has been shown to avoid overfitting in multivariate regression.
+		\item Has been shown to avoid overfitting in multivariate regression
         
 		\item If level 2 learner uses regularization $\leadsto$ models are forced to learn similar parameters for different targets.  
 	\end{itemize}
@@ -267,6 +277,8 @@
 	{\tiny Cheng and H\"ullermeier, Combining Instance-based learning and Logistic Regression for Multi-Label classification, Machine Learning, 2009.}
 	
 \end{frame}
+
+
 
 \begin{frame}{Stacking vs Binary Relevance: Example}
 
@@ -296,14 +308,6 @@
 
 \end{frame}
 
-\begin{frame}{Enforcing similarity in Deep Learning}
-	\begin{center}
-		Commonly-used architecture: weight sharing in the final layer with $m$ nodes, i.e., weight sharing among the targets \\
-		\includegraphics[scale=0.4]{figure/weightsharing}
-	\end{center}
-
-    {\tiny Caruana, Multitask learning: A knowledge-based source of inductive bias. Machine	Learning 1997.}
-\end{frame}
 
 \endlecture
 \end{document}
