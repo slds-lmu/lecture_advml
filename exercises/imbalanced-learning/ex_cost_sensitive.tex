@@ -290,47 +290,21 @@
 \end{enumerate}
 }
 
-\aufgabe{PR-curve}{
 
-Draw the PR-curve for the following data set:
+\aufgabe{Tomek Links}{
+Implement the Tomek Links subsampling technique. The implementation can be decomposed into the following steps:
+\begin{enumerate}
+    \item Write a function \texttt{find\_tomek\_links} that identifies all samples belonging to Tomek links. The function accepts the input features \texttt{x} with shape \texttt{(num\_samples, num\_features)} and the class labels \texttt{y} with shape \texttt{(num\_samples,)}. We assume that class label 1 represents the positive class, and 0 represents the negative class. In addition, the function should return a \textbf{binary} array with shape \texttt{(num\_samples,)}, in which 1 means that the corresponding sample belong to a Tomek link. For example, if there are 6 samples in a dataset, and there are two Tomek links connecting samples (with 0-based indices) \texttt{0-1, 4-5}, respectively. Then, the returned indicator array should be \texttt{[1, 1, 0, 0, 1, 1]}.
 
+    \item Write a function \texttt{find\_kept\_samples} that identifies the samples to be kept when performing subsampling. This function takes \texttt{x} and \texttt{y}, along with a binary array \texttt{is\_tomek\_sample} of shape \texttt{(num\_samples,)} that indicates whether each sample belong to a Tomek link. The function should return a binary array of shape \texttt{(num\_samples,)}, in which 1 means the sample should be kept, while 0 indicates it should be removed (because it is a sample of majority class and it belongs to a Tomek link).
 
-\begin{center}
-	\begin{tabular}{c|c}
-		
-		\textbf{Truth} & \textbf{Score}  \\
-		\hline
-		Pos & 0.95 \\
-		
-		Pos & 0.86  \\
-		
-		Pos & 0.69  \\
-		
-		Neg &  0.65  \\
-		
-		Pos &  0.59 \\
-		
-		Neg  &  0.52 \\
-		
-		Pos &  0.51  \\
-		
-		Neg  &  0.39 \\
-		
-		Neg  &  0.28 \\
-		
-		Neg  &  0.18 \\
-		
-		Pos  & 0.15  \\
-		
-		Neg  &  0.06 \\
-	\end{tabular}
-\end{center}
-}
-
-
-\aufgabe{MetaCost}{
-
-
-Implement the MetaCost algorithm and use it with some classifier of your choice on an imbalanced data set of your choice, where the cost-matrix is given by the cost-sensitive heuristic we saw in the lecture. Compare the confusion matrices of the underlying classifier and the MetaCost classifier as well as their total costs.
+    \item Write a script that run the experiment as follows:
+    \begin{enumerate}
+        \item Generate an imbalanced dataset.
+        \item Visualize the imbalanced dataset, with positive and negative samples plotted in two distinct colors.
+        \item Find out the samples of Tomek links and visualize them in a different color.
+        \item Identify the samples that should be removed during subsampling. Visualize them in a different color.
+    \end{enumerate}
+\end{enumerate}
 }
 \end{document}
