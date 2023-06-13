@@ -8,9 +8,9 @@
 
 \newcommand{\titlefigure}{figure/f1_score_plot}
 \newcommand{\learninggoals}{
-  \item Get to know alternative performance measures for accuracy
-  \item See their advantages over accuracy for imbalanced data sets
-  \item Understand the extensions of these measures for multiclass settings
+  \item Know performance measures beyond accuracy
+  \item Know their advantages over accuracy for imbalanced data 
+  \item Know extensions of these measures for multiclass settings
 }
 
 \title{Advanced Machine Learning}
@@ -18,7 +18,7 @@
 
 \begin{document}
 
-\lecturechapter{Imbalanced Learning: Performance Measures}
+\lecturechapter{Imbalanced Learning: \\ Performance Measures}
 \lecture{Advanced Machine Learning}
 
 
@@ -29,7 +29,7 @@
     \footnotesize{
         \begin{itemize}
             \item We encourage readers to first go through \href{https://slds-lmu.github.io/i2ml/chapters/04_evaluation/04-08-measures-classification/}{\beamergotobutton{Chapter 04.08 in I2ML }}.
-            \item In binary classification  (i.e., $\Yspace = \{-1,+1\}$):
+            \item In binary classification  ($\Yspace = \{-1,+1\}$):
 
 		\end{itemize}
 		
@@ -52,9 +52,9 @@
             \item $F_1$ score balances Recall ($\rho_{TPR}$) and Precision ($\rho_{PPV}$):
             $$\rho_{F_1} = 2 \cdot \cfrac{\rho_{PPV} \cdot \rho_{TPR}}{\rho_{PPV} + \rho_{TPR}}$$
             
-            \item Note $\rho_{F_1}$ does not account for TN.
+            \item Note that $\rho_{F_1}$ does not account for TN.
             
-            \item Question: does $F_1$ score suffer from data imbalance as accuracy?
+            \item Does $\rho_{F_1}$ suffer from data imbalance like accuracy does?
         \end{itemize}
             
     }
@@ -75,15 +75,16 @@
     	\end{minipage}
 	
     	\begin{itemize}
-    		\item A model with $\rho_{TPR} = 0$ (no pos. instance predicted as 
-    		pos.) or 
-    		$\rho_{PPV} = 0$ (no TP among the predicted) has $\rho_{F_1} = 0$.
+    		\item A model with $\rho_{TPR} = 0$ %(no pos. instance predicted as pos.) 
+      or 
+    		$\rho_{PPV} = 0$ %(no TP among the predicted) 
+      has $\rho_{F_1} = 0$.
       
-    		\item Always predicting \enquote{negative}: $\rho_{F_1} = 0$
+    		\item Always predicting \enquote{negative}: $\rho_{TPR} = \rho_{F_1} = 0$
       
-    		\item Always predicting \enquote{positive}: $\rho_{F_1} = 2 \cdot \rho_{PPV} / 
+    		\item Always predicting \enquote{positive}: $\rho_{TPR} = 1 \Rightarrow \rho_{F_1} = 2 \cdot \rho_{PPV} / 
     		(\rho_{PPV} + 1) = 2 \cdot \np / (\np + n)$,\\ 
-    		$\leadsto$ small when $\np$ is small.
+    		$\leadsto$ small when $\np (= TP + FN = TP)$  is small.
     
             \item Hence, $F_1$ score is more robust to data imbalance than accuracy.
       
@@ -159,7 +160,7 @@
     			\item Balanced accuracy (BAC) balances $\rho_{TNR}$ and $\rho_{TPR}$: 
     			$$\rho_{BAC} = \frac{\rho_{TNR} + \rho_{TPR}}{2}$$
 
-    			\item  It tends more towards the \textbf{higher} of two combined values.
+    			%\item  It tends more towards the \textbf{higher} of two combined values.
     		\end{itemize}
     	\end{minipage}
     	\begin{minipage}[c]{0.49\textwidth}
@@ -211,10 +212,10 @@
             \item $\rho_{MCC} \approx 1$ $\leadsto$ nearly zero error $\leadsto$ good classification, i.e., strong correlation between predicted and true classes.
             \vspace{10pt}
     	
-            \item $\rho_{MCC} \approx 0$ $\leadsto$ no correlation, i.e., no better than random guessing.
+            \item $\rho_{MCC} \approx 0$ $\leadsto$ no correlation, i.e., not better than random guessing.
             \vspace{10pt}
     	
-            \item $\rho_{MCC} \approx -1$ $\leadsto$ reversed classification, i.e., essentially switching the labels.
+            \item $\rho_{MCC} \approx -1$ $\leadsto$ reversed classification, i.e., switch labels.
             \vspace{10pt}
     
             \item Previous measures requires defining positive class. But MCC does not depend on which class is the positive one.
@@ -226,7 +227,7 @@
 \end{vbframe}
 
 
-\begin{vbframe}{Performance Measures for Multiclass Classification}
+\begin{vbframe}{Multiclass Classification}
 	\small{
 		\begin{center}
 			\tiny
@@ -245,7 +246,7 @@
 		\end{center}
 		
 		\begin{itemize}
-			\item $n_{ij}$: the number of $j$ instances classified as $i$.
+			\item $n_{ji}$: the number of $i$ instances classified as $j$.
 
             \item $n_i = \sum_{j=1}^g n_{ji}$ the total number of $i$ instances.
 
@@ -257,7 +258,7 @@
     
                     \item True negative rate $\rho_{TNR_i} = \frac{\sum_{j\neq i}n_{jj}}{n-n_i}$ 
     
-                    \item Positive predictive value (\textbf{Precision}) $\rho_{PPR_i} = \frac{n_{ii}}{\sum_{j=1}^g n_{ij}}$.
+                    \item Positive predictive value (\textbf{Precision}) $\rho_{PPR_j} = \frac{n_{jj}}{\sum_{i=1}^g n_{ji}}$.
                     
                 \end{itemize}
 
@@ -323,10 +324,10 @@
 
 		\begin{itemize}
 		
-			\item ``Micro'' versions of metrics for the multiclass setting: e.g. the micro $TPR$ is $\frac{\sum_{i=1}^g TP_i}{\sum_{i=1}^g TP_i + FN_i}$ 
+			\item ``Micro'' versions, e.g., the micro $TPR$ is $\frac{\sum_{i=1}^g TP_i}{\sum_{i=1}^g TP_i + FN_i}$ 
             \vspace{10pt}
 		
-			\item Moreover, the MCC can be extended to:
+			\item MCC can be extended to:
 			
 			$$   \rho_{MCC} = \frac{ n  \sum_{i=1}^g n_{ii} -  \sum_{i=1}^g \hat n_i n_i}{\sqrt{ (n^2 - \sum_{i=1}^g \hat n_i^2)(n^2 - \sum_{i=1}^g n_i^2)  }},$$
 
@@ -347,13 +348,13 @@
 
 		\begin{itemize}
 
-            \item Since different measures focus on different characteristics $\leadsto$ No golden answer to this question.
+            \item Since different measures focus on other characteristics $\leadsto$ No golden answer to this question.
 	
-			\item Depends on the application, which characteristic is more important than another.
+			\item Depends on application and importance of characteristics.
 
-			\item However, it is clear that the usage of accuracy is inappropriate if the data set is imbalanced. $\leadsto$ Use altenative ones.
+			\item However, it is clear that accuracy usage is inappropriate if the data set is imbalanced. $\leadsto$ Use alternative metrics.
 
-			\item Be careful with comparing the absolute values of the different measures, as these can be on different ``scales'', e.g.\ MCC and BAC. 
+			\item Be careful with comparing the absolute values of the different measures, as these can be on different ``scales'', e.g.,\ MCC and BAC. 
 	
 		\end{itemize}
 	}
