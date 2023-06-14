@@ -8,7 +8,7 @@
 \newcommand{\titlefigure}{figure/SMOTE.png}
 \newcommand{\learninggoals}{
 	\item Know the idea of sampling methods for coping with imbalanced data
-	\item Understand the different undersampling techniques
+	\item Understand the different sampling techniques
 }
 
 \title{Advanced Machine Learning}
@@ -16,7 +16,7 @@
 
 \begin{document}
 	
-\lecturechapter{Imbalanced Learning: Sampling Methods Part 1}
+\lecturechapter{Imbalanced Learning: \\ Sampling Methods Part 1}
 \lecture{Advanced Machine Learning}
 
 \sloppy
@@ -37,11 +37,11 @@
                     
 					\item Undersampling --- Removing instances of majority class(es).
 			
-					\item Oversampling --- Adding/Creating new instances of minority class(es).
+					\item Oversampling --- Adding/Creating new instances of minority class(es).  (Slower, but usually works better.)
 
-                    \item Oversampling is slower, but usually works better.
+                    %\item Oversampling is slower, but usually works better.
 
-					\item Hybrid --- Combining both sampling.
+					\item Hybrid --- Combining both methods.
 			
 				\end{itemize}
 			\end{minipage}
@@ -61,14 +61,14 @@
     \begin{itemize}
         \item Random oversampling (ROS):
         \begin{itemize}
-            \item Randomly \textbf{replicate} \textbf{minority} instances until a desired imbalance ratio.
-            \item Prone to overfitting due to multiple tied instances!
+            \item Randomly \textbf{replicate} \textbf{minority} instances.% until a desired imbalance ratio.
+            \item Prone to overfitting due to multiple tied instances.
         \end{itemize}
 
         \item Random undersampling (RUS):
         \begin{itemize}
-            \item Randomly \textbf{eliminate} \textbf{majority} instances until a desired imbalance ratio.
-            \item Might remove informative instances and destroy important concepts in data!
+            \item Randomly \textbf{eliminate} \textbf{majority} instances. % until a desired imbalance ratio.
+            \item Might remove informative instances and destroy important concepts in data.
         \end{itemize}
 
         \item Better: Introduce heuristics in removal process (RUS) and do not create exact copies (ROS).
@@ -81,39 +81,45 @@
     \small{
 
         \begin{itemize}            
-            \item Remove only noisy borderline examples of majority class(es).
-            \item Noisy borderline examples:
-            \begin{itemize}
-                % Need this \footnotesize to maintain fontsize
-                \footnotesize
-                \item From different classes.
-                \item ``Very close'' to each other.
-            \end{itemize} 
-                
+            \item Remove ``noisy borderline'' examples (very close observations of different classes) of majority class(es).
+%            \item Noisy borderline examples are ``very close'' observations of different classes.
+            % \begin{itemize}
+            %     % Need this \footnotesize to maintain fontsize
+            %     \footnotesize
+            %     \item From different classes.
+            %     \item ``Very close'' to each other.
+            % \end{itemize} 
+            \item Let $E^{(i)} = (\xi,\yi)$ and $E^{(j)} = (\xv^{(j)},y^{(j)})$ be two data points in $\D$. % with $\yi\neq y^{(j)}.$
         \end{itemize}
         \begin{columns}
-            \begin{column}{0.6\textwidth}	
+            \begin{column}{0.7\textwidth}	
         
                 \begin{itemize}
-                    \item Let $E^{(i)} = (\xi,\yi)$ and $E^{(j)} = (\xv^{(j)},y^{(j)})$ be two data points in $\D$ with $\yi\neq y^{(j)}.$
-                    \vspace{10pt}
+
+                    %\vspace{10pt}
                     
                     \item A pair $(E^{(i)},E^{(j)})$ is called \emph{Tomek link} iff there is no other data point $E^{(k)} = (\xv^{(k)},y^{(k)})$ such that
         
                     \begin{itemize} 
                     \footnotesize
                 
-                       \item [] $d(\xv^{(i)}, \xv^{(k)}) < d(\xv^{(i)}, \xv^{(j)}) $
-                       \item [] or $d(\xv^{(j)}, \xv^{(k)}) < d(\xv^{(i)}, \xv^{(j)}) $ holds,
+                       \item [] $d(\xv^{(i)}, \xv^{(k)}) < d(\xv^{(i)}, \xv^{(j)}) $ or
+                       \item [] $d(\xv^{(j)}, \xv^{(k)}) < d(\xv^{(i)}, \xv^{(j)}) $ holds,
                     
                     \end{itemize}
         
                 where $d$ is some distance on $\Xspace.$
+                \item $\yi \neq \yi[j]$% E^{(i)}$ and $E^{(j)}$ have different $y$'s 
+                $\leadsto$ noisy borderline examples.
+
+                \item Remove majority instance in each data pair in a Tomek link where $\yi \neq \yi[j]$.
+
+                %\item No random sampling here, but it can be combined with RUS.
                 
                 \end{itemize}		
             \end{column}
         
-            \begin{column}{0.4\textwidth}
+            \begin{column}{0.3\textwidth}
                 \begin{figure}
                     \centering
                     \includegraphics[width=0.85\textwidth]{figure/tomek_link_plot.png}	
@@ -126,35 +132,35 @@
    }
 \end{frame}
 
- \begin{frame}{Undersampling: Tomek Links}
+%  \begin{frame}{Undersampling: Tomek Links}
 
-    \begin{columns}
-        \begin{column}{0.59\textwidth}
-            \begin{itemize} 
+%     \begin{columns}
+%         \begin{column}{0.59\textwidth}
+%             \begin{itemize} 
                 
-                 \item A pair $(E^{(i)},E^{(j)})$ is called \emph{Tomek link} iff there is no other data point $E^{(k)} = (\xv^{(k)},y^{(k)})$ such that $d(\xv^{(i)}, \xv^{(k)}) < d(\xv^{(i)}, \xv^{(j)}) $ or $d(\xv^{(j)}, \xv^{(k)}) < d(\xv^{(i)}, \xv^{(j)}) $ holds.
+%                  \item A pair $(E^{(i)},E^{(j)})$ is called \emph{Tomek link} iff there is no other data point $E^{(k)} = (\xv^{(k)},y^{(k)})$ such that $d(\xv^{(i)}, \xv^{(k)}) < d(\xv^{(i)}, \xv^{(j)}) $ or $d(\xv^{(j)}, \xv^{(k)}) < d(\xv^{(i)}, \xv^{(j)}) $ holds.
                 
-                \item $E^{(i)}$ and $E^{(j)}$ have different $y$'s $\leadsto$ a bordeline case.
+%                 \item $E^{(i)}$ and $E^{(j)}$ have different $y$'s $\leadsto$ a bordeline case.
 
-                \item Remove majority instance in each data pair in a Tomek link.
+%                 \item Remove majority instance in each data pair in a Tomek link.
 
-                \item No sampling here, but it can be combined with RUS.
+%                 \item No random sampling here, but can be combined with RUS.
 
             
-            \end{itemize}
-        \end{column}
+%             \end{itemize}
+%         \end{column}
 
-        \begin{column}{0.4\textwidth}
-            \begin{figure}
-                \centering
-                \includegraphics[width=0.85\textwidth]{figure/tomek_link_plot.png}	\tiny
-                \\ Franciso Herrera (2013), Imbalanced Classification: Common
-                Approaches and Open Problems (\href{https://sci2s.ugr.es/sites/default/files/files/TutorialsAndPlenaryTalks/SSTiC-Trends in-Classification-Imbalanced-data-sets.pdf}{\underline{URL}}).
-            \end{figure}
-        \end{column}
-    \end{columns}
+%         \begin{column}{0.4\textwidth}
+%             \begin{figure}
+%                 \centering
+%                 \includegraphics[width=0.85\textwidth]{figure/tomek_link_plot.png}	\tiny
+%                 \\ Franciso Herrera (2013), Imbalanced Classification: Common
+%                 Approaches and Open Problems (\href{https://sci2s.ugr.es/sites/default/files/files/TutorialsAndPlenaryTalks/SSTiC-Trends in-Classification-Imbalanced-data-sets.pdf}{\underline{URL}}).
+%             \end{figure}
+%         \end{column}
+%     \end{columns}
 
-\end{frame}
+% \end{frame}
 	
 	
 \begin{frame}{Undersampling: Condensed Nearest Neighbor (CNN)}
@@ -162,23 +168,23 @@
     \begin{itemize}
     
         \item Remove majority instances far away from decision boundary. 
-        \item Constructing a consistent subset $\tilde{\D}$ of $\D$ in terms of the 1-NN classifier. 
+        \item Construct a \textbf{consistent} subset $\tilde{\D}$ of $\D$. % in terms of the 1-NN classifier. 
 
         \item A subset $\tilde{\D}$ of $\D$ is called consistent if using a 1-NN classifier on $\tilde{\D}$ classifies each instance in $\D$ correctly.
 
-    \end{itemize}	
+%     \end{itemize}	
 
-\end{frame}
+% \end{frame}
 
-\begin{frame}{Undersampling: Condensed Nearest Neighbor (CNN)}
-    \begin{itemize}
-        \item Creates a consistent subset:
+% \begin{frame}{Undersampling: Condensed Nearest Neighbor (CNN)}
+%     \begin{itemize}
+        \item Create a consistent subset:
         
         \begin{enumerate}
     
             \item Initialize $\tilde{\D}$ by selecting \textbf{all minority} instances and randomly picking \textbf{one majority} instance.
     
-            \item Classify each instance in $\D$ with the 1-NN classifier based on $\tilde{\D}.$
+            \item Classify each instance in $\D$ with 1-NN classifier based on $\tilde{\D}.$
         
             \item Remove all misclassified instances from $\D$.
             
@@ -215,35 +221,35 @@
 
 \end{frame}
 	
-\begin{frame}{Oversampling: SMOTE}
+% \begin{frame}{Oversampling: SMOTE}
 
-    \begin{itemize}	
-        \item The Synthetic Minority Oversampling Technique (SMOTE) operates by creating \textbf{new synthetic examples} of minority class.
+%     \begin{itemize}	
+%         \item The Synthetic Minority Oversampling Technique (SMOTE) operates by creating \textbf{new synthetic examples} of minority class.
 
-        \item Interpolate between neighboring minority examples.
+%         \item Interpolate between neighboring minority examples.
 
-        \item Examples are created in $\Xspace$ rather than in $\Xspace\times\Yspace.$
+%         \item Examples are created in $\Xspace$ rather than in $\Xspace\times\Yspace.$
 
-        \item Algorithm: For each minority instance: 
+%         \item Algorithm: For each minority instance: 
 
-        \begin{itemize} 
+%         \begin{itemize} 
 
-            \item Find $k$ nearest minority neighbors.
+%             \item Find $k$ nearest minority neighbors.
     
-            \item Randomly select $j$ of these neighbors.
+%             \item Randomly select $j$ of these neighbors.
     
-            \item Randomly generate new instances along the lines connecting the minority instance and its $j$ neighbors.
+%             \item Randomly generate new instances along the lines connecting the minority instance and its $j$ neighbors.
     
-        \end{itemize}
+%         \end{itemize}
 
-    \end{itemize}
+%     \end{itemize}
 
-    \begin{figure}
-        \centering
-        \includegraphics[width=0.8\textwidth]{figure/SMOTE.png} 
-    \end{figure}
+%     \begin{figure}
+%         \centering
+%         \includegraphics[width=0.8\textwidth]{figure/SMOTE.png} 
+%     \end{figure}
 
-\end{frame}
+% \end{frame}
 
 \endlecture
 \end{document}
