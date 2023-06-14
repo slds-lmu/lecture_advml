@@ -7,7 +7,7 @@
 
 \newcommand{\titlefigure}{figure/SMOTE.png}
 \newcommand{\learninggoals}{
-	\item Know the idea of sampling methods for coping with imbalanced data
+	%\item Know the idea of sampling methods for coping with imbalanced data
 	\item Understand the state-of-art oversampling technique SMOTE
 }
 
@@ -21,46 +21,46 @@
 
 \sloppy
 	
-\begin{frame}{Sampling Methods: Overview}
-    \begin{itemize}
+% \begin{frame}{Sampling Methods: Overview}
+%     \begin{itemize}
 
-        \item Balance training data distribution to perform better on minority classes.
+%         \item Balance training data distribution to perform better on minority classes.
         
-        \item Independent of classifier $\leadsto$ very flexible and general.
+%         \item Independent of classifier $\leadsto$ very flexible and general.
 
-        \item Three groups: 
+%         \item Three groups: 
     
-        \begin{minipage}{0.5\textwidth}
+%         \begin{minipage}{0.5\textwidth}
     
-            \begin{itemize} 
+%             \begin{itemize} 
                 
-                \item Undersampling --- Removing majority instances.
+%                 \item Undersampling --- Removing majority instances.
         
-                \item Oversampling --- Adding/Creating new minority instances.
+%                 \item Oversampling --- Adding/Creating new minority instances.
 
-                \item Oversampling is slower than undersampling but usually works better.
+%                 \item Oversampling is slower than undersampling but usually works better.
 
-                \item Hybrid approaches --- Combining undersampling and oversampling.
+%                 \item Hybrid approaches --- Combining undersampling and oversampling.
         
-            \end{itemize}
+%             \end{itemize}
     
-        \end{minipage}
-        \begin{minipage}{0.4\textwidth}
-                \begin{figure}
-                \centering
-                \scalebox{0.8}{\includegraphics{figure/under_oversampling.png}}
-            \end{figure}
-        \end{minipage}
+%         \end{minipage}
+%         \begin{minipage}{0.4\textwidth}
+%                 \begin{figure}
+%                 \centering
+%                 \scalebox{0.8}{\includegraphics{figure/under_oversampling.png}}
+%             \end{figure}
+%         \end{minipage}
 
-    \end{itemize}
+%     \end{itemize}
     
-\end{frame}
+% \end{frame}
 
 
 \begin{frame}{Oversampling: SMOTE}
     \begin{itemize}
         %			
-        \item SMOTE operates by creating \textbf{new synthetic instances} of minority class.
+        \item SMOTE creates \textbf{synthetic instances} of minority class.
 
         \item Interpolate between neighboring minority instances.
 
@@ -72,9 +72,9 @@
 
             \item Find its $k$ nearest minority neighbors.
     
-            \item Randomly select $j$ of these neighbors.
+            \item Randomly select one of these neighbors.
     
-            \item Randomly generate new instances along the lines connecting the minority example and its $j$ selected neighbors.
+            \item Randomly generate new instances along the lines connecting the minority example and its selected neighbor.
     
         \end{itemize}
     \end{itemize}
@@ -135,7 +135,7 @@
 
 \begin{frame}{SMOTE: Visualization continued}	
 
-    For 100 iterations of SMOTE with $K=3$ and randomly selecting neighbors:
+    After 100 iterations of SMOTE for $K=3$ we get:		
 
     \begin{figure}
         \centering
@@ -147,7 +147,8 @@
 \begin{frame}{SMOTE: Example}
     
     \begin{itemize}
-        \item Iris data set with $\Yspace=\{ \texttt{setosa},\texttt{versicolor},\texttt{virginica}  \}$, and 50 instances for each class.
+        \item Iris data set with 3 classes % $\Yspace=\{ \texttt{setosa},\texttt{versicolor},\texttt{virginica}  \}$, 
+        and 50 instances per class.
         
         \item Make the data set ``imbalanced'': 
         \begin{itemize}
@@ -160,8 +161,8 @@
         \centering
         \includegraphics[width=0.9\linewidth]{figure_man/smoted_iris_data_ggplot.pdf}
     \end{figure}
-		
-    The new minority instances slightly increase the difficulty of separating the two classes with a hyperplane.
+
+SMOTE enriches minority class feature space.
 	
 \end{frame}
 
@@ -174,7 +175,7 @@
         
         \item Well-performed among the oversampling techniques and is the basis for many oversampling methods: Borderline-SMOTE, LN-SMOTE, $\ldots$ (over 90 extensions!)
     
-        \item Prone to overgeneralizing as it pays no attention to the majority class.
+        \item Prone to overgeneralizing as it pays no attention to majority class.
 
     \end{itemize}		
 
@@ -184,23 +185,25 @@
 
     \begin{itemize}
     
-        \item Compare different sampling techniques on the Optdigits dataset for optical recognition of handwritten digits.
+        \item Compare different sampling techniques on a binarized version of Optdigits dataset for optical recognition of handwritten digits.
     
-        \item Use random forest with 100 trees, 5-fold cv and employ $F_1$-Score. The pos./neg. class-ratios are 0.11, 0.68, 0.68 and 0.79:
+        \item Use random forest with 100 trees, 5-fold cv, and $F_1$-Score. %The pos./neg. class-ratios are 0.11, 0.68, 0.68, and 0.79:
            \begin{center}
-             \begin{tabular}{lr}
+             \begin{tabular}{lrr}
              \toprule
-             Learner & F1-Score\\
+             Sampling technique & Class ratio &F1-Score\\
              \midrule
-             Base RF & 0.9239\\
-             Undersample RF & 0.9538\\
-             Oversample RF & 0.9538\\
-             SMOTE RF & 0.9576\\
+             None & 0.11 &0.9239\\
+             Undersampling & 0.68 & 0.9538\\
+             Oversampling & 0.69& 0.9538\\
+             SMOTE & 0.79 & 0.9576\\
              \bottomrule
              \end{tabular}    
             \end{center}
             
-        \item Sampling techniques outperform base learner. \item SMOTE leads sampling techniques, although by a small margin.
+        \item Class ratios could be tuned (here done manually).
+        \item Sampling techniques outperform base learner. 
+        \item SMOTE leads sampling techniques, although by a small margin.
 
     \end{itemize}		
 
