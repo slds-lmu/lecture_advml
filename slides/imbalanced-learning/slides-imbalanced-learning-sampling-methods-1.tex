@@ -163,37 +163,37 @@
 % \end{frame}
 	
 	
-\begin{frame}{Undersampling: Condensed Nearest Neighbor (CNN)}
-	
-    \begin{itemize}
-    
-        \item Remove majority instances far away from decision boundary. 
-        \item Construct a \textbf{consistent} subset $\tilde{\D}$ of $\D$. % in terms of the 1-NN classifier. 
-
-        \item A subset $\tilde{\D}$ of $\D$ is called consistent if using a 1-NN classifier on $\tilde{\D}$ classifies each instance in $\D$ correctly.
-
-%     \end{itemize}	
-
-% \end{frame}
-
 % \begin{frame}{Undersampling: Condensed Nearest Neighbor (CNN)}
+	
 %     \begin{itemize}
-        \item Create a consistent subset:
-        
-        \begin{enumerate}
     
-            \item Initialize $\tilde{\D}$ by selecting \textbf{all minority} instances and randomly picking \textbf{one majority} instance.
-    
-            \item Classify each instance in $\D$ with 1-NN classifier based on $\tilde{\D}.$
+%         \item Remove majority instances far away from decision boundary. 
+%         \item Construct a \textbf{consistent} subset $\tilde{\D}$ of $\D$. % in terms of the 1-NN classifier. 
+
+%         \item A subset $\tilde{\D}$ of $\D$ is called consistent if using a 1-NN classifier on $\tilde{\D}$ classifies each instance in $\D$ correctly.
+
+% %     \end{itemize}	
+
+% % \end{frame}
+
+% % \begin{frame}{Undersampling: Condensed Nearest Neighbor (CNN)}
+% %     \begin{itemize}
+%         \item Create a consistent subset:
         
-            \item Remove all misclassified instances from $\D$.
+%         \begin{enumerate}
+    
+%             \item Initialize $\tilde{\D}$ by selecting \textbf{all minority} instances and randomly picking \textbf{one majority} instance.
+    
+%             \item Classify each instance in $\D$ with 1-NN classifier based on $\tilde{\D}.$
+        
+%             \item Remove all misclassified instances from $\D$.
             
-        \end{enumerate}	
+%         \end{enumerate}	
     
-    \end{itemize}
+%     \end{itemize}
     
     
-\end{frame}
+% \end{frame}
 	
 \begin{frame}{Undersampling: Other Approaches}
 
@@ -210,7 +210,8 @@
             \item If $\yi$ is minority class \emph{and} 3-NN classifies it as majority $\leadsto$ Remove 3 nearest neighbors from $\D$.
         
         \end{enumerate} 
-    
+
+    \item Condensed Nearest Neighbor (CNN): Construct a \textbf{minimally consistent} subset $\tilde{\D}$ of $\D$.
         \item One-sided selection (OSS): Tomek link + CNN
 
         \item CNN + Tomek link: to reduce computation of finding Tomek links $\leadsto$ first use CNN and then remove the Tomek links.
