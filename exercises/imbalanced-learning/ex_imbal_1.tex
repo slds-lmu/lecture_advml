@@ -78,6 +78,7 @@
 \usepackage{bm}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
+\usepackage{bbm}
 
 
 \input{../../style/common}
@@ -288,6 +289,25 @@
 	\item What are the population counterparts of the class-specific variants in the multiclass setting of true positive rate, positive predictive value and true negative rate?
   
 \end{enumerate}
+}
+
+\aufgabe{Minimum Expected Cost Principle}{
+
+    Given a cost matrix $\mathbf{C}$
+    \begin{center}
+        \begin{tabular}{c c | c c}
+            \multirow{2}{*}{} & \multirow{2}{*}{} & \multicolumn{2}{c}{True class} \\
+                & & $y=1$ & $y = -1$ \\
+            \hline
+            Predicted & $\yh = 1$ & $C(1, 1) = 0$ & $C(1, -1) = 1$ \\
+            class    & $\yh = -1$ & $C(-1, 1) = \frac{n_{-}}{n_{+}}$ & $C(-1, -1) = 0$ \\
+        \end{tabular}
+    \end{center}
+    where $n_{+}, n_{-}$ denote the number of testing samples with label $1$ and $-1$, respectively. We further assume that we have knowledge of $p(\cdot | \xv)$. According to the Minimum Expected Cost Principle, $\xv$ as class $1$ if 
+    \begin{align*}
+        \E_{K\sim p(\cdot | \xv)} (C(1, K)) \leq \E_{K\sim p(\cdot | \xv)} (C(-1, K)).
+    \end{align*}
+    This yields the optimal threshold $c^*$ for the probabilitic classifier $h(\xv) = 2 \cdot \mathbbm{1}_{[\pi(\xv) \geq c^*]} - 1$. If we recompute the optimal threshold for $h(\xv)$ on a more imbalanced dataset with larger $n_{-} / n_{+}$, how will the testing PPV and TPR change?
 }
 
 
