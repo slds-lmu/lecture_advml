@@ -307,11 +307,13 @@
     \begin{align*}
         \E_{K\sim p(\cdot | \xv)} (C(1, K)) \leq \E_{K\sim p(\cdot | \xv)} (C(-1, K)).
     \end{align*}
-    This yields the optimal threshold $c^*$ for the probabilitic classifier $h(\xv) = 2 \cdot \mathbbm{1}_{[\pi(\xv) \geq c^*]} - 1$. If we recompute the optimal threshold for $h(\xv)$ on a more imbalanced dataset with larger $n_{-} / n_{+}$, how will the testing PPV and TPR change?
+    This yields the optimal threshold $c^*$ for the probabilitic classifier $h(\xv) = 2 \cdot \mathbbm{1}_{[\pi(\xv) \geq c^*]} - 1$. If we append more samples of class $-1$ to the test set and recompute the optimal threshold for $h(\xv)$, how will PPV and TPR change?
+    
 }
 
 
 \aufgabe{MetaCost}{
+
     Implement the MetaCost algorithm and use it with some classifier of your choice on an imbalanced data set of your choice, where the cost-matrix is given by the cost-sensitive heuristic we saw in the lecture. Compare the confusion matrices of the underlying classifier and the MetaCost classifier as well as their total costs.
 }
 
