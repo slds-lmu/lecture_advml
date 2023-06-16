@@ -23,9 +23,13 @@
 \usetikzlibrary{shapes.misc}
 
 
-\newcommand{\titlefigure}{figure/mean_relation}
+\newcommand{\titlefigure}{figure/Slide5}
 \newcommand{\learninggoals}{
-  \item Know how to leveraging and constucting the target similarity in multi-target learning
+  \item Kronecker kernel ridge regression
+  \item Graph relations in targets
+  \item Probabilistic classifier chains
+  \item Low-Rank approximations
+  
 %  \item 
 }
 
@@ -55,7 +59,7 @@
     			f(\xv,\tv) = \bm\omega^\top \left(\phi(\xv) \otimes \psi(\tv) \right) ,
     		\end{equation*}
     
-    	where $\phi$ is feature mapping for features and $\psi$ is feature mapping for target (features) and $\otimes$ is Kronecker product. \textbf{TODO: Define $\tv$}
+    	where $\phi$ is feature mapping for features and $\psi$ is feature mapping for target (features) and $\otimes$ is Kronecker product. 
     
     	\item This yields Kronecker product pairwise kernel in the dual:
     	
@@ -81,14 +85,14 @@
 
 
 
-\begin{frame}{Exploiting relations in regularization terms}
+\begin{frame}{Exploiting relations in regularization}
 
 	\begin{center}
 		\includegraphics[width=0.65\textwidth]{figure/targetrelations}
 	\end{center} 
 
 	\begin{itemize}
-		\item Graph-based regularization for tree-type relations in targets: 
+		\item Graph-based regularization for graph-type relations in targets: 
 
 		\begin{equation*}
 			\min_\Theta \|Y - \Phi \Theta \|^2_F + \lambda \sum_{m=1}^l \sum_{m' \in \mathcal{N}(m)} \|\thetab_m - \ \thetab_{m'}\|^2,
@@ -97,7 +101,7 @@
 		where $\mathcal{N}(j)$ is the set of targets related to target $j.$
         \item The graph or tree is given as prior information.
 		
-		\item Can be extended to a weighted version aware of the similarities (or correlations).
+		\item Can be extended to a weighted version aware of the similarities
 	
 	\end{itemize}
 
@@ -137,7 +141,7 @@
 		$$
 		\P(\yv ~|~ \xv) = \prod_{j=m}^{l} \P(y_m ~|~ \xv, y_1, \ldots,y_{m-1}) \, .
 		$$
-		\item  Learning relies on constructing \alert{probabilistic classifiers} for estimating 
+		\item  Learning relies on constructing \alert{probabilistic classifiers} for
 		$$
 		\P( y_m|\xv, y_1, \ldots,y_{m-1}) \,,
 		$$
@@ -191,7 +195,7 @@
 	
 	\begin{itemize}\small
 		\item For subset 0/1 loss one needs to find $
-		\fbayes(\xv) = \argmax_{\yv} \P(\yv ~|~ \xv)
+		h(\xv) = \argmax_{\yv} \P(\yv ~|~ \xv)
 		$.
 		\item Greedy and approximate search techniques with guarantees exist.
 %		\footnote{Kumar et al., Beam search algorithms for multilabel
@@ -211,8 +215,8 @@
 	\end{center}
 
 	\begin{itemize}
-		\item Low rank materializes the idea that some structure is shared across different targets.
-		\item Typically perform a low-rank approximation of the parameter matrix:
+		\item Low rank = some structure is shared across targets
+		\item Typically perform low-rank approx of param matrix:
 		$$\min_\Theta \|Y - \Phi \Theta \|^2_F + \lambda \, \mathrm{rank}(\Theta)$$
 	\end{itemize}
 	{\tiny Chen et al., A convex formulation for learning shared structures from
@@ -240,18 +244,18 @@
 	
 \end{frame}
 
-\begin{frame}{Overview of methods}
+% \begin{frame}{Overview of methods}
 	
-	\begin{itemize}
-		\item Popular for multi-output regression, multi-task learning and multi-label classification.
-		\item Linear as well as nonlinear methods.
-		\item Algorithms: 
-		\begin{itemize}
-			\item Principal component analysis, Canonical correlation analysis, Partial least squares.
-			\item Singular value decomposition, Alternating structure optimization.
-			\item Compressed sensing, Output codes, Landmark labels, Bloom filters, Auto-encoders.
-		\end{itemize}
-	\end{itemize}
+% 	\begin{itemize}
+% 		\item Popular for multi-output regression, multi-task learning and multi-label classification.
+% 		\item Linear as well as nonlinear methods.
+% 		\item Algorithms: 
+% 		\begin{itemize}
+% 			\item Principal component analysis, Canonical correlation analysis, Partial least squares.
+% 			\item Singular value decomposition, Alternating structure optimization.
+% 			\item Compressed sensing, Output codes, Landmark labels, Bloom filters, Auto-encoders.
+% 		\end{itemize}
+% 	\end{itemize}
 %   \footnote{Weston et al., Kernel dependency estimation, NIPS 2002}
 % 	\footnote{Multi-label prediction via sparse infinite CCA, NIPS 2009}
 %\footnote{Tai and Lin, Multilabel classification with principal label space transformation, Neural Computation 2012}
@@ -264,7 +268,7 @@
 %	classification tasks, NIPS 2013}
 % 	\footnote{Wicker et al., A nonlinear label compression and transformation
 %	method for multi-label classification using autoencoders, PAKDD 2016}
-\end{frame}
+%\end{frame}
 
 
 %
