@@ -9,7 +9,7 @@
 \newcommand{\titlefigure}{figure/Slide2}
 \newcommand{\learninggoals}{
   \item Understand the practical relevance of multi-target prediction problems
-  \item Know the relevant special cases of multi-target prediction
+  \item Know relevant special cases of multi-target prediction
   \item Understand the difference between inductive and transductive learning problems
 }
 
@@ -54,102 +54,110 @@
 
 \begin{frame}{Multi-target prediction: Characteristics}
 
-    Characterized by instances $\xv \in \Xspace$ and targets $m \in [1, 2, \ldots, l]$ with following properties: 
+    Characterized by instances $\xv \in \Xspace$ and targets $m \in \{1, 2, \ldots, l\}$ with following properties: 
 
     \begin{itemize} \small
 
-        \item A training set $\D = \{(\xi, \yim)\}_{i=1}^n$, where $\yim \in \Yspace_m$ is label for target $m$.  
-        
-        \item $n$ instances and $l$ targets $\leadsto$ Scores $\yim$ can be arranged in an $n \times l$ matrix $Y$. Note $Y$ may have missing values.
+        %\item A training set $\D = \{(\xi, \yim)\}_{i=1}^n$, where $\yim \in \Yspace_m$ is label for target $m$.  
 
-        \item Label space $\Yspace_m$ can be nominal, ordinal or real-valued.  
+        \item A training set $\D = \{(\xi, \yv^{(i)})\}_{i=1}^n$, where $\yv^{(i)} = (\yi_1, \dots, \yi_l)$, with $\yim \in \Yspace_m$ is label for target $m$.  
+      
+        \item $n$ instances and $l$ targets $\leadsto$ Labels $\yim$ can be arranged in an $n \times l$ matrix $\bm{Y}$. Note $\bm{Y}$ may have missing values.
+
+        \item Target spaces $\Yspace_m$ can be nominal, ordinal or real-valued.  
     
-        \item Goal: to predict scores for any pair $(\xv, m) \in \Xspace \times [1, 2, \ldots, l]$.  
+        \item Goal: predict scores for any pair $(\xv, m) \in \Xspace \times \{1, 2, \ldots, l\}$.  
     
     \end{itemize}
 In conventional MTP setting: no available side information for targets. 
 \end{frame}
 
-\section{Special Cases of Multi-target Prediction}
+%\section{Special Cases of Multi-target Prediction}
 
 \begin{frame}{Multivariate regression}
-    \begin{itemize}
-        \item $|\Tspace|=l$ $\leadsto$ all targets are observed during training. 
+    %\begin{itemize}
+        %\item $|\Tspace|=l$ $\leadsto$ all targets are observed during training. 
+%        \item All targets are observed during training. 
+     Target space $\Yspace_m = \mathbb{R} \  \forall m \in \{1, 2, \ldots, l\}$ . 
 
-        \begin{minipage}{0.45\textwidth}    
+
+%        \begin{minipage}{0.45\textwidth}    
         
-            \item The score set is $\Yspace = \mathbb{R}$. 
+  %          \item The target space is $\Yspace_m = \mathbb{R} \  \forall m $ . 
 
-            \item No side information is available for targets. We can re-index the targets with $\tv = (1, 2, \ldots, l)^T$. 
-        \end{minipage}
-        \hfill
-        \begin{minipage}{0.45\textwidth}    
+            %\item No side information is available for targets. We can re-index the targets with $\tv = (1, 2, \ldots, l)^T$. 
+ %       \end{minipage}
+   %     \hfill
+    %    \begin{minipage}{0.45\textwidth}    
             \begin{center} 	
-            \includegraphics[width=0.99\textwidth,trim = 0 0 100 100,clip]{figure/Slide1} 	\tiny
+            \includegraphics[width=0.7\textwidth,trim = 0 0 100 100,clip]{figure/Slide1} 	\tiny
             \\ Waegeman et al. (2019), Multi-target prediction:
             A unifying view on problems and methods (\href{https://arxiv.org/pdf/1809.02352.pdf}{\underline{URL}}).
 
             \end{center}
-        \end{minipage}
-    \end{itemize}
+     %   \end{minipage}
+    %\end{itemize}
 
-	Example: Predict whether a protein (rows) will bind to a set of experimentally developed small molecules (columns).
+	Example: Predict binding strength between proteins (rows) and molecules (columns).
 %
 \end{frame}
 
 
 
 \begin{frame}{Multi-label classification}
-	\begin{itemize}
+Target space $\Yspace_m = \{0,1\} \  \forall m \in \{1, 2, \ldots, l\}$
+ %\begin{itemize}
 
-        \begin{minipage}{0.45\textwidth}  
-            \item All targets are observed during training.
+  %       \begin{minipage}{0.45\textwidth}  
+  %           \item All targets are observed during training.
             
-            \item No side information is available for targets. 
+  %           \item No side information is available for targets. 
 
-			\item The score matrix $Y$ has no missing values. 	
+		% %	\item The score matrix $Y$ has no missing values. 	
 
-			\item $\Yspace_m = \{0,1\}$ for all $m$.	
-		\end{minipage}
-        \hfill
-		\begin{minipage}{0.45\textwidth}    
+		% 	%\item $\Yspace_m = \{0,1\}$ for all $m$.	
+  %  Target space $\Yspace_m = \{0,1\} \  \forall m \in \{1, 2, \ldots, l\}$
+		% \end{minipage}
+  %       \hfill
+		%\begin{minipage}{0.45\textwidth}    
 		\begin{center}
-			\includegraphics[width=0.9\textwidth,trim = 0 0 100 100,clip]{figure/Slide2} \tiny
+			\includegraphics[width=0.7\textwidth,trim = 0 0 100 100,clip]{figure/Slide2} \tiny
 			\\ Waegeman et al. (2019), Multi-target prediction:
 			A unifying view on problems and methods (\href{https://arxiv.org/pdf/1809.02352.pdf}{\underline{URL}}).
 		\end{center}
-		\end{minipage}
-	\end{itemize}	
+		%\end{minipage}
+	%\end{itemize}	
 
-	Example: Assign for documents (rows) the appropriate category tags (columns).
+	Example: Assign documents (rows) to category tags (columns).
 
 \end{frame}
 
 
 \begin{frame}{Label ranking}
-    In \emph{label ranking}, each instance is associated with a ranking of targets. 
+    In \emph{label ranking}, each instance is associated with a ranking of targets. \\
+    $\Yspace_m = \{1, \ldots , l\} \ \forall m$, and labels (i.e., ranks) $\yim \neq y_{k}^{(i)} \forall m \neq k$. 
 
-		\begin{itemize}
+		% \begin{itemize}
 			
-			\begin{minipage}{0.45\textwidth}    
-                \item All targets are observed during training. 
+		% 	\begin{minipage}{0.45\textwidth}    
+  %               \item All targets are observed during training. 
 
-    			\item No side information is available for targets. 		
+  %   			\item No side information is available for targets. 		
                 
-    			\item $Y$ has no missing values. 
+  %   			\item $Y$ has no missing values. 
                 
-    			\item $\Yspace_m = \{1, \ldots , l\}$ for all $m$, and the scores (i.e. ranks) $\yim \neq y_{k}^{(i)}$ for all $1 \leq m,k \neq l$. 
-			\end{minipage}
-            \hfill
-			\begin{minipage}{0.45\textwidth}    
+  %   			\item $\Yspace_m = \{1, \ldots , l\}$ for all $m$, and the scores (i.e. ranks) $\yim \neq y_{k}^{(i)}$ for all $1 \leq m,k \neq l$. 
+		% 	\end{minipage}
+  %           \hfill
+		% 	\begin{minipage}{0.45\textwidth}    
     			\begin{center}
-                    \includegraphics[width=0.9\textwidth,trim = 0 0 100 0,clip]{figure/labelranking} \tiny
+                    \includegraphics[width=0.7\textwidth,trim = 0 0 100 0,clip]{figure/labelranking} \tiny
     				\\ Waegeman et al. (2019), Multi-target prediction:
     				A unifying view on problems and methods (\href{https://arxiv.org/pdf/1809.02352.pdf}{\underline{URL}}).
      	
     			\end{center}
-	        \end{minipage}
-		\end{itemize}
+%	        \end{minipage}
+%		\end{itemize}
   
 	Example: Predict for users (rows) their preferences over specific activities (columns).
 	
@@ -162,13 +170,13 @@ In conventional MTP setting: no available side information for targets.
 			
 			\begin{minipage}{0.45\textwidth}  
 
-                \item \textbf{Not all targets are relavent for all instances}. E.g. a student may only attend one school, other labels are \textbf{irrelavent}.
+                \item \textbf{Not all targets are relevent for all instances}. E.g., a student may only attend one school, other labels are \textbf{irrelavent}.
                 
-                \item All targets are observed during training.
+%                \item All targets are observed during training.
 
-			    \item No side information is available for targets. 
+%			    \item No side information is available for targets. 
        
-				\item Label space is homogenous across columns of $Y$, e.g., $\Yspace_m = \{0,1\}$ or $\Yspace_m = \R$ for all $m$.
+				\item Label space is homogenous across columns of $\bm{Y}$, e.g., $\Yspace_m = \{0,1\}$ or $\Yspace_m = \R$ for all $m$.
 
 			\end{minipage}
             \hfill
@@ -189,9 +197,9 @@ In conventional MTP setting: no available side information for targets.
 
 		\begin{itemize}
             \item It is also possible when the $m$-th task is multiclass classification. That is, $f(\xv)_m \in \R^{g_m}$ is the probability predictions for $g_m$ classes. \\
-            $\leadsto$ The techniques for multi-target learning are also applicalble under this setting. But the notations will be cumbersome, so we will not cover it.
+            $\leadsto$ The techniques for multi-target learning are also applicable under this setting, notation becomes cumbersome.
 
-            \item Label space can be inhomogeneous. E.g. $\Yspace_m = \{0, 1\}$ and $\Yspace_k = \R$. \\
+            \item Target space can be inhomogeneous, e.g. $\Yspace_m = \{0, 1\}$ and $\Yspace_k = \R$. \\
             $\leadsto$ A mixture of multi-label classification and multivariate regression.
             
 		\end{itemize}
@@ -199,16 +207,16 @@ In conventional MTP setting: no available side information for targets.
 \end{frame}
 
 
-\section{Learning with Side Information on Targets}
+%\section{Learning with Side Information on Targets}
 
 
 \begin{vbframe}{Side information on targets}
     \begin{itemize}
-        \item In some applications additional side information about targets is available.
-        \item Examples: 
-        \begin{itemize}
+        \item Sometimes, additional side information about targets is available.
+%        \item Examples: 
+ %       \begin{itemize}
             \begin{minipage}{0.45\textwidth}    
-                \item Extra representation for the target molecules in drug design application (\emph{structured representation}).
+                \item Extra representation for target molecules in drug design (\emph{structured representation}).
             \end{minipage}
             \hfill
             \begin{minipage}{0.4\textwidth}    
@@ -237,13 +245,13 @@ In conventional MTP setting: no available side information for targets.
                     \\ Waegeman et al. (2019), Multi-target prediction: A unifying view on problems and methods (\href{https://arxiv.org/pdf/1809.02352.pdf}{\underline{URL}}).	
                 \end{center}
             \end{minipage}
-        \end{itemize}
+        %\end{itemize}
         
         \item Such problems are referred to as dyadic or link  prediction.
         
-        \item Such problems fulfill the four properties of MTP setting.
+%        \item Such problems fulfill the four properties of MTP setting.
         
-        \item Scores $\yim$ can be arranged in a matrix $Y$, which is often sparse. 
+        \item Labels $\yim$ can be arranged in a matrix $\bm{Y}$, which is often sparse. 
         
         \item Thus, \emph{dyadic prediction} can be seen as \emph{multi-target prediction with target features}. 
     \end{itemize}
@@ -254,7 +262,7 @@ In conventional MTP setting: no available side information for targets.
 	\begin{itemize} 
 		\item In previous problems, 
 		\begin{enumerate}
-			\item predictions need be be generated for novel instances, 
+			\item predictions need to be generated for novel instances, 
 			\item targets are known beforehand and observed during training.
 		\end{enumerate}
 		\item These problems are \emph{inductive} w.r.t.\ instances and \emph{transductive} w.r.t.\ targets.
@@ -285,7 +293,7 @@ In conventional MTP setting: no available side information for targets.
 	\begin{itemize}
 		\item Setting A --- transductive w.r.t. targets and instances. Goal: predict missing values of score matrix (\emph{matrix completion}).
 
-		\item Setting B --- transductive w.r.t.\ targets and inductive w.r.t. instances.
+		\item Setting B --- transductive w.r.t.\ targets and inductive w.r.t. instances (\emph{classical supervised learning}).
 
 	\end{itemize}
 
