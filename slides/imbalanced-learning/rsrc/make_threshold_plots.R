@@ -31,7 +31,7 @@ for (j in 1:length(learners)) {
     th = list(thresholds = num[i])
     # fit models and evaluate with the cost measure
     if(j == 2){
-    learner = as_learner(po("encode") %>>% lrn(learners[j], predict_type = "prob") %>>%
+    learner = as_learner(po("encode") %>>% lrn(learners[j], nrounds = 300, predict_type = "prob") %>>%
                            po("threshold", param_vals = th))
     }else{
     learner = as_learner(lrn(learners[j], predict_type = "prob") %>>%
@@ -60,9 +60,9 @@ plot_log = ggplot(data=out[[1]], aes(x=num, y=cost, group=1)) +
   labs(x = "threshold") +
   ggtitle("Logistic Regression") +
   geom_point(data = emp_min[[1]], color = "blue") +
-  geom_text(x=0.75, y=275, label="Empirical min (0.76, 155)", color = "blue", size = 4) +
+  geom_text(x=0.75, y=275, label="Empirical min (0.76, 147.33)", color = "blue", size = 4) +
   geom_point(data = theo_min[[1]], color = "orange") +
-  geom_text(x=0.75, y=250, label="Theoretical min (0.75, 157.33)", color = "orange", size = 4) +
+  geom_text(x=0.75, y=250, label="Theoretical min (0.75, 148.33)", color = "orange", size = 4) +
   geom_segment(aes(x = 0.76, y = 125, xend = 0.76, yend = 240), linetype="dashed", color = "blue", size=0.75) +
   geom_segment(aes(x = 0.75, y = 125, xend = 0.75, yend = 240), linetype="dashed", color = "orange", size=0.75) +
   theme(plot.title = element_text(hjust = 0.5))
@@ -73,10 +73,10 @@ plot_xgboost = ggplot(data=out[[2]], aes(x=num, y=cost, group=1)) +
   labs(x = "threshold") +
   ggtitle("XGBoost") +
   geom_point(data = emp_min[[2]], color = "blue") +
-  geom_text(x=0.75, y=275, label="Empirical min (0.62, 171.67)", color = "blue", size = 4) +
+  geom_text(x=0.75, y=275, label="Empirical min (0.97, 152.67)", color = "blue", size = 4) +
   geom_point(data = theo_min[[2]], color = "orange") +
-  geom_text(x=0.75, y=250, label="Theoretical min (0.75, 233.33)", color = "orange", size = 4) +
-  geom_segment(aes(x = 0.62, y = 150, xend = 0.62, yend = 240), linetype="dashed", color = "blue", size=0.75) +
+  geom_text(x=0.75, y=250, label="Theoretical min (0.75, 169.33)", color = "orange", size = 4) +
+  geom_segment(aes(x = 0.97, y = 150, xend = 0.97, yend = 240), linetype="dashed", color = "blue", size=0.75) +
   geom_segment(aes(x = 0.75, y = 150, xend = 0.75, yend = 240), linetype="dashed", color = "orange", size=0.75) +
   theme(plot.title = element_text(hjust = 0.5))
 
@@ -86,10 +86,10 @@ plot_ranger = ggplot(data=out[[3]], aes(x=num, y=cost, group=1)) +
   labs(x = "threshold") +
   ggtitle("Random Forest") +
   geom_point(data = emp_min[[3]], color = "blue") +
-  geom_text(x=0.75, y=275, label="Empirical min (0.72, 138.33)", color = "blue", size = 4) +
+  geom_text(x=0.75, y=275, label="Empirical min (0.68, 142.33)", color = "blue", size = 4) +
   geom_point(data = theo_min[[3]], color = "orange") +
-  geom_text(x=0.75, y=250, label="Theoretical min (0.75, 142.33)", color = "orange", size = 4) +
-  geom_segment(aes(x = 0.72, y = 125, xend = 0.72, yend = 240), linetype="dashed", color = "blue", size=0.75) +
+  geom_text(x=0.75, y=250, label="Theoretical min (0.75, 153)", color = "orange", size = 4) +
+  geom_segment(aes(x = 0.68, y = 125, xend = 0.68, yend = 240), linetype="dashed", color = "blue", size=0.75) +
   geom_segment(aes(x = 0.75, y = 125, xend = 0.75, yend = 240), linetype="dashed", color = "orange", size=0.75) +
   theme(plot.title = element_text(hjust = 0.5))
 
