@@ -455,7 +455,9 @@ Implement the MetaCost algorithm and use it with some classifier of your choice 
 
 \hlcom{#  we use CART as the black-box classifier}
 \hlstd{classifier}  \hlkwb{=} \hlstr{"classif.rpart"}
+\hlcom{#  bag size}
 \hlstd{B}           \hlkwb{=} \hlkwd{round}\hlstd{(n}\hlopt{/}\hlnum{4}\hlstd{)}
+\hlcom{#  number of bagging iterations}
 \hlstd{L}           \hlkwb{=} \hlnum{10}
 
 \hlcom{# 1st phase: Bagging}
