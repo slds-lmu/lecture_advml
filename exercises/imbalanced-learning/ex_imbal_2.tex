@@ -80,6 +80,7 @@
 \usepackage{algpseudocode}
 
 
+
 \input{../../style/common}
 
 \tcbset{enhanced}
@@ -243,51 +244,44 @@
 
 
 \begin{document}
-% !Rnw weave = knitr
-
 
 
 \input{../../latex-math/basic-math.tex}
 \input{../../latex-math/basic-ml.tex}
 
-\kopfaml{9}{Imbalanced Learning}
+\kopfaml{10}{Imbalanced Learning}
 
-\aufgabe{Performance Measures}{
+\aufgabe{Cost Curves}{
 
+Given the following table of FPR and TPR obtained from two classifiers
 
-\newcommand{\sens}{\mathbf{A}} % vector x (bold)
-\newcommand{\ba}{\mathbf{a}}
-\newcommand{\batilde}{\tilde{\mathbf{a}}}
-\newcommand{\Px}{\mathbb{P}_{x}} % P_x
-\newcommand{\Pxj}{\mathbb{P}_{x_j}} % P_{x_j}
-\newcommand{\indep}{\perp \!\!\! \perp} % independence symbol
+\begin{table}[h]
+    \centering
+    \begin{tabular}{c | c | c}
+        \hline
+        FPR & TPR of Classifier 1 & TPR of Classifier 2\\
+        \hline
+        0.0 & 0.000 & 0.000 \\
+        0.1 & 0.600 & 0.200 \\
+        0.2 & 0.750 & 0.400 \\
+        0.3 & 0.825 & 0.600 \\
+        0.4 & 0.850 & 0.800 \\
+        0.5 & 0.875 & 0.925 \\
+        0.6 & 0.900 & 0.960 \\
+        0.7 & 0.925 & 0.980 \\
+        0.8 & 0.950 & 0.990 \\
+        0.9 & 0.975 & 0.995 \\
+        1.0 & 1.000 & 1.000\\
+        \hline
+    \end{tabular}
+\end{table}
 
-
-%
 \begin{enumerate}
-	%
-	\item Given the following confusion matrices 
-%	
-	$$	M_1 = \begin{pmatrix}
-		0 & 10 \\
-		0 & 990
-	\end{pmatrix}, \quad 	
-	M_2 = \begin{pmatrix}
-		10 & 0 \\
-		10 & 980
-	\end{pmatrix},  \quad 	
-	M_3 = \begin{pmatrix}
-	10 & 10 \\
-	0 & 980
-	\end{pmatrix},	$$
-%
-	each of which corresponds to a classifier.
-%	
-	Compute the accuracy, $F_1$ score, G measure/mean, BAC and MCC of each classifier.
-	%		
-	\item What are the population counterparts of the class-specific variants in the multiclass setting of true positive rate, positive predictive value and true negative rate?
-  
+    \item Implement a function \texttt{draw\_roc\_curves} to draw the ROC curves of Classifier 1 and Classifier 2.
+    \item Implement a function \texttt{draw\_cost\_curves} to draw the cost curves of Classifier 1 and Classifier 2.
+    \item By inspecting the plotted cost curves, in what range of probability of positive ($\pi_{+}$) is Classifier 1 better than Classifier 2?
 \end{enumerate}
+
 }
 
 
