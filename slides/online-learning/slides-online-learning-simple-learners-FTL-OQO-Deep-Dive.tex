@@ -1,0 +1,404 @@
+\documentclass[11pt,compress,t,notes=noshow, xcolor=table]{beamer}
+\input{../../style/preamble}
+\input{../../latex-math/basic-math}
+\input{../../latex-math/basic-ml}
+\input{../../latex-math/ml-online}
+
+\usepackage{multicol}
+
+\newcommand{\titlefigure}{figure/FTL_illustration}
+\newcommand{\learninggoals}{
+	\item Prove that FTL works for online quadratic optimization problems
+	%  \item Get to know the FTRL algorithm as a stable alternative
+}
+
+\title{Advanced Machine Learning}
+\date{}
+
+\begin{document}
+	
+	\lecturechapter{Follow the leader for OQO problems}
+	\lecture{Advanced Machine Learning}
+	
+	
+	
+	\sloppy
+
+
+
+
+\begin{frame} 
+\frametitle{FTL for OQO problems}
+%	
+\footnotesize
+%
+\begin{itemize}
+	%		
+	\item One popular instantiation of the online learning problem is the problem of \emph{online quadratic optimization} (OQO).
+	%		
+	\item In its most general form, the loss function is thereby defined as 
+	%	
+	\begin{align*}
+		%		 \label{defi_loss_quadratic_optim}
+		%		
+		\l(a_t,z_t) =  \frac12 \norm{a_t-z_t}^2,
+		%		
+	\end{align*}
+	%	
+	where $\Aspace,\Zspace \subset \R^d.$ 
+	%		
+	%		
+	\item  {\visible<1->{ \textbf{Proposition:}
+			%	
+			Using FTL on any online quadratic optimization problem with $\Aspace = \mathbb{R}^d$ and $V = \sup\limits_{z \in \Zspace} \norm{z}$, leads to a regret of  
+			%	 
+			\begin{equation*}
+				%	
+				R_T^{\FTL}  \leq 4V^2 \, (\log(T) + 1 ).
+				%		
+	\end{equation*} }}
+	%
+	\item []
+	%	
+	
+\end{itemize}
+%	
+\end{frame}
+
+
+\begin{frame} 
+	\frametitle{FTL for OQO problems: Analysis}
+	%	
+	\small
+	\begin{itemize}		
+		
+		\item \textbf{Proof:}
+		%	
+		\begin{itemize}
+				%				
+				\item In the following, we denote  $a_1^{\FTL}, a_2^{\FTL}, \ldots$  simply by  $a_1, a_2, \ldots$  	
+				%		
+				\pause
+				\fbox{\begin{minipage}{0.9\textwidth}
+						\begin{align*}
+					%	
+						&\mbox{\textbf{Reminder (Useful Lemma):} \qquad } \\
+						&R_T^{\FTL} {\color{black} \leq}    {\color{black} \sum\nolimits_{t=1}^T \l(a_t^{\FTL},z_t) }-  {\color{black}\sum\nolimits_{t=1}^T  \l(a_{t+1}^{\FTL},z_t)}
+					%	
+				\end{align*}
+				\end{minipage}
+				}
+				
+				\pause	
+				 \item  Using this lemma, we just have to show that
+				%
+				\begin{align} \label{ineq_help_FTL_quadr}
+						%	
+						\sum\limits_{t=1}^T \left(\l(a_t,z_t) - \l(a_{t+1},z_t)  \right) \leq 4L^2 \cdot \left(\log(T) + 1 \right).
+						%	
+					\end{align}
+				%						
+%				since $R_T^{\FTL} \stackrel{{\color{blue} \mbox{Lemma}}}{\leq} \sum\nolimits_{t=1}^T \left(\l(a_t,z_t) - \l(a_{t+1},z_t)  \right).$ 
+				%	
+				\pause			
+				 \item So, we will prove (\ref{ineq_help_FTL_quadr}).
+				%				
+				For this purpose, we compute the explicit form of the actions of FTL for this type of online learning problem.
+				%				
+			\end{itemize}
+		%		
+	\end{itemize}
+\end{frame}
+%
+%
+\begin{frame} 
+	\frametitle{FTL for OQO problems: Analysis}
+	%	
+	\small
+	\begin{itemize}	
+		%	
+		\item[]
+		\begin{itemize}	 \small
+				%				
+				\item Claim: It holds that $a_t = \frac{1}{t - 1} \cdot \sum\nolimits_{s = 1}^{t-1} z_s,$ if $\l(a,z)=\frac12\norm{a-z}^2 .$ 
+				%			
+				\pause	
+				\begin{itemize} \small
+						%				
+						 \item	Recall that $$a_t^{\FTL} = \argmin_{a \in \mathcal{A}} \sum_{s=1}^{t-1} \l(a,z_s)  = \argmin_{a \in \mathcal{A}} \sum_{s=1}^{t-1} \frac12 \norm{a - z_s}^2. $$
+						%		
+						\pause				
+						 \item So, we have to find the minimizer of the function $$f(a):= \sum_{s=1}^{t-1} \frac12 \norm{a - z_s}^2  =   \sum_{s=1}^{t-1} \frac12 (a - z_s)^\top (a-z_s).$$
+						%		
+						\pause				
+						 \item Compute  $\nabla f(a) = \sum_{s=1}^{t-1}  a  - z_s =  (t-1) a  - \sum_{s=1}^{t-1} z_s,$ which we set to zero and solve with respect to $a$ to obtain the claim.\\
+						%
+						{\tiny ($f$ is convex, so that this leads indeed to a minimizer.)}
+						%	
+						%				
+					\end{itemize} 
+				%				
+			\end{itemize}
+		%		
+	\end{itemize}
+\end{frame}
+%
+%
+\begin{frame} 
+	\frametitle{FTL for OQO problems: Analysis}
+	%	
+	\small
+	\begin{itemize}	
+		%	
+		\item[]
+		\begin{itemize}	 
+				%
+				\item Hence, $a_t$ is the empirical average of $z_1, \ldots, z_{t-1}$ and we can provide the following incremental update formula for its computation
+				%
+				\begin{equation*}
+						%
+						\begin{split}
+								%	
+								a_{t+1} = \tfrac{1}{t} \cdot \sum\limits_{s = 1}^{t} z_s
+								%	
+								&= \tfrac{1}{t}\left(z_t + \sum\limits_{s = 1}^{t-1} z_s \right)  \\
+%								
+								&= \tfrac{1}{t}(z_t + (t-1) a_t) 
+								%	
+								 =  \tfrac{1}{t} z_t + \left(1 - \tfrac{1}{t} \right)  a_t.
+								%	
+							\end{split}
+						%
+					\end{equation*} 
+				%
+				%
+				\pause
+				 \item From the last display we derive that
+				%
+				\begin{equation*}
+						%	
+						\begin{split}
+								% 
+								a_{t+1} - z_t = \left(1 - \tfrac{1}{t} \right) \cdot a_t + \tfrac{1}{t} z_t - z_t = \left(1 - \tfrac{1}{t} \right) \cdot (a_t - z_t).
+								%
+							\end{split}
+						%	
+					\end{equation*}
+				%	
+				\pause		
+				 \item Claim:
+				%
+				\begin{align*} 
+						%				\label{help_ineq_FTL_analysis}
+						%	
+						\l(a_t,z_t) - \l(a_{t+1},z_t) \leq \tfrac{1}{t} \cdot \norm{a_t - z_t}^2. \tag{2}
+						%	
+					\end{align*}
+				%	
+			\end{itemize}
+		%
+	\end{itemize}
+\end{frame}
+
+
+\begin{frame} 
+	\frametitle{FTL for OQO problems: Analysis}
+	%	
+	
+	\fbox{\begin{minipage}{0.99\textwidth}
+					\begin{equation*}
+		%	
+		\begin{split}
+			% 
+			\mbox{\textbf{Reminder:} \quad }	a_{t+1} - z_t = \left(1 - \tfrac{1}{t} \right) \cdot (a_t - z_t).
+			%
+		\end{split}
+		%	
+	\end{equation*}
+\end{minipage}
+}
+	
+	\small
+	\begin{itemize}	
+		%	
+		\item[]
+		\begin{itemize}	 
+				%
+				\item Indeed, this can be seen as follows
+				%
+				{\footnotesize
+						\begin{align*}
+								%
+								\l(a_t,z_t) - \l(a_{t+1},z_t) 
+								%
+								&= \tfrac{1}{2}\norm{a_t - z_t}^2 - \frac{1}{2}\norm{a_{t+1} - z_{t}}^2 \\
+								%
+								 &= \tfrac{1}{2} \left( \norm{a_t - z_t}^2 - \norm{a_{t+1} - z_{t}}^2 \right) \\
+								%
+								%				\Big[\mbox{Using \ }a_{t+1} - z_t  = \left(1 - \tfrac{1}{t} \right) \cdot (a_t - z_t) \Big] \quad  
+								 &= \tfrac{1}{2} \left( \norm{a_t - z_t}^2  - \norm{\left(1 - \tfrac{1}{t} \right) \cdot (a_t - z_t)}^2 \right).
+								%
+								%
+							\end{align*}	
+					}
+				\pause 
+				\item And from this,
+								{\footnotesize
+					\begin{align*}
+						%
+						\l(a_t,z_t) - \l(a_{t+1},z_t) 
+						%
+						%
+						&= \tfrac{1}{2} \left( \norm{a_t - z_t}^2  - \left(1 - \tfrac{1}{t} \right)^2 \cdot \norm{a_t - z_t}^2 \right) \\
+						%
+						&= \tfrac{1}{2} \left(1 - \left(1 - \tfrac{1}{t} \right)^2 \right) \cdot \norm{a_t - z_t}^2 \\
+						%
+						&= \left(\tfrac{1}{t} - \tfrac{1}{2t^2}\right) \cdot \norm{a_t - z_t}^2 \\
+						%
+						&\leq \tfrac{1}{t} \cdot \norm{a_t - z_t}^2.
+						%
+					\end{align*}	
+				}
+				
+				%
+			\end{itemize}
+	\end{itemize}
+\end{frame}
+
+
+\begin{frame} 
+	\frametitle{FTL for OQO problems: Analysis}
+	%	
+	\small
+	
+
+
+	\begin{itemize}	
+		%	
+		
+
+
+		\pause
+		\item[] 
+		
+			\fbox{\begin{minipage}{0.9\textwidth}
+				\begin{align}
+					%				 \label{help_ineq_FTL_analysis}
+					%	
+					\mbox{\textbf{Reminder:} \quad }\l(a_t,z_t) - \l(a_{t+1},z_t) \leq \tfrac{1}{t} \cdot \norm{a_t - z_t}^2 \tag{2}.
+					%	
+				\end{align}	 
+			\end{minipage}
+		}
+		
+		\begin{itemize}	
+				\footnotesize
+				
+				\item Since by assumption $L = \sup\limits_{z \in \Zspace} \norm{z}$ and $a_t$ is the empirical average of $z_1, \ldots, z_{t-1}$, we have that $\norm{a_t} \leq L.$
+				%
+				\pause
+				 \item Now the triangle inequality states that for any two vectors $x, y \in \mathbb{R}^d$ it holds that 
+				%
+				\begin{equation*}
+						\norm{x + y} \leq \norm{x} + \norm{y},
+					\end{equation*} 
+				%
+				 so that
+				%
+				\begin{equation*} 
+						%				\label{help_ineq_FTL_analysis_sec}
+						%
+						\norm{a_t - z_t} \leq \norm{a_t} + \norm{z_t} \leq 2L.
+						%
+						\tag{3}
+					\end{equation*}
+				%				
+				\pause 
+
+				%
+				 \item Summing over all $t$ in (2) and using (3) we arrive at
+				%
+				\begin{equation*}
+						%
+						\begin{split}
+								%
+								\sum\limits_{t=1}^T \left(\l(a_t,z_t) - \l(a_{t+1},z_t)  \right) 
+								%					
+								 \leq \sum\limits_{t=1}^T \left(\tfrac{1}{t} \cdot \norm{a_t - z_t}^2 \right) 
+								%
+								&\leq  \sum\limits_{t=1}^T \tfrac{1}{t} \cdot (2L)^2 \\
+								%					
+								 &= 4L^2 \cdot \sum\limits_{t=1}^T \tfrac{1}{t}.
+								%
+								%				\leq 4L^2 \cdot \left(\log(T) + 1 \right),
+								%
+							\end{split}
+						%
+						%
+					\end{equation*}
+				
+			\end{itemize}
+	\end{itemize}
+\end{frame}
+
+
+\begin{frame} 
+	\frametitle{FTL for OQO problems: Analysis}
+	%	
+	\small
+	\begin{itemize}	
+		%	
+		\item[]
+		\begin{itemize}	
+				\item[]
+				%			
+				
+				\fbox{\begin{minipage}{0.9\textwidth}	
+				\begin{equation*}
+						%
+						\begin{split}
+								%
+								\mbox{\textbf{Reminder:} \quad } \sum\limits_{t=1}^T \left(\l(a_t,z_t) - \l(a_{t+1},z_t)  \right) 
+								%
+								\leq  4L^2 \cdot \sum\limits_{t=1}^T \tfrac{1}{t} 
+								%
+								%				\leq 4L^2 \cdot \left(\log(T) + 1 \right),
+								%
+							\end{split}
+						%
+						%
+					\end{equation*}
+				\end{minipage}
+			}
+				%
+				\pause			
+				%
+				 \item Now, it holds that   $\sum\limits_{t=1}^T \tfrac{1}{t} \leq \log(T) + 1,$ so that we obtain
+				%				
+				 \begin{equation*}
+						%
+						\begin{split}
+								%
+								\sum\limits_{t=1}^T \left(\l(a_t,z_t) - \l(a_{t+1},z_t)  \right) 
+								%					
+								 &\leq 4L^2 \cdot \sum\limits_{t=1}^T \tfrac{1}{t} 
+								%
+								  \leq  4L^2 \cdot \left(\log(T) + 1 \right),
+								%
+							\end{split}
+						%
+						%
+					\end{equation*}
+				%
+				which is what we wanted to prove. \qed
+				%
+			\end{itemize}
+		%		
+	\end{itemize}
+	%	
+\end{frame}
+
+
+%
+\endlecture
+\end{document}
