@@ -1,0 +1,124 @@
+\documentclass[11pt,compress,t,notes=noshow, xcolor=table]{beamer}
+\input{../../style/preamble}
+\input{../../latex-math/basic-math}
+\input{../../latex-math/basic-ml}
+\input{../../latex-math/ml-online}
+
+\usepackage{multicol}
+
+\newcommand{\titlefigure}{figure/FTL_illustration}
+\newcommand{\learninggoals}{
+	\item Getting to know online linear optimzation (OLO) problems 
+	\item See that FTL might fail for these problems
+	\item Understanding the root cause for FTL's flaw
+}
+
+\title{Advanced Machine Learning}
+\date{}
+
+\begin{document}
+	
+	\lecturechapter{Follow the leader on OLO problems}
+	\lecture{Advanced Machine Learning}
+	
+	
+	
+	\sloppy
+	
+
+
+\begin{frame} \frametitle{FTL for online linear optimization}
+	%	 
+	\small
+	\begin{itemize}
+		%	 	
+		\item Another popular instantiation of the online learning problem is the online linear optimization problem, which is characterized by a linear loss function $\l(a,z)=a^\top z.$ 
+		%	 	
+		\pause
+		\item  Let $\Aspace=[-1,1]$ and  suppose that 
+		%	
+		$  z_t = \begin{cases}
+			-\frac12, & \mbox{$t=1,$} \\
+			%			
+			1, & \mbox{$t$ is even,}\\
+			%			
+			-1, & \mbox{$t$ is odd.}
+		\end{cases} $
+		%	
+		\pause 
+		\item No matter how we choose the first action $a_1^{\FTL},$ it will hold that FTL has a cumulative loss greater than (or equal) $T-3/2,$ while the best action in hindsight has a cumulative loss of $-1/2.$ 
+		%		 
+		\item Thus, FTL's cumulative regret is at least $T-1,$ which is linearly growing in $T.$
+		%		 
+	\end{itemize}
+	%	
+\end{frame}
+
+\begin{frame} \frametitle{FTL for online linear optimization}
+	\scriptsize
+	\begin{itemize}
+		\item Indeed, note that 
+		%		
+		\begin{align*}
+			%			
+			a_{t+1}^{\FTL} = \argmin_{a \in \Aspace} \sum_{s=1}^t \l(a,z_s) &= \argmin_{a \in [-1,1]} a \sum_{s=1}^t  z_s \\
+			%		
+			&= \begin{cases}
+				%			
+				-1, & \mbox{if }\sum_{s=1}^t  z_s>0,\\
+				1, & \mbox{if }\sum_{s=1}^t  z_s<0,\\
+				\mbox{arbitrary}, & \mbox{if }\sum_{s=1}^t  z_s=0.\\
+				%			
+			\end{cases} 
+			%			
+		\end{align*}
+		\pause 
+		\begin{centering}
+			\begin{tabular}{c|c|c|c|c|c} 
+				$t$ & $a_t^{\FTL}$ & $z_t$ & $\l(a_t^{\FTL},z_t)$  &  $\sum_{s=1}^t \l(a_s^{\FTL},z_s)$ & $\sum_{s=1}^t z_s $ \\
+				\hline
+				1 & 1 & $-1/2$ & $-1/2$ & $-1/2$ & $-1/2$  \\
+				\hline
+				\pause 2 & 1 & 1 & 1 & 1 $- 1/2$ & 1/2 \\
+				\hline
+				\pause 3 & $-1$ & $-1$ & 1 & 2 $- 1/2$ & $-1/2$ \\
+				\hline
+				\pause \vdots & \vdots & \vdots & \vdots & \vdots & \vdots \\
+				\hline 
+				& & & & &\\
+				$T$ & $(-1)^T$ & $(-1)^T$ & 1 & $T-1-1/2$ & $(-1/2)^{T}$ \\
+			\end{tabular}
+		\end{centering}
+		%		 
+		\pause \item The best action has cumulative loss 		
+		%		
+		\begin{align*}
+			%			
+			\inf_{a \in \Aspace} \sum\nolimits_{s=1}^T \l(a,z_s) &= \inf_{a \in [-1,1]} a \underbrace{\sum\nolimits_{s=1}^T  z_s}_{=(-1/2)^{T}} = -1/2.
+			%			
+		\end{align*}
+		%	 	
+	\end{itemize}
+	%	
+\end{frame}
+
+\begin{frame} \frametitle{FTL for online linear optimization}
+	\begin{itemize}
+		\small
+		%		
+		\item Thus, we see: FTL can fail for {\color{red} online linear optimization problems}, although it is well suited for {\color{blue}  online quadratic optimization problems}!
+		%		
+		\item The reason is that the action selection of FTL is not stable enough (caused by the loss function), which is fine for {\color{blue} the latter problem}, but problematic for {\color{red} the former}.
+		%
+		\item One has to note that the online linear optimization problem example above, where FTL fails, is in fact an adversarial learning setting: The environmental data is generated in such a way that the FTL learner is fooled in each time step.
+		%		
+	\end{itemize}
+	%	
+\end{frame}
+
+
+
+
+%
+\endlecture
+\end{document}

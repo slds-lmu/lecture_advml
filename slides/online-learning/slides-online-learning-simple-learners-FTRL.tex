@@ -1,0 +1,466 @@
+\documentclass[11pt,compress,t,notes=noshow, xcolor=table]{beamer}
+\input{../../style/preamble}
+\input{../../latex-math/basic-math}
+\input{../../latex-math/basic-ml}
+\input{../../latex-math/ml-online}
+
+\usepackage{multicol}
+
+\newcommand{\titlefigure}{figure/bias-variance-tradeoff}
+\newcommand{\learninggoals}{ 
+  \item Get to know FTRL as a stable alternative for FTL 
+  \item See a suitable regularization for OLO problems
+}
+
+\title{Advanced Machine Learning}
+\date{}
+
+\begin{document}
+
+\lecturechapter{Follow the regularized leader }
+\lecture{Advanced Machine Learning}
+
+
+
+\sloppy
+
+
+
+\begin{frame} 
+	\frametitle{Follow the regularized leader}
+	% 	
+	\small
+	\begin{itemize}
+		% 		
+		\item To overcome the shortcomings of the FTL algorithm, one can incorporate a regularization function $\reg: \Aspace \to \R_+$ into the action choice of FTL, which leads to more stability.
+		% 		
+		 \item  
+		To be more precise, let for $t\geq 1$
+		%
+		{\footnotesize 		\begin{align*} 
+				%		\label{defi_forel_estimate}
+				%	
+				a_t^{\FTRL} \in \argmin_{a \in \mathcal{A}} \left( \reg(a) + \sum\nolimits_{s=1}^{t-1} \l(a,z_s) \right),
+				%	
+			\end{align*}
+			{\tiny (Technical side note: if there are more than one minimum, then one of them is chosen.)\\}	
+		}
+		%
+		\noindent then the algorithm choosing $a_t^{\FTRL}$ in time step $t$ is called the \textbf{Follow the regularized leader} (FTRL) algorithm.
+		% 		
+		  \item {\visible<2->{  \emph{Interpretation:} The algorithm predicts $a_t$ as the element in $\Aspace,$ which minimizes the regularization function plus the cumulative loss so far over the previous $t-1$ time periods.}}
+		%		
+		  \item {\visible<3>{  Obviously, the behavior of the FTRL algorithm is depending heavily on the choice of the regularization function $\reg.$ 
+%		  
+		  If $\reg \equiv 0,$ then FTRL equals FTL.}}
+	\end{itemize}
+	% 	
+\end{frame}
+
+\begin{frame} 	
+	\frametitle{Regularization in online learning vs.\ batch learning}
+	\small
+	\begin{itemize}
+		%	
+		\item Note that in the batch learning scenario, the learner seeks to optimize an objective function which is the sum of the training loss and a regularization function:
+		%
+		\begin{align*}
+			% 		 \label{def:form_of_ml_problems}
+			%	
+			\min_{\thetab\in \R^p} \, \sum_{i=1}^n L(\yi,\thetab) + \lambda \, \psi(\thetab),	
+			%	
+		\end{align*}	
+		% 		
+		where $\lambda\geq 0$ is some regularization parameter.
+		%	
+		{\visible<2->{  \item Here, the regularization function is part of the whole objective function, which the learner seeks to minimize. }}
+		%	
+		 \item {\visible<3>{  However, in the online learning scenario the regularization function does (usually) not appear in the regret the learner seeks to minimize, but the regularization function is only part of the action/decision rule at each time step.}}
+		% 		
+	\end{itemize}
+	% 	
+\end{frame}
+
+
+\begin{frame} 
+	\frametitle{Regret analysis of FTRL: A Helpful Lemma}
+	%	
+	\small
+	\begin{itemize}
+		\item \textbf{Lemma:}
+		%	
+		Let $a_1^{\FTRL}, a_2^{\FTRL}, \ldots$ be the sequence of actions coming used by the FTRL algorithm for the environmental data sequence $z_1,z_2,\ldots$ . 
+		%	
+		 Then, for all $\tilde a \in \Aspace$ we have
+		%	
+		\begin{equation*}
+			%	
+			\begin{split}
+				R_T^{\FTRL}(\tilde a) &= \sum\limits_{t=1}^T \big(\l(a_t^{\FTRL},z_t) - \l(\tilde a,z_t) \big)
+				%		
+				\\ &\leq \reg(\tilde a) - \reg(a_1^{\FTRL}) +\sum\limits_{t=1}^T \left(\l(a_t^{\FTRL},z_t) - \l(a_{t+1}^{\FTRL},z_t)\right).
+			\end{split}
+			%	
+		\end{equation*}
+		%	
+		\pause	
+		  \item \emph{Interpretation}: the regret of the FTRL algorithm is bounded by the difference of cumulated losses of itself compared to its one-step lookahead cheater version and an additional regularization difference term. 
+		%		
+		  \item [$\Rightarrow$] We have seen an analogous result for FTL!
+		  
+		  {\tiny (The proof is similar.)}
+		%	
+	\end{itemize}
+	% 	
+\end{frame}
+
+
+%\begin{frame} 
+%	\frametitle{Regret analysis of FTRL: A Helpful Lemma}
+%	%	
+%	\small
+%	\begin{itemize}
+%		\footnotesize 
+%		%	
+%		\item \textbf{Proof:} 
+%		\begin{itemize}
+%			\item 		For sake of brevity, we write $a_1, a_2, \ldots$ for $a_1^{\FTRL}, a_2^{\FTRL}, \ldots$ 
+%			
+%			 \item Note that FTRL for $\l(\cdot,z_1), \ldots, \l(\cdot,z_T)$ is equivalent to running FTL on $\l(\cdot,z_0),\l(\cdot,z_1), \ldots, \l(\cdot,z_T)$ with $\l(\cdot,z_0)=\reg(\cdot),$ that is, we are pretending as if there was an additional time step $t=0,$ where we suffered a loss of  $\reg(\cdot)$ and performed a meaningless action $a_0.$
+%			%		
+%			  \item Indeed:
+%			%		
+%			$$	a_t^{\FTRL} = \argmin{a \in \mathcal{A}} \big( \reg(a) + \sum_{i=1}^{t-1} \l(a,z_i) \big) 
+%			  = \argmin{a \in \mathcal{A}} \big( \sum_{i=0}^{t-1} \l(a,z_i) \big)   = a_t^{\FTL}.
+%			%			
+%			$$
+%			%		
+%			%		where the action for FTL is 
+%			%	
+%		\end{itemize}
+%	\end{itemize}
+%	% 	
+%\end{frame}
+%
+%
+%\begin{frame} 
+%	\frametitle{Regret analysis of FTRL: A Helpful Lemma}
+%	%	
+%	\small
+%	\begin{itemize}\item[]
+%		\begin{itemize}
+%			%		
+%			\footnotesize
+%			\item Thus, by applying the analogous lemma for the FTL, we obtain for any $\tilde a \in \Aspace$
+%			%	
+%			\begin{center}
+%				%
+%				$R_T^{FTL}(\tilde a) = \sum\nolimits_{t=0}^T (\l(a_t,z_t) - \l(\tilde a,z_t)) \leq  \sum\nolimits_{t=0}^T (\l(a_t,z_t) - \l(a_{t+1},z_t)).$
+%				%			
+%			\end{center}
+%			%	
+%			  \item 	This is equivalent to 
+%			%	
+%			\begin{align*}
+%				\reg(a_0) - \reg(\tilde a)+ \sum\nolimits_{t=1}^T (\l(a_t,z_t) &- \l(\tilde a,z_t)) \\ &\leq  \reg(a_0) - \reg(a_1) + \sum\nolimits_{t=1}^T (\l(a_t,z_t) - \l(a_{t+1},z_t)).
+%				%			
+%			\end{align*}		 
+%			%			 
+%			  \item Rearranging yields
+%			%			 
+%			\begin{align*}
+%				R_T^{FTRL}(\tilde a) = \sum\nolimits_{t=1}^T (\l(a_t,z_t) &- \l(\tilde a,z_t)) \\ &\quad \leq \reg(\tilde a) - \reg(a_1) + \sum\nolimits_{t=1}^T (\l(a_t,z_t) - \l(a_{t+1},z_t)).
+%				%		
+%			\end{align*}
+%			%	
+%			\qed
+%			%	
+%			%			
+%		\end{itemize}
+%	\end{itemize}
+%\end{frame}
+
+\begin{frame} 
+	\frametitle{FTRL for online linear optimization}
+	\small
+	\begin{itemize}
+		%		
+		\item In the following, we analyze the FTRL algorithm for the linear loss $\l(a,z)=a^\top z$ for online linear optimization (OLO) problems.
+		 \item For this purpose,  the squared L2-norm regularization will be used:
+		%
+		\begin{equation*}
+			%		 \label{eq_l2_reg}
+			%
+			\reg(a) = \frac{1}{2 \eta}  \norm{a}^2 = \frac{a^\top a}{2 \eta}   ,
+			%
+		\end{equation*} 
+		%
+		where $\eta$ is some positive scalar, the \emph{regularization magnitude.}
+		%
+		  \item {\visible<2->{  It is straightforward to compute that if $\Aspace = \R^d,$ then
+		%
+		$$ a_t^{\FTRL} = - \eta  \sum\nolimits_{s=1}^{t-1} z_s.$$}}
+		%
+		%
+		\item {\visible<3->{Hence, in this case we have for the FTRL algorithm the following update rule 
+		%
+		\begin{equation*}
+			%		\label{eq:forel_update}
+			%	
+			a_{t+1}^{\FTRL} = a_t^{\FTRL} - \eta \, z_t, \qquad t=1,\ldots,T-1. 
+			%	
+		\end{equation*} }}
+	
+		%	
+		{\visible<4>{    \emph{Interpretation:}  $-z_t$ is the \emph{direction} in which the update of $a_t^{\FTRL}$ to $a_{t+1}^{\FTRL}$ is conducted with \emph{step size} $\eta$ in order to reduce the loss.}}
+		%		
+	\end{itemize}
+\end{frame}
+
+\begin{frame} 
+	\frametitle{FTRL for OLO: Theoretical guarantees}
+	\small
+	\begin{itemize}
+		
+		\item \textbf{Proposition:}
+		%	
+		Using the FTRL algorithm with the squared L2-norm regularization on any online linear optimization (OLO) problem with $\Aspace \subset \mathbb{R}^d$ leads to a regret of FTRL with respect to any action $\tilde a \in \Aspace$  of
+		%	 
+		\begin{equation*}
+			%	
+			R_T^{FTRL}(\tilde a)  \leq \frac{1}{2\eta}  \norm{\tilde a}^2 +   \eta  \sum\limits_{t=1}^T \norm{z_t}^2.
+			%		
+		\end{equation*}
+		%		
+		%		where $C>0$ is some constant depending on $\Aspace.$
+		%	
+		{\visible<2->{  \item We will show the result only for the case $\Aspace=\R^d.$   
+		%	
+		\item For the more general case, where $\Aspace$ is a strict subset of $\R^d,$ we need a slight modification of the update formula above:
+		 %	
+		 $$ a_t^{\FTRL} = \Pi_\Aspace\big( - \eta  \sum\nolimits_{i=1}^{t-1} z_i\big)  = \argmin_{a \in \mathcal{A}} \norm{ a - \eta   \sum\nolimits_{i=1}^{t-1} z_i }^2. $$
+		 %	
+		 In words, the action of the FTRL algorithm has to be projected onto the set $\Aspace.$
+		 %	
+		 %	Completing the square
+		 Here, $\Pi_\Aspace: \R^d \to \Aspace$ is the projection onto $\Aspace.$
+		 
+		 {\tiny (The proof is essentially the same, except that the Cauchy-Schwarz inequality is used in between.)} }}
+		%
+	\end{itemize}
+\end{frame}
+
+\begin{frame} 
+	\frametitle{FTRL for OLO: Theoretical guarantees}
+	\small
+	\begin{itemize}
+		\footnotesize
+
+		\item \textbf{Proof:}
+		
+		\fbox{\begin{minipage}{0.95\textwidth}
+				\begin{equation*}
+					%	
+					\begin{split}
+						% 
+						& \mbox{\textbf{Reminder (1):} \quad }	R_T^{\FTRL}(\tilde a) \leq \reg(\tilde a) - \reg(a_1^{\FTRL}) +\sum\limits_{t=1}^T \left(\l(a_t^{\FTRL},z_t) - \l(a_{t+1}^{\FTRL},z_t)\right). \\
+						%							
+						& \mbox{\textbf{Reminder (2):} \quad }	a_{t+1}^{\FTRL} = a_t^{\FTRL} - \eta \, z_t, \qquad t=1,\ldots,T-1.
+						%
+					\end{split}
+					%	
+				\end{equation*}
+			\end{minipage}
+		}
+		\footnotesize
+			
+			%	
+			 \item 	For sake of brevity, we write $a_1, a_2, \ldots$ for $a_1^{\FTRL}, a_2^{\FTRL}, \ldots$ 
+			%		
+			\pause
+			 \item With this,
+			%
+			\begin{align*}
+				%				
+				R_T^{FTRL}(\tilde a) &\leq \reg(\tilde a) - \reg(a_1) + \sum\nolimits_{t=1}^T (\l(a_t,z_t) - \l(a_{t+1},z_t))  \tag{Reminder (1)}\\
+				%
+				 &\leq \frac{1}{2\eta}  \norm{\tilde a}^2 + \sum\nolimits_{t=1}^T ( a_t^\top z_t  -  a_{t+1}^\top z_t  ) \tag{$\reg(a_1)\geq 0$ and definition of $\reg$} \\
+				%
+				 &= \frac{1}{2\eta}  \norm{\tilde a}^2 + \sum\nolimits_{t=1}^T  ( a_t^\top-  a_{t+1}^\top   )z_t \tag{Distributivity} \\
+				%
+				 &= \frac{1}{2\eta}  \norm{\tilde a}^2 + \eta \sum\nolimits_{t=1}^T   \norm{z_t}^2.  \tag{Reminder (2)}
+				% 
+				%
+			\end{align*}
+			%
+			\qed
+%		
+	\end{itemize}
+\end{frame}
+
+\begin{frame} 
+	\frametitle{FTRL for OLO: Theoretical guarantees}
+	\small
+	\begin{itemize}	 
+		
+		\footnotesize
+		
+		\item Interpretation of the terms in the proposition, i.e., of 
+%		
+		$$R_T^{FTRL}(\tilde a) \leq  \frac{1}{2\eta}  {\color{blue} \norm{\tilde a}^2 }+  \eta  {\color{orange} \sum\limits_{t=1}^T \norm{z_t}^2}:$$
+		%	
+		
+		\begin{itemize}\footnotesize
+			%	
+			 \item  {\visible<2->{ $ {\color{blue} \norm{\tilde a}^2 }$ represents a  {\color{blue} \emph{bias term:}} The regret upper bound of FTRL is always biased by the term $ \norm{\tilde a}^2.$
+			%	
+			The impact of the bias term can be reduced by a higher regularization magnitude, i.e.,  a higher choice of $\eta.$ }}
+			%	
+			 \item  {\visible<3->{ ${\color{orange} \sum\limits_{t=1}^T \norm{z_t}^2}$ represents a  {\color{orange} \emph{''variance'' term}}: The more the environment data $z_t$ varies, the larger this term. Hence, for a high variance a smaller regularization magnitude is needed, i.e., a smaller choice of $\eta.$  }}
+			
+			
+			%	
+		\end{itemize}	
+		
+		%
+		 \item  {\visible<4->{ 
+		Thus, we have a trade-off for the optimal choice of $\eta:$ Making $\eta$ large, leads to a smaller {\color{blue} bias} but at the expense  of a higher {\color{orange} variance} and making $\eta$ small leads to a smaller {\color{orange} variance} at the expense  of a higher {\color{blue} bias}.}}
+		
+		 \item [$\Rightarrow$]  {\visible<5>{ With the right choice of $\eta$, we can prevent the instability of FTRL for an online linear optimization (OLO) problem. }}
+		
+		
+		%	
+	\end{itemize}
+\end{frame}
+
+\begin{frame} 
+	\frametitle{FTRL for OLO: Theoretical guarantees}
+	\small
+	\begin{itemize}	 
+		%
+		\small	
+		%
+		
+		\begin{minipage}{.5\textwidth}
+			\item 
+			Under certain assumptions we can balance the trade-off induced by the bias and the variance by choosing $\eta$ appropriately.
+			
+		\end{minipage}
+		\begin{minipage}{.4\textwidth}
+			
+			\begin{figure}
+				\centering
+				\includegraphics[width=0.9\linewidth]{figure/bias-variance-tradeoff} 
+			\end{figure}
+			
+		\end{minipage}
+		%	
+		%		
+		 \item  {\visible<2->{ \textbf{Corollary:}
+		%	
+		Suppose we use the FTRL algorithm with the squared L2-norm regularization on an online linear optimization problem with $\Aspace \subset \mathbb{R}^d$ such that 
+%		
+		\begin{itemize}\small
+%			
+			\item $\sup_{\tilde a \in \Aspace}\norm{\tilde a} \leq B$ for some finite constant $B>0,$ 
+%			
+			\item $\sup_{z \in \Zspace}\norm{z} \leq V$ for some finite constant $V>0.$
+%			
+		\end{itemize}}}
+		%	
+		{\visible<3->{ Then, by choosing the step size $\eta$ for FTRL as $\eta = \frac{B}{V\sqrt{2\, T}}$ it holds that
+		%	
+			$$	R_T^{FTRL} \leq   BV\sqrt{2\, T}.		$$
+			%	
+		 }}
+		%		
+		\item  {\visible<4>{ Note that the (optimal) parameter $\eta$ depends on the time horizon $T,$ which is oftentimes not known in advance.
+		%	
+		However, there are some tricks (i.e., the \emph{doubling trick}), which can help in such cases. }}
+		%	provides an algorithm which has the same order of the regret, but does not need the knowledge of the time horizon in advance.
+		%		
+	\end{itemize}
+\end{frame}
+
+\begin{frame} 
+	\frametitle{FTRL for OLO: Theoretical guarantees}
+	\small
+	\begin{itemize}	 
+		\small
+		\item \textbf{Proof:}
+		
+		\begin{itemize} \small
+			%	
+			\item By the latter {\color{green} proposition} and the {\color{olive} assumptions }
+			%	
+			\begin{align*}
+				%	
+				R_T^{FTRL}(\tilde a)  
+				%				 
+				 \quad &{\color{green}\leq} \quad  \frac{1}{2\eta}  \norm{\tilde a}^2 \ &&+  \eta  \sum\limits_{t=1}^T \norm{z_t}^2 \\
+				%				 
+				%				&\leq \frac{1}{2\eta}  \underbrace{\norm{\tilde a}^2}_{\mbox{$\leq B^2$ by assumption}} \ +  \eta  \sum\limits_{t=1}^T \underbrace{\norm{z_t}^2 }_{\mbox{$\leq V^2$ by assumption}} \\
+				%		
+				 &{\color{olive} \leq} \quad \frac{B^2}{2\eta} \qquad \qquad\qquad\qquad\quad  &&+ \eta \, T \, V^2.
+				%		
+			\end{align*}
+			%	
+			 {\visible<2->{	\item The right-hand side of the latter display is independent of $\tilde a,$ so that 
+			%	
+			\begin{align*}
+				%	
+				R_T^{FTRL}	\leq   \frac{B^2}{2\eta}  +  \eta \, T \, V^2.
+				%		
+			\end{align*} }}
+			%
+			  {\visible<3->{ \item Now, the right-hand side of the latter display is a function of the form $f(\eta) = a/\eta + b \eta$ for some suitable $a,b>0.$ }}
+			%	
+			 {\visible<4->{ \item   Minimizing $f$ with respect to $\eta$ results in the minimizer $\eta^* = \frac{B}{V\sqrt{2\,T}}.$ }}
+			%	
+			  {\visible<5->{ \item Plugging this minimizer into the latter display leads to the asserted inequality. \qed }}	
+			%	
+		\end{itemize}
+		%
+	\end{itemize}
+	%
+\end{frame}
+
+\begin{frame}
+	\frametitle{Desired results}
+	%	
+	\small
+	\begin{itemize}\small
+		%		
+		\item With the FTRL algorithm we can cope with 
+%		
+		\begin{itemize}\small
+			%			
+			 \item online quadratic optimization (OQO) problems by using no regularity ($\reg \equiv 0$). In this case, we have satisfactory regret guarantees and also a quick update rule for $a_{t+1}^{\FTRL}$ (It is just the empirical average over all data points seen till $t$),
+			%			
+			 {\visible<2->{  \item online linear optimization (OLO) problems by using a suitable regularization function.
+			%			
+			In this case, we have quick update formulas and satisfactory regret guarantees as well. }}
+			%
+		\end{itemize}
+		%		
+		   \item [$\Rightarrow$]  {\visible<3->{ But what about other online learning problems or rather other loss functions? }}
+		%
+		 {\visible<3>{   \item  What we wish to have is an approach such that we can achieve for a large class of loss functions $\l$ the advantages of FTRL for OLO and OCO problems:
+		
+		\begin{itemize}\small
+			 \item  [(a)] reasonable regret upper bounds;
+			  \item  [(b)] a quick update formula.
+		\end{itemize} }}
+		%		
+%		 \item For this purpose, we will dig into the theory of \emph{convex functions} in order to transfer the advantages of FTRL to a larger class of online learning problems.
+		%
+	\end{itemize}
+	%	
+\end{frame}
+
+
+
+
+%
+\endlecture
+\end{document}
