@@ -11,9 +11,9 @@
 
 \newcommand{\titlefigure}{figure/fmeasure}
 \newcommand{\learninggoals}{
-  \item Get to know loss functions for multi-target prediction problems
-  \item Know Bayes predictor for Hamming and subset $0/1$ loss
-  \item Understand the difference between macro-, micro-, and instance-wise-losses 
+    \item Get to know loss functions for multi-target prediction problems
+    \item Understand the difference between instance-wise and decomposable losses 
+    \item Know Bayes predictor for Hamming and subset $0/1$ loss
 }
 
 \title{Advanced Machine Learning}
@@ -35,7 +35,7 @@
         
 		\item Following loss minimization in machine learning , we need a \emph{multivariate loss function} 
 		$$
-		L: \, (\Yspace_1 \times \cdots \times \Yspace_l)^n \times (\R^{g_1} \times \cdots \times \R^{g_l})^n \rightarrow \mathbb{R}.
+		L: \, (\Yspace_1 \times \cdots \times \Yspace_l) \times (\R^{g_1} \times \cdots \times \R^{g_l}) \rightarrow \mathbb{R}.
 		$$ 
 
         \item In multi-target regression: $\Yspace_1 = \ldots = \Yspace_l = \R$, and $g_1 = \ldots = g_l = 1$.
@@ -47,55 +47,28 @@
 
 \begin{frame}{Multivariate loss functions}
 	\begin{itemize}
-		\item $L$ is decomposable over instances if
-		$$
-		L(\bm{Y}, f) = \frac{1}{n} \sum_{i=1}^n L(\yv^{(i)}, f(\xi)) 
-		%\quad \text{vs.} \quad L \ne \sum_{i=1}^n \ell(\yv^{(i)}, f(\xi)) 
-		\, ,
-		$$
-		i.e., as a sum of losses over all examples. 
-		
-		
-		\item $L$ is decomposable over targets if
-		$$
-		L(\bm{Y}, f) = \frac{1}{l} \sum_{m=1}^l L_m(\bm{Y}_m, f(\xv)_m) 
-		$$
-		with single-target losses $L_m$. 
-		
-%		
-
-		\begin{minipage}{0.45\textwidth}
-%			
-			\item Two categories: micro- and instance-wise-losses. 
-%			
+		\begin{minipage}{0.45\textwidth}	
+			\item Two categories: 
+            \begin{itemize}
+                \item Decomposable.
+                \item Instance-wise.
+            \end{itemize}
 		\end{minipage}
-%	
 		\begin{minipage}{0.45\textwidth}
 			\begin{center}
 				\includegraphics[width=0.75\textwidth]{figure/fmeasure}
 			\end{center}
 		\end{minipage}
-
-	\end{itemize}
-
-\end{frame}
-
-
-
-
-\begin{frame}
-	\frametitle{Micro Losses}
-	\begin{itemize}
-
-        \item Micro-losses: $L$ corresponds to aggregating the pointwise losses over the targets and instances.
-    	$$
-    	L =  \frac{1}{n \cdot l} \sum_{i,m} L_m(y_m^{(i)} , f(\xv)_m^{(i)}),
-    	$$
-    	where $L_m: \Yspace_m \times \R^{g_m} \to \R$ in this case.      
-     
-		\item Example \emph{Squared error loss} (i.e., used in multivariate regression):
+		
+		\item $L$ is decomposable over targets if
 		$$
-		L_{\text{MSE}} = \frac{1}{n \cdot l}\sum_{i, m} (y_m^{(i)} - f(\xv)_m^{(i)})^2.
+		L(\yv, f) = \frac{1}{l} \sum_{m=1}^l L_m(y_m, f(\xv)_m) 
+		$$
+		with single-target losses $L_m$.     
+     
+		\item Example: \emph{Squared error loss} (in multivariate regression):
+		$$
+		L_{\text{MSE}} = \frac{1}{l}\sum_{m=1}^l (y_m - f(\xv)_m)^2.
 		$$
         \item Can also be used for cases with missing entries.
 		
@@ -109,16 +82,16 @@
 
 		\item \emph{Hamming loss} averages over mistakes on individual scores:    
 		$$
-		\displaystyle L_H(\bm{Y}, h) = \frac{1}{n \cdot l}  \, \sum_{i, m} \, \mathds{1}_{[y_m \neq h_m(x)]},
+		\displaystyle L_H(\yv, h) = \frac{1}{l}  \, \sum_{m=1}^l \, \mathds{1}_{[y_m \neq h_m(x)]},
 		$$
-        where $h_m(x) := [f(\xv)_m \geq c_m]$ is the threshold function for task $m$ with threshold $c_m$. Note: the loss is not decomposible over targets.
+        where $h_m(x) := [f(\xv)_m \geq c_m]$ is the threshold function for task $m$ with threshold $c_m$. 
         
         \item Hamming loss is identical to the average \emph{0/1 loss} if computed on the entire dataset.
 
 		
 		\item The \emph{subset 0/1 loss} simply checks for entire correctness:  
 		\begin{align*}
-			\displaystyle L_{0/1}(\bm{Y}, h) & = \frac{1}{n} \sum_i \mathds{1}_{[ \yv \neq \mathbf{h} ]}  =  \frac{1}{n} \sum_i \max_m \, \mathds{1}_{[y_m \neq  h_m(x)]}
+			\displaystyle L_{0/1}(\yv, h) & = \mathds{1}_{[ \yv \neq \mathbf{h} ]}  = \max_m \, \mathds{1}_{[y_m \neq  h_m(x)]}
 		\end{align*}
 		
 	\end{itemize}
