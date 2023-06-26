@@ -31,7 +31,7 @@
 
 \begin{frame}{Multivariate Loss Functions}
 	\begin{itemize}
-		\item In MTP: For a feature vector $\xv$, predict a tuple of scores $f(\xv) = (f(x)_1, f(x)_2, \ldots, f(x)_l)^\top$ for $l$ tasks with a function (hypothesis) $f: \Xspace \rightarrow \R^{g_1} \times \cdots \times \R^{g_l} $.
+		\item In MTP: For a feature vector $\xv$, predict a tuple of scores $f(\xv) = (f(x)_1, f(x)_2, \ldots, f(x)_l)^\top$ for $l$ targets with a function (hypothesis) $f: \Xspace \rightarrow \R^{g_1} \times \cdots \times \R^{g_l} $.
         
 		\item Following loss minimization in machine learning, we need a \emph{multivariate loss function} 
 		$$
@@ -84,7 +84,7 @@
 		$$
 		\displaystyle L_H(\yv, \mathbf{h}) = \frac{1}{l}  \, \sum_{m=1}^l \, \mathds{1}_{[y_m \neq h_m(\xv)]},
 		$$
-        where $h_m(\xv) := [f(\xv)_m \geq c_m]$ is the threshold function for task $m$ with threshold $c_m$. 
+        where $h_m(\xv) := [f(\xv)_m \geq c_m]$ is the threshold function for target $m$ with threshold $c_m$. 
         
         \item Hamming loss is identical to the average \emph{0/1 loss} %if computed on the entire dataset 
         and is decomposable.
@@ -102,7 +102,7 @@
 	\begin{itemize}
 		\item The risk minimizer for the Hamming loss is the  \emph{marginal mode}:
 		$$
-		f^*(\xv)_m = \arg \max_{y_m \in \{0,1\}} \Pr( y_j  ~|~ \xv )\,, \quad m = 1,\ldots,l,
+		f^*(\xv)_m = \arg \max_{y_m \in \{0,1\}} \Pr( y_m  ~|~ \xv )\,, \quad m = 1,\ldots,l,
 		$$
 		%\item 
 		while for the subset 0/1 loss it is the \emph{joint mode}:
