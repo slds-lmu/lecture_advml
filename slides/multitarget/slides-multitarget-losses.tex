@@ -13,7 +13,7 @@
 \newcommand{\learninggoals}{
     \item Get to know loss functions for multi-target prediction problems
     \item Understand the difference between instance-wise and decomposable losses 
-    \item Know Bayes predictor for Hamming and subset $0/1$ loss
+    \item Know risk minimizer for Hamming and subset $0/1$ loss
 }
 
 \title{Advanced Machine Learning}
@@ -33,7 +33,7 @@
 	\begin{itemize}
 		\item In MTP: For a feature vector $\xv$, predict a tuple of scores $f(\xv) = (f(x)_1, f(x)_2, \ldots, f(x)_l)^\top$ for $l$ tasks with a function (hypothesis) $f: \Xspace \rightarrow \R^{g_1} \times \cdots \times \R^{g_l} $.
         
-		\item Following loss minimization in machine learning , we need a \emph{multivariate loss function} 
+		\item Following loss minimization in machine learning, we need a \emph{multivariate loss function} 
 		$$
 		L: \, (\Yspace_1 \times \cdots \times \Yspace_l) \times (\R^{g_1} \times \cdots \times \R^{g_l}) \rightarrow \mathbb{R}.
 		$$ 
@@ -48,11 +48,11 @@
 \begin{frame}{Multivariate loss functions}
 	\begin{itemize}
 		\begin{minipage}{0.45\textwidth}	
-			\item Two categories: 
-            \begin{itemize}
-                \item Decomposable.
-                \item Instance-wise.
-            \end{itemize}
+			\item We treat two categories: Decomposable and instance-wise
+            % \begin{itemize}
+            %     \item Decomposable.
+            %     \item Instance-wise.
+            % \end{itemize}
 		\end{minipage}
 		\begin{minipage}{0.45\textwidth}
 			\begin{center}
@@ -68,7 +68,7 @@
      
 		\item Example: \emph{Squared error loss} (in multivariate regression):
 		$$
-		L_{\text{MSE}} = \frac{1}{l}\sum_{m=1}^l (y_m - f(\xv)_m)^2.
+		L_{\text{MSE}}(\yv, f) = \frac{1}{l}\sum_{m=1}^l (y_m - f(\xv)_m)^2.
 		$$
         \item Can also be used for cases with missing entries.
 		
@@ -78,20 +78,20 @@
 \begin{frame}{Instance-wise Losses}
 	\begin{itemize}
 		
-        \item Given a label vector $\yv$, it computes the loss on single instance. 
+        %\item Given a label vector $\yv$, it computes the loss on single instance. 
 
-		\item \emph{Hamming loss} averages over mistakes on individual scores:    
+		\item \emph{Hamming loss} averages over mistakes in single targets:    
 		$$
-		\displaystyle L_H(\yv, h) = \frac{1}{l}  \, \sum_{m=1}^l \, \mathds{1}_{[y_m \neq h_m(x)]},
+		\displaystyle L_H(\yv, \mathbf{h}) = \frac{1}{l}  \, \sum_{m=1}^l \, \mathds{1}_{[y_m \neq h_m(\xv)]},
 		$$
-        where $h_m(x) := [f(\xv)_m \geq c_m]$ is the threshold function for task $m$ with threshold $c_m$. 
+        where $h_m(\xv) := [f(\xv)_m \geq c_m]$ is the threshold function for task $m$ with threshold $c_m$. 
         
-        \item Hamming loss is identical to the average \emph{0/1 loss} if computed on the entire dataset.
+        \item Hamming loss is identical to the average \emph{0/1 loss} %if computed on the entire dataset 
+        and is decomposable.
 
-		
-		\item The \emph{subset 0/1 loss} simply checks for entire correctness:  
+		\item The \emph{subset 0/1 loss} checks for entire correctness and is not decomposable:  
 		\begin{align*}
-			\displaystyle L_{0/1}(\yv, h) & = \mathds{1}_{[ \yv \neq \mathbf{h} ]}  = \max_m \, \mathds{1}_{[y_m \neq  h_m(x)]}
+			\displaystyle L_{0/1}(\yv, \mathbf{h}) & = \mathds{1}_{[ \yv \neq \mathbf{h} ]}  = \max_m \, \mathds{1}_{[y_m \neq  h_m(\xv)]}
 		\end{align*}
 		
 	\end{itemize}
