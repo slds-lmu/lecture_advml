@@ -1,0 +1,99 @@
+% maxwidth is the original width if it is less than linewidth
+% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\usepackage[utf8]{inputenc}
+\usepackage{a4wide,paralist}
+\usepackage{amsmath, amssymb, xfrac, amsthm}
+\usepackage{dsfont}
+\usepackage{xcolor}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{bm}
+
+% for showing python code blocks
+\usepackage{listings}
+\lstdefinestyle{pythonstyle}{
+    language=Python,
+    backgroundcolor=\color[rgb]{0.98,0.98,0.98},
+    commentstyle=\color[rgb]{0.13,0.54,0.13},
+    keywordstyle=\color[rgb]{0.2,0.29,0.37},
+    numberstyle=\tiny\color{gray},
+    stringstyle=\color[rgb]{0.73,0.13,0.13},
+    basicstyle=\ttfamily\small,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=4
+}
+\lstset{style=pythonstyle}
+
+
+% %exercise numbering
+\renewcommand{\theenumi}{(\alph{enumi})}
+\renewcommand{\theenumii}{\roman{enumii}}
+\renewcommand\labelenumi{\theenumi}
+
+
+\font \sfbold=cmssbx10
+
+\setlength{\oddsidemargin}{0cm} \setlength{\textwidth}{16cm}
+
+
+\sloppy
+\parindent0em
+\parskip0.5em
+\topmargin-2.3 cm
+\textheight25cm
+\textwidth17.5cm
+\oddsidemargin-0.8cm
+\pagestyle{empty}
+
+
+\newcommand{\kopfaml}[2]{
+\hrule
+\vspace{.15cm}
+\begin{minipage}{\textwidth}
+%akwardly i had to put \" here to make it compile correctly
+	{\sf\bf Advanced Machine Learning \hfill Exercise sheet #1\\
+	 \url{https://slds-lmu.github.io/i2ml/} \hfill #2}
+\end{minipage}
+\vspace{.05cm}
+\hrule
+\vspace{1cm}}
+
+
+\newenvironment{allgemein}
+	{\noindent}{\vspace{1cm}}
+
+\newcounter{aufg}
+\newenvironment{aufgabe}[1]
+	{\refstepcounter{aufg}\textbf{Exercise \arabic{aufg}: #1}\\ \noindent}
+	{\vspace{0.5cm}}
+
+\newcounter{loes}
+\newenvironment{loesung}[1]
+	{\refstepcounter{loes}\textbf{Solution \arabic{loes}: #1}\\\noindent}
+	{\bigskip}
+
+\newenvironment{bonusaufgabe}
+	{\refstepcounter{aufg}\textbf{Exercise \arabic{aufg}*\footnote{This
+	is a bonus exercise.}:}\\ \noindent}
+	{\vspace{0.5cm}}
+
+\newenvironment{bonusloesung}
+	{\refstepcounter{loes}\textbf{Solution \arabic{loes}*:}\\\noindent}
+	{\bigskip}

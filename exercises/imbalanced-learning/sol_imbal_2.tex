@@ -1,637 +1,361 @@
 \documentclass[a4paper]{article}
-\usepackage[]{graphicx}\usepackage[]{xcolor}
-% maxwidth is the original width if it is less than linewidth
-% otherwise use linewidth (to make sure the graphics do not exceed the margin)
-\makeatletter
-\def\maxwidth{ %
-  \ifdim\Gin@nat@width>\linewidth
-    \linewidth
-  \else
-    \Gin@nat@width
-  \fi
-}
-\makeatother
-
-\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
-\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
-\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
-\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
-\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
-\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
-\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
-\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
-\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
-\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
-\let\hlipl\hlkwb
-
-\usepackage{framed}
-\makeatletter
-\newenvironment{kframe}{%
- \def\at@end@of@kframe{}%
- \ifinner\ifhmode%
-  \def\at@end@of@kframe{\end{minipage}}%
-  \begin{minipage}{\columnwidth}%
- \fi\fi%
- \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
- \colorbox{shadecolor}{##1}\hskip-\fboxsep
-     % There is no \\@totalrightmargin, so:
-     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
- \MakeFramed {\advance\hsize-\width
-   \@totalleftmargin\z@ \linewidth\hsize
-   \@setminipage}}%
- {\par\unskip\endMakeFramed%
- \at@end@of@kframe}
-\makeatother
-
-\definecolor{shadecolor}{rgb}{.97, .97, .97}
-\definecolor{messagecolor}{rgb}{0, 0, 0}
-\definecolor{warningcolor}{rgb}{1, 0, 1}
-\definecolor{errorcolor}{rgb}{1, 0, 0}
-\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
-
-\usepackage{alltt}
-\newcommand{\SweaveOpts}[1]{}  % do not interfere with LaTeX
-\newcommand{\SweaveInput}[1]{} % because they are not real TeX commands
-\newcommand{\Sexpr}[1]{}       % will only be parsed by R
-
-
-
-
-\usepackage[utf8]{inputenc}
-%\usepackage[ngerman]{babel}
-\usepackage{a4wide,paralist}
-\usepackage{amsmath, amssymb, xfrac, amsthm}
-\usepackage{dsfont}
-%\usepackage[usenames,dvipsnames]{xcolor}
-\usepackage{xcolor}
-\usepackage{amsfonts}
-\usepackage{graphicx}
+\include{../../style/preamble_ueb.tex}
 \usepackage{caption}
 \usepackage{subcaption}
-\usepackage{framed}
-\usepackage{multirow}
-\usepackage{bytefield}
-\usepackage{csquotes}
-\usepackage[breakable, theorems, skins]{tcolorbox}
-\usepackage{hyperref}
-\usepackage{cancel}
-\usepackage{bm}
-\usepackage{algorithm}
-\usepackage{algpseudocode}
-
-
-\input{../../style/common}
-
-\tcbset{enhanced}
-
-\DeclareRobustCommand{\mybox}[2][gray!20]{%
-	\iffalse
-	\begin{tcolorbox}[   %% Adjust the following parameters at will.
-		breakable,
-		left=0pt,
-		right=0pt,
-		top=0pt,
-		bottom=0pt,
-		colback=#1,
-		colframe=#1,
-		width=\dimexpr\linewidth\relax,
-		enlarge left by=0mm,
-		boxsep=5pt,
-		arc=0pt,outer arc=0pt,
-		]
-		#2
-	\end{tcolorbox}
-	\fi
-}
-
-\DeclareRobustCommand{\myboxshow}[2][gray!20]{%
-%	\iffalse
-	\begin{tcolorbox}[   %% Adjust the following parameters at will.
-		breakable,
-		left=0pt,
-		right=0pt,
-		top=0pt,
-		bottom=0pt,
-		colback=#1,
-		colframe=#1,
-		width=\dimexpr\linewidth\relax,
-		enlarge left by=0mm,
-		boxsep=5pt,
-		arc=0pt,outer arc=0pt,
-		]
-		#2
-	\end{tcolorbox}
-%	\fi
-}
-
-
-%exercise numbering
-\renewcommand{\theenumi}{(\alph{enumi})}
-\renewcommand{\theenumii}{\roman{enumii}}
-\renewcommand\labelenumi{\theenumi}
-
-
-\font \sfbold=cmssbx10
-
-\setlength{\oddsidemargin}{0cm} \setlength{\textwidth}{16cm}
-
-
-\sloppy
-\parindent0em
-\parskip0.5em
-\topmargin-2.3 cm
-\textheight25cm
-\textwidth17.5cm
-\oddsidemargin-0.8cm
-\pagestyle{empty}
-
-\newcommand{\kopf}[2]{
-\hrule
-\vspace{.15cm}
-\begin{minipage}{\textwidth}
-%akwardly i had to put \" here to make it compile correctly
-	{\sf\bf Introduction to Machine Learning \hfill Exercise sheet #1\\
-	 \url{https://slds-lmu.github.io/i2ml/} \hfill #2}
-\end{minipage}
-\vspace{.05cm}
-\hrule
-\vspace{1cm}}
-
-\newcommand{\kopfic}[2]{
-\hrule
-\vspace{.15cm}
-\begin{minipage}{\textwidth}
-%akwardly i had to put \" here to make it compile correctly
-	{\sf\bf Introduction to Machine Learning \hfill Live Session #1\\
-	 \url{https://slds-lmu.github.io/i2ml/} \hfill #2}
-\end{minipage}
-\vspace{.05cm}
-\hrule
-\vspace{1cm}}
-
-\newcommand{\kopficsl}[2]{
-\hrule
-\vspace{.15cm}
-\begin{minipage}{\textwidth}
-%akwardly i had to put \" here to make it compile correctly
-	{\sf\bf Supervised Learning \hfill Live Session #1\\
-	 \url{https://slds-lmu.github.io/i2ml/} \hfill #2}
-\end{minipage}
-\vspace{.05cm}
-\hrule
-\vspace{1cm}}
-
-\newcommand{\kopfaml}[2]{
-\hrule
-\vspace{.15cm}
-\begin{minipage}{\textwidth}
-%akwardly i had to put \" here to make it compile correctly
-	{\sf\bf Advanced Machine Learning \hfill Exercise sheet #1\\
-	 \url{https://slds-lmu.github.io/i2ml/} \hfill #2}
-\end{minipage}
-\vspace{.05cm}
-\hrule
-\vspace{1cm}}
-
-
-\newcommand{\kopfdive}[1]{
-\hrule
-\vspace{.15cm}
-\begin{minipage}{\textwidth}
-%akwardly i had to put \" here to make it compile correctly
-	{\sf\bf Supervised Learning \hfill Deep Dive\\
-	 \url{https://slds-lmu.github.io/i2ml/} \hfill #1}
-\end{minipage}
-\vspace{.05cm}
-\hrule
-\vspace{1cm}}
-
-\newcommand{\kopfsl}[2]{
-\hrule
-\vspace{.15cm}
-\begin{minipage}{\textwidth}
-%akwardly i had to put \" here to make it compile correctly
-	{\sf\bf Supervised Learning \hfill Exercise sheet #1\\
-	 \url{https://slds-lmu.github.io/i2ml/} \hfill #2}
-\end{minipage}
-\vspace{.05cm}
-\hrule
-\vspace{1cm}}
-
-\newenvironment{allgemein}
-	{\noindent}{\vspace{1cm}}
-
-\newcounter{aufg}
-\newenvironment{aufgabe}[1]
-	{\refstepcounter{aufg}\textbf{Exercise \arabic{aufg}: #1}\\ \noindent}
-	{\vspace{0.5cm}}
-
-\newcounter{loes}
-\newenvironment{loesung}[1]
-	{\refstepcounter{loes}\textbf{Solution \arabic{loes}: #1}\\\noindent}
-	{\bigskip}
-
-\newenvironment{bonusaufgabe}
-	{\refstepcounter{aufg}\textbf{Exercise \arabic{aufg}*\footnote{This
-	is a bonus exercise.}:}\\ \noindent}
-	{\vspace{0.5cm}}
-
-\newenvironment{bonusloesung}
-	{\refstepcounter{loes}\textbf{Solution \arabic{loes}*:}\\\noindent}
-	{\bigskip}
-
 
 
 \begin{document}
-% !Rnw weave = knitr
-
-
 
 \input{../../latex-math/basic-math.tex}
 \input{../../latex-math/basic-ml.tex}
 
-\kopfaml{8}{Imbalanced Learning}
+\kopfaml{10}{Imbalanced Learning}
 
-\loesung{Performance Measures}{
+\loesung{Cost Curves}{
 
 \begin{enumerate}
-	%
-	\item Given the following confusion matrices 
-%	
-	$$	M_1 = \begin{pmatrix}
-		0 & 10 \\
-		0 & 990
-	\end{pmatrix}, \quad 	
-	M_2 = \begin{pmatrix}
-		10 & 0 \\
-		10 & 980
-	\end{pmatrix},  \quad 	
-	M_3 = \begin{pmatrix}
-	10 & 10 \\
-	0 & 980
-	\end{pmatrix},	$$
-%
-	each of which corresponds to a classifier.
-%	
-	Compute the accuracy, $F_1$ score, G measure/mean, BAC and MCC of each classifier.
-	
-	\textbf{Accuracy:}
-	
-	Accuracy is computed by $\rho_{ACC} = \frac{TP+TN}{TP+TN+FN+FP}.$ 
-%	
-	Thus, we get
-%	
-	$$		\rho_{ACC}(M_1) = \frac{990}{1000} = 0.99  , \quad \rho_{ACC} (M_2)   =  \frac{990}{1000} = 0.99  ,\quad \rho_{ACC}(M_3)  =    \frac{990}{1000} = 0.99   .	$$
-	
-	\textbf{$F_1$ score:}
-	
-	$F_1$ score is computed by $ \rho_{F_1} =  2 \cdot \frac{\rho_{PPV} \cdot \rho_{TPR} }{\rho_{PPV} + \rho_{TPR}},$
-	where $\rho_{PPV} = \frac{TP}{TP + FP}$ and $\rho_{TPR} = \frac{TP}{TP + FN}.$
-%	
-	Thus, we get for the precision (PPV)
-%	
-	$$		\rho_{PPV}(M_1) = \frac{0}{10} = 0  , \quad \rho_{PPV} (M_2)   =  \frac{10}{10} = 1 ,\quad \rho_{PPV}(M_3)  =    \frac{10}{20} = 1/2   ,	$$
-%	
-	and the recall (TPR)
-%	
-	$$		\rho_{TPR}(M_1) = \frac{0}{0} = 0  , \quad \rho_{TPR} (M_2)   =  \frac{10}{20} = 1/2  ,\quad \rho_{TPR}(M_3)  =    \frac{10}{10} = 1  ,	$$
-%		
-	so that
-%
-	$$		\rho_{F_1}(M_1) = 0  , \quad \rho_{F_1} (M_2)   =  2 \cdot \frac{1 \cdot 0.5}{1 + 0.5} = 2/3  ,\quad \rho_{F_1}(M_3)  =  2 \cdot \frac{1 \cdot 0.5}{1 + 0.5} = 2/3   .	$$
-	
-	\emph{Note:} Here, we used the convention that $0/0 = 0.$  
-	
-	
-	\textbf{G score:}
-	
-	G score is computed by $ \rho_{G} =  \sqrt{\rho_{PPV} \cdot \rho_{TPR} }.$
-%	
-	Thus, with the above
-%	
-	$$		\rho_{G}(M_1) = 0  , \quad \rho_{G} (M_2)   = \sqrt{1 \cdot 0.5} = \sqrt{0.5} \approx 0.7071  ,\quad \rho_{G}(M_3)  = \sqrt{1 \cdot 0.5} = \sqrt{0.5} \approx 0.7071.	$$
-	
-	
-	\textbf{G mean:}
-	
-	G mean is computed by $ \rho_{G_m} =  \sqrt{\rho_{TNR} \cdot \rho_{TPR} },$ where $\rho_{TNR} = \frac{TN}{TN + FP}$ and $\rho_{TPR} = \frac{TP}{TP + FN}.$
-%	
-	For the TNR we have
-	%	
-	$$		\rho_{TNR}(M_1) = \frac{990}{1000} = 0.99  , \quad \rho_{TNR} (M_2)   =  \frac{980}{980} = 1  ,\quad \rho_{TNR}(M_3)  =    \frac{980}{990} \approx 0.9899  ,	$$
-	%	
-	Thus, with the above
-	%	
-	$$		\rho_{G_m}(M_1) = 0, \quad \rho_{G_m} (M_2)   = \sqrt{1 \cdot 0.5} = \sqrt{0.5} \approx 0.7071  ,\quad \rho_{G_m}(M_3)  = \sqrt{1 \cdot \frac{980}{990} } \approx 0.9949.	$$
-	
-	
-	\textbf{BAC:}
-	
-	BAC is computed by $ \rho_{BAC} =  \frac{\rho_{TNR} + \rho_{TPR} }{2}.$	
-%	
-	Thus, with the above
-	%	
-	$$		\rho_{BAC}(M_1) = \frac{0 + 990/1000}{2} \approx 0.5, \quad \rho_{BAC} (M_2)   = \frac{1 + 0.5}{2} = 0.75,\quad \rho_{BAC}(M_3)  = \frac{1 + \frac{980}{990} }{2} \approx 0.9949.	$$
-%	
-	
-	\textbf{MCC:}
-%	
-	MCC is computed by $ \rho_{MCC} =  \frac{TP\cdot TN - FP\cdot FN}{ \sqrt{(TP+FN)(TP+FP)(TN+FN)(TN+FP)} }.$	
-	%	
-	Thus, with the above
-	%	
-	$$		\rho_{MCC}(M_1) = 0, \quad \rho_{MCC} (M_2)   = \frac{ 10\cdot 980 - 0 }{  \sqrt{20\cdot10\cdot990\cdot980}  } = 0.7035265,\quad \rho_{MCC}(M_3)  = \frac{ 10\cdot 980 - 0 }{  \sqrt{20\cdot10\cdot990\cdot980}  } = 0.7035265.	$$
-	
-	%		
-	\item What are the population counterparts of the class-specific variants in the multiclass setting of true positive rate, positive predictive value and true negative rate?
-	
-	\textbf{True positive rate:}
-	
-	In the multiclass classification setting ($\Yspace=\{1,\ldots,g\}$), the class-specific variant of the true positive rate (or rather recall) is 
-%	
-	$$ \rho_{TPR_i} = \frac{n(i,i)}{n_i} $$
-%	
-	which corresponds to the fraction of correctly classified instances $i$	among all $i$ instances.
-%	
-	Thus, the population counterpart is $\P(  \yh = i ~|~ y=i ),$ where $\yh$ is the prediction random variable (i.e., $\yh=f(\xv)$ for a classifier $f$) and $y$ is the random variable representing the labels.
-	
-	
-	\textbf{Positive predictive value:}
-	
-	In the multiclass classification setting ($\Yspace=\{1,\ldots,g\}$), the class-specific variant of the positive predictive value (or rather precision) is 
-	%	
-	$$ \rho_{PPV_i} = \frac{n(i,i)}{\sum_{j=1}^g  n(i,j) }$$
-	%	
-	which corresponds to the fraction of correctly classified instances $i$	among all $i$ classifications.
-	%	
-	Thus, the population counterpart is $\P(  y= i ~|~  \yh = i).$ 
-	
-	
-	\textbf{True negative rate:}
-	
-	In the multiclass classification setting ($\Yspace=\{1,\ldots,g\}$), the class-specific variant of the true negative rate is 
-	%	
-	$$ \rho_{TNR_i} = \frac{\sum_{j\neq i}  n(j,j) }{ n - n_i }$$
-	%	
-	which corresponds to the fraction of correctly classified non-$i$ instances among all non-$i$ instances.
-	%	
-	Thus, the population counterpart is $\P( \yh \neq i  ~|~  y \neq i ).$ 
-  
+    \item We can simply retrieve the FPRs and TPRs from the table (or matrix) and plot the curves.
+\begin{lstlisting}
+import numpy as np
+import matplotlib.pyplot as plt
+
+# The first column is FPR, the second column is TPR
+FPR_TPR_1 = np.array(
+    [[0.0, 0.00],
+     [0.1, 0.60],
+     [0.2, 0.75],
+     [0.3, 0.825],
+     [0.4, 0.85],
+     [0.5, 0.875],
+     [0.6, 0.90],
+     [0.7, 0.925],
+     [0.8, 0.950],
+     [0.9, 0.975],
+     [1.0, 1.0]])
+
+FPR_TPR_2 = np.array(
+    [[0.0, 0.00],
+     [0.1, 0.2],
+     [0.2, 0.4],
+     [0.3, 0.6],
+     [0.4, 0.8],
+     [0.5, 0.925],
+     [0.6, 0.96],
+     [0.7, 0.98],
+     [0.8, 0.99],
+     [0.9, 0.995],
+     [1.0, 1.00]]
+)
+
+
+def draw_roc_curves(fpr_tpr_1: np.ndarray, fpr_tpr_2: np.ndarray) -> None:
+    fig, ax = plt.subplots(1, 1, figsize=(8, 7))
+    ax.plot(fpr_tpr_1[:, 0], fpr_tpr_1[:, 1], marker='o', label='Classifier 1')
+    ax.plot(fpr_tpr_2[:, 0], fpr_tpr_2[:, 1], marker='o', label='Classifier 2')
+
+    ax.set_xlabel('False Positive Rate')
+    ax.set_ylabel('True Positive Rate')
+    ax.grid('on')
+
+    plt.legend()
+    plt.savefig('roc_curves.pdf', bbox_inches='tight')
+\end{lstlisting}
+The ROC curves are shown in Figure~\ref{fig:roc_curves}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{figures/roc_curves}
+    \caption{ROC Curves.}
+    \label{fig:roc_curves}
+\end{figure}
+
+\item The cost is computed as 
+\begin{align*}
+    \rho_{MCE} = (FNR - FPR) \cdot \pi_{+} + FPR
+\end{align*}
+For each $(FPR, TPR)$ point in the ROC space, we draw a line of $(\pi_{+}, \rho_{MCE})$.
+
+\begin{lstlisting}
+
+def draw_cost_curves(fpr_tpr_1: np.ndarray, fpr_tpr_2: np.ndarray) -> None:
+    fnr_1 = 1 - fpr_tpr_1[:, 1]
+    fnr_2 = 1 - fpr_tpr_2[:, 1]
+    # Probability of positive
+    # Assume P = 50 points in [0.0, 1.0]
+    pos_probs = np.linspace(0.0, 1.0, 50)
+
+    # Compute the coefficient (FNR - FPR)
+    # Shape after expansion: (N, 1), where N is the number of points in ROC space.
+    fnr_minus_fpr_1 = np.expand_dims(fnr_1 - fpr_tpr_1[:, 0], 1)
+    fnr_minus_fpr_2 = np.expand_dims(fnr_2 - fpr_tpr_2[:, 0], 1)
+
+    # Costs shape: (N, P)
+    costs_1 = fnr_minus_fpr_1 * np.expand_dims(pos_probs, 0) + np.expand_dims(fpr_tpr_1[:, 0], 1)
+    costs_2 = fnr_minus_fpr_2 * np.expand_dims(pos_probs, 0) + np.expand_dims(fpr_tpr_2[:, 0], 1)
+    # Point-wise minimum across cost lines.
+    cost_curve_1 = costs_1.min(0)
+    cost_curve_2 = costs_2.min(0)
+
+    # Find the cross point of two cost curves. The following operation assumes that
+    # cust_curve_1 is lower than cost_curve_2 in the beginning of the curves.
+    cross_point_ind = np.flatnonzero(cost_curve_1 > cost_curve_2)[0]
+
+    fig, ax = plt.subplots(1, 1, figsize=(8, 7))
+    ax.plot(pos_probs, cost_curve_1, label='Classifier 1')
+    ax.plot(pos_probs, cost_curve_2, label='Classifier_2')
+    ax.vlines(
+        pos_probs[cross_point_ind],
+        ymin=0.0,
+        ymax=cost_curve_1[cross_point_ind],
+        linestyles='dashed',
+        colors=['k'],
+    )
+    ax.set_xlabel('Probability of Positive')
+    ax.set_ylabel('Error Rate')
+
+    plt.legend()
+    plt.savefig('cost_curves.pdf', bbox_inches='tight')
+
+
+if __name__ == '__main__':
+    draw_roc_curves(FPR_TPR_1, FPR_TPR_2)
+    draw_cost_curves(FPR_TPR_1, FPR_TPR_2)
+
+\end{lstlisting}
+Then, we obtain Figure~\ref{fig:cost_curves}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{figures/cost_curves}
+    \caption{Cost Curves.}
+    \label{fig:cost_curves}
+\end{figure}
+
 \end{enumerate}
+
 }
 
-\loesung{PR-curve}{
+\loesung{Tomek Links}{
 
-Draw the PR-curve for the following data set:
+\begin{enumerate}
+\item 
+\begin{lstlisting}
 
+import matplotlib.pyplot as plt
+import numpy as np
 
-\begin{center}
-	\begin{tabular}{c|c}
-		
-		\textbf{Truth} & \textbf{Score}  \\
-		\hline
-		Pos & 0.95 \\
-		
-		Pos & 0.86  \\
-		
-		Pos & 0.69  \\
-		
-		Neg &  0.65  \\
-		
-		Pos &  0.59 \\
-		
-		Neg  &  0.52 \\
-		
-		Pos &  0.51  \\
-		
-		Neg  &  0.39 \\
-		
-		Neg  &  0.28 \\
-		
-		Neg  &  0.18 \\
-		
-		Pos  & 0.15  \\
-		
-		Neg  &  0.06 \\
-	\end{tabular}
-\end{center}
-
-Note that $n_+ = 6 = n_-$ and our classification rule is 
-%
-$$\fx = 2 \cdot \mathds{1}_{[ s(\xv) \ge c]} -1.$$
-
-\begin{minipage}{0.5\textwidth}
-	\textbf{Step 1:}
-	We start with a threshold value of $c=0.95,$ then $TP=1,$ $FP=0$ and $FN= n_+ -1.$
-	%
-	Thus, 
-	%
-	%
-	$$  \rho_{TPR} = \frac{TP}{TP+FN} = 1/6 \quad \mbox{and} \quad \rho_{PPV} = \frac{TP}{TP + FP} = 1, $$
-	%
-	so that we first draw a line from $(0,1)$ to $(1/6,1).$
-	%
-\end{minipage}
-\begin{minipage}{0.45\textwidth}
-	\centering
-	\scalebox{0.4}{\includegraphics{figures/PR_curve_step_1}}
-\end{minipage}
+from sklearn.datasets import make_classification
+from sklearn.metrics import pairwise_distances
 
 
+def find_tomek_links(x: np.ndarray, y: np.ndarray) -> np.ndarray:
+    """Find Tomek Links in samples.
 
-\begin{minipage}{0.5\textwidth}
-	\textbf{Step 2:}
-We decrease the threshold value to $c=0.86,$ then $TP=2,$ $FP=0$ and $FN= n_+ - 2.$
-%
-Thus, 
-%
-%
-$$  \rho_{TPR} = \frac{TP}{TP+FN} = 2/6 \quad \mbox{and} \quad \rho_{PPV} = \frac{TP}{TP + FP} =  1, $$
-%
-so that we draw another line from $(1/6,1)$ to $(1/3,1).$
-%
-\end{minipage}
-\begin{minipage}{0.45\textwidth}
-\centering
-\scalebox{0.4}{\includegraphics{figures/PR_curve_step_2}}
-\end{minipage}
+    Args:
+        x: Data samples with shape (num_samples, num_features).
+        y: Binary class labels with shape (num_samples,). 
+           1 means positive class, 0 means negative class.
 
+    Returns:
+        An array with shape (num_samples, ) with binary values, 
+        for which 1 means that the corresponding sample 
+        belongs to a Tomek link, while 0 means that the 
+        sample does not belong to any Tomek link.
+    """
 
-\begin{minipage}{0.5\textwidth}
-	\textbf{Step 3:}
-We decrease the threshold value to $c=0.69,$ then $TP=3,$ $FP=0$ and $FN= n_+ - 3.$
-%
-Thus, 
-%
-%
-$$  \rho_{TPR} = \frac{TP}{TP+FN} = 3/6 \quad \mbox{and} \quad \rho_{PPV} = \frac{TP}{TP + FP} =  1, $$
-%
-so that we draw another line from $(1/3,1)$ to $(1/2,1).$
-%
-\end{minipage}
-\begin{minipage}{0.45\textwidth}
-\centering
-\scalebox{0.4}{\includegraphics{figures/PR_curve_step_3}}
-\end{minipage}
+    num_samples = x.shape[0]
+    dist = pairwise_distances(x)
 
-\begin{minipage}{0.5\textwidth}
-	\textbf{Step 4:}
-We decrease the threshold value to $c=0.65,$ then $TP=3,$ $FP=1$ and $FN= n_+ - 3.$
-%
-Thus, 
-%
-%
-$$  \rho_{TPR} = \frac{TP}{TP+FN} = 3/6 \quad \mbox{and} \quad \rho_{PPV} = \frac{TP}{TP + FP} =  3/4, $$
-%
-so that we draw another line from $(1/2,1)$ to $(1/2,3/4).$
-%
-\end{minipage}
-\begin{minipage}{0.45\textwidth}
-\centering
-\scalebox{0.4}{\includegraphics{figures/PR_curve_step_4}}
-\end{minipage}
+    # Compute the min. pairwise distance between samples with
+    # pos. and neg. samples, respectively. To this end, we employ 
+    # masked arrays, which can be constructed by
+    # applying binary masks to the original array. In the masks, 1
+    # means excluding the corresponding samples when performing 
+    # operations e.g. min, argmin, etc.
 
+    # pos_mask has shape (num_samples, num_samples).
+    pos_mask = np.tile(np.expand_dims(1-y, 0), (num_samples, 1))
+    # Also excluding each sample itself.
+    # Otherwise, argmin will always point to the sample itself.
+    pos_mask[np.arange(num_samples), np.arange(num_samples)] = True
+    dist_pos = np.ma.array(dist, mask=pos_mask)
+    # Sample indices indicate the closest positive sample to each data sample.
+    min_dist_inds_pos = dist_pos.argmin(axis=1)
 
-\begin{minipage}{0.5\textwidth}
-	\textbf{Step 5:}
-We decrease the threshold value to $c=0.59,$ then $TP=4,$ $FP=1$ and $FN= n_+ - 4.$
-%
-Thus, 
-%
-%
-$$  \rho_{TPR} = \frac{TP}{TP+FN} = 4/6 \quad \mbox{and} \quad \rho_{PPV} = \frac{TP}{TP + FP} =  4/5, $$
-%
-so that we draw another line from $(1/2,3/4)$ to $(2/3,4/5).$
-%
-\end{minipage}
-\begin{minipage}{0.45\textwidth}
-\centering
-\scalebox{0.4}{\includegraphics{figures/PR_curve_step_5}}
-\end{minipage}
+    neg_mask = np.tile(np.expand_dims(y, 0), (num_samples, 1))
+    neg_mask[np.arange(num_samples), np.arange(num_samples)] = True
+    dist_neg = np.ma.array(dist, mask=neg_mask)
+    min_dist_inds_neg = dist_neg.argmin(axis=1)
 
-\begin{minipage}{0.5\textwidth}
-	\textbf{Step 6:}
-We decrease the threshold value to $c=0.52,$ then $TP=4,$ $FP=2$ and $FN= n_+ - 4.$
-%
-Thus, 
-%
-%
-$$  \rho_{TPR} = \frac{TP}{TP+FN} = 4/6 \quad \mbox{and} \quad \rho_{PPV} = \frac{TP}{TP + FP} =  4/6, $$
-%
-so that we draw another line from $(2/3,4/5)$ to $(2/3,2/3).$
-%
-\end{minipage}
-\begin{minipage}{0.45\textwidth}
-\centering
-\scalebox{0.4}{\includegraphics{figures/PR_curve_step_6}}
-\end{minipage}
+    # This interpolation is equivalent to: if y_i = 1, then select the closest pos.
+    # sample; if y_i = 0, then select the closest neg. sample. In other words, it
+    # identifies the index of the closest intra-class sample.
+    min_dist_inds_same_y = min_dist_inds_pos * y + min_dist_inds_neg * (1 - y)
+    # This interpolation is equivalent to: if y_i = 1, then select the closest neg.
+    # sample; if y_i = 0, then select the closest pos. sample. In other words, it
+    # identifies the index of the closest inter-class sample.
+    min_dist_inds_diff_y = min_dist_inds_pos * (1 - y) + min_dist_inds_neg * y
+    # Retrieve the distance to the closest intra-class sample and 
+    # inter-class sample
+    min_dist_same_y = dist[np.arange(num_samples), min_dist_inds_same_y]
+    min_dist_diff_y = dist[np.arange(num_samples), min_dist_inds_diff_y]
 
-\begin{minipage}{0.5\textwidth}
-	\textbf{Step 7:}
-We decrease the threshold value to $c=0.51,$ then $TP=5,$ $FP=2$ and $FN= n_+ - 5.$
-%
-Thus, 
-%
-%
-$$  \rho_{TPR} = \frac{TP}{TP+FN} = 5/6 \quad \mbox{and} \quad \rho_{PPV} = \frac{TP}{TP + FP} =  5/7, $$
-%
-so that we draw another line from $(2/3,2/3)$ to $(5/6,5/7).$
-%
-\end{minipage}
-\begin{minipage}{0.45\textwidth}
-\centering
-\scalebox{0.4}{\includegraphics{figures/PR_curve_step_7}}
-\end{minipage}
+    # A sample belongs to a Tomek link if its closest inter-class sample is closer
+    # than its closest intra-class sample.
+    tomek_pairs = np.stack([np.arange(num_samples), min_dist_inds_diff_y], axis=1)
+    # tomek_pairs has shape (num_tomek_pairs, 2) in the end
+    tomek_pairs = tomek_pairs[min_dist_diff_y <= min_dist_same_y]
 
-\begin{minipage}{0.5\textwidth}
-	\textbf{Step 8:}
-We decrease the threshold value to $c=0.39,$ then $TP=5,$ $FP=3$ and $FN= n_+ - 5.$
-%
-Thus, 
-%
-%
-$$  \rho_{TPR} = \frac{TP}{TP+FN} = 5/6 \quad \mbox{and} \quad \rho_{PPV} = \frac{TP}{TP + FP} =  5/8, $$
-%
-so that we draw another line from $(5/6,5/7)$ to $(5/6,5/8).$
-%
-\end{minipage}
-\begin{minipage}{0.45\textwidth}
-\centering
-\scalebox{0.4}{\includegraphics{figures/PR_curve_step_8}}
-\end{minipage}
+    # create a binary array and set the elements to 1 if the corresponding indices
+    # appear in the tomek_pairs.
+    is_tomek_sample = np.zeros((num_samples, ), dtype=bool)
+    is_tomek_sample[tomek_pairs.flat] = True
+    return is_tomek_sample
 
-\begin{minipage}{0.5\textwidth}
-	\textbf{Step 9:}
-We decrease the threshold value to $c=0.28,$ then $TP=5,$ $FP=4$ and $FN= n_+ - 5.$
-%
-Thus, 
-%
-%
-$$  \rho_{TPR} = \frac{TP}{TP+FN} = 5/6 \quad \mbox{and} \quad \rho_{PPV} = \frac{TP}{TP + FP} =  5/9, $$
-%
-so that we draw another line from $(5/6,5/8)$ to $(5/6,5/9).$
-%
-\end{minipage}
-\begin{minipage}{0.45\textwidth}
-\centering
-\scalebox{0.4}{\includegraphics{figures/PR_curve_step_9}}
-\end{minipage}
+\end{lstlisting}
 
-\begin{minipage}{0.5\textwidth}
-	\textbf{Step 10:}
-We decrease the threshold value to $c=0.18,$ then $TP=5,$ $FP=5$ and $FN= n_+ - 5.$
-%
-Thus, 
-%
-%
-$$  \rho_{TPR} = \frac{TP}{TP+FN} = 5/6 \quad \mbox{and} \quad \rho_{PPV} = \frac{TP}{TP + FP} =  5/10, $$
-%
-so that we draw another line from $(5/6,5/9)$ to $(5/6,1/2).$
-%
-\end{minipage}
-\begin{minipage}{0.45\textwidth}
-\centering
-\scalebox{0.4}{\includegraphics{figures/PR_curve_step_10}}
-\end{minipage}
+\item 
 
-\begin{minipage}{0.5\textwidth}
-	\textbf{Step 11:}
-We decrease the threshold value to $c=0.15,$ then $TP=6,$ $FP=5$ and $FN= n_+ - 6 = 0.$
-%
-Thus, 
-%
-%
-$$  \rho_{TPR} = \frac{TP}{TP+FN} =  1 \quad \mbox{and} \quad \rho_{PPV} = \frac{TP}{TP + FP} =  6/11, $$
-%
-so that we draw another line from $(5/6,1/2)$ to $(1,6/11).$
-%
-\end{minipage}
-\begin{minipage}{0.45\textwidth}
-\centering
-\scalebox{0.4}{\includegraphics{figures/PR_curve_step_11}}
-\end{minipage}
+\begin{lstlisting}
+def find_kept_samples(
+        x: np.ndarray,
+        y: np.ndarray,
+        is_tomek_sample: np.ndarray
+) -> np.ndarray:
+    """Given the binary array indicating which sample belongs to a Tomek link. Find out which sample should be kept. The sample should be removed if it belongs to a Tomek link and it is majority class.
 
-\begin{minipage}{0.5\textwidth}
-	\textbf{Step 12:}
-We decrease the threshold value to $c=0,$ then $TP=6,$ $FP=6$ and $FN= n_+ - 6 = 0.$
-%
-Thus, 
-%
-%
-$$  \rho_{TPR} = \frac{TP}{TP+FN} = 1 \quad \mbox{and} \quad \rho_{PPV} = \frac{TP}{TP + FP} =  6/12, $$
-%
-so that we draw another line from $(1,6/11)$ to $(1,1/2).$
-%
-\end{minipage}
-\begin{minipage}{0.45\textwidth}
-\centering
-\scalebox{0.4}{\includegraphics{figures/PR_curve_step_12}}
-\end{minipage}
+    Args:
+        x: Data samples with shape (num_samples, num_features).
+        y: Binary class labels with values 0 or 1.
+        is_tomek_sample: A binary array with shape (num_samples,), 
+            in which 1 means that the sample belongs to a Tomek link.
+
+    Returns:
+        A binary array with shape (num_samples,), in which 1 means that the 
+        corresponding sample should be kept, otherwise it should be removed.
+    """
+    num_samples = x.shape[0]
+    to_be_kept = np.ones((num_samples, ), dtype=bool)
+
+    # Define which class is majority
+    num_pos_samples = y.sum()
+    num_neg_samples = num_samples - num_pos_samples
+    if num_pos_samples >= num_neg_samples:
+        y_major = 1
+    else:
+        y_major = 0
+
+    # Only remove the sample in a Tomek link if it is majority class
+    is_major_tomek_sample = np.logical_and(is_tomek_sample, y == y_major)
+    to_be_kept[is_major_tomek_sample] = False
+
+    return to_be_kept
+\end{lstlisting}
+
+\item 
+\begin{lstlisting}
+def run_experiment() -> None:
+    # Generate data
+    random_state = np.random.RandomState(11)
+    x, y = make_classification(
+        100,
+        n_features=2,
+        n_redundant=0,
+        n_clusters_per_class=1,
+        flip_y=0.02,
+        class_sep=1.0,
+        weights=[0.25, 0.75],
+        random_state=random_state)
+
+    # Plot the original dataset
+    fig, ax = plt.subplots(1, 1)
+    x_pos = x[y == 1]
+    x_neg = x[y == 0]
+    ax.scatter(x_pos[:, 0], x_pos[:, 1], facecolors='none', edgecolors='r', label='Pos. samples')
+    ax.scatter(x_neg[:, 0], x_neg[:, 1], facecolors='none', edgecolors='b', label='Neg. samples')
+    ax.set_title('Original Dataset')
+    ax.set_xlim(-3, 3)
+    ax.set_ylim(-3, 3)
+    plt.legend()
+    plt.savefig('original_dataset.pdf', bbox_inches='tight')
+    plt.clf()
+
+    # Find out which samples belong to Tomek links.
+    is_tomek_link = find_tomek_links(x, y)
+
+    fig, ax = plt.subplots(1, 1)
+    x_tomek = x[is_tomek_link]
+    ax.scatter(x_pos[:, 0], x_pos[:, 1], facecolors='none', edgecolors='r', label='Pos. samples')
+    ax.scatter(x_neg[:, 0], x_neg[:, 1], facecolors='none', edgecolors='b', label='Neg. samples')
+    ax.scatter(
+        x_tomek[:, 0],
+        x_tomek[:, 1],
+        facecolors='none',
+        edgecolors='g',
+        label='Set of Tomek-link samples')
+    ax.set_title('Set of Tomek-link samples')
+    ax.set_xlim(-3, 3)
+    ax.set_ylim(-3, 3)
+    plt.legend()
+    plt.savefig('tomek_links.pdf', bbox_inches='tight')
+    plt.clf()
+
+    # Identify which samples should be kept and which should be removed
+    to_be_kept = find_kept_samples(x, y, is_tomek_link)
+
+    fig, ax = plt.subplots(1, 1)
+    x_removed = x[~to_be_kept]
+    x, y = x[to_be_kept], y[to_be_kept]
+    x_pos, x_neg = x[y == 1], x[y == 0]
+    ax.scatter(x_pos[:, 0], x_pos[:, 1], facecolors='none', edgecolors='r', label='Pos. samples')
+    ax.scatter(x_neg[:, 0], x_neg[:, 1], facecolors='none', edgecolors='b', label='Neg. samples')
+    ax.scatter(
+        x_removed[:, 0],
+        x_removed[:, 1],
+        facecolors='none',
+        edgecolor='k',
+        linestyle='dotted',
+        label='Removed samples')
+    ax.set_title('Majority Samples in Tomek links Removed')
+    ax.set_xlim(-3, 3)
+    ax.set_ylim(-3, 3)
+    plt.legend()
+    plt.savefig('subsampled_dataset.pdf', bbox_inches='tight')
+    plt.clf()
 
 
+if __name__ == '__main__':
+    run_experiment()
+\end{lstlisting}
+
+After running the script, we obain the following figures:
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/original_dataset}
+        \caption{Original Dataset.}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/tomek_links}
+        \caption{Tomek Links.}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.32\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{figures/removed_dataset}
+        \caption{Subsampled Dataset.}
+    \end{subfigure}
+\end{figure}
+
+\end{enumerate}
 
 
 }
+
+
+
 
 
 
