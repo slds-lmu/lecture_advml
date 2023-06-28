@@ -165,53 +165,37 @@ def find_tomek_links(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     num_samples = x.shape[0]
     dist = pairwise_distances(x)
 
-    # Compute the min. pairwise distance between samples with
-    # pos. and neg. samples, respectively. To this end, we employ 
-    # masked arrays, which can be constructed by
-    # applying binary masks to the original array. In the masks, 1
-    # means excluding the corresponding samples when performing 
+    # Compute the min. pairwise distance between samples. Note that the distance
+    # to each sample itself is 0 and trivial, so this case should be excluded when
+    # computing the pairwise distance. To this end, we employ masked arrays,
+    # which can be constructed by applying binary masks to the original array.
+    # In the masks, 1 means excluding the corresponding samples when performing
     # operations e.g. min, argmin, etc.
 
-    # pos_mask has shape (num_samples, num_samples).
-    pos_mask = np.tile(np.expand_dims(1-y, 0), (num_samples, 1))
-    # Also excluding each sample itself.
-    # Otherwise, argmin will always point to the sample itself.
-    pos_mask[np.arange(num_samples), np.arange(num_samples)] = True
-    dist_pos = np.ma.array(dist, mask=pos_mask)
-    # Sample indices indicate the closest positive sample to each data sample.
-    min_dist_inds_pos = dist_pos.argmin(axis=1)
+    mask = np.eye(num_samples, dtype=bool)
+    masked_dist = np.ma.array(dist, mask=mask)
+    nearest_j_to_i = masked_dist.argmin(axis=1)
+    # Check if the nearest neighbor of j is also i. 
+    # If yes, they are mutually nearest.
+    nearest_i_to_j = np.zeros_like(nearest_j_to_i)
+    nearest_i_to_j[nearest_j_to_i] = np.arange(num_samples)
 
-    neg_mask = np.tile(np.expand_dims(y, 0), (num_samples, 1))
-    neg_mask[np.arange(num_samples), np.arange(num_samples)] = True
-    dist_neg = np.ma.array(dist, mask=neg_mask)
-    min_dist_inds_neg = dist_neg.argmin(axis=1)
+    is_mutually_closest = nearest_i_to_j == nearest_j_to_i
+    # Tomek links also requires the pair to have different labels
+    is_diff_y = y != y[nearest_j_to_i]
+    is_tomek_sample = np.logical_and(is_mutually_closest, is_diff_y)
 
-    # This interpolation is equivalent to: if y_i = 1, then select the closest pos.
-    # sample; if y_i = 0, then select the closest neg. sample. In other words, it
-    # identifies the index of the closest intra-class sample.
-    min_dist_inds_same_y = min_dist_inds_pos * y + min_dist_inds_neg * (1 - y)
-    # This interpolation is equivalent to: if y_i = 1, then select the closest neg.
-    # sample; if y_i = 0, then select the closest pos. sample. In other words, it
-    # identifies the index of the closest inter-class sample.
-    min_dist_inds_diff_y = min_dist_inds_pos * (1 - y) + min_dist_inds_neg * y
-    # Retrieve the distance to the closest intra-class sample and 
-    # inter-class sample
-    min_dist_same_y = dist[np.arange(num_samples), min_dist_inds_same_y]
-    min_dist_diff_y = dist[np.arange(num_samples), min_dist_inds_diff_y]
-
-    # A sample belongs to a Tomek link if its closest inter-class sample is closer
-    # than its closest intra-class sample.
-    tomek_pairs = np.stack([np.arange(num_samples), min_dist_inds_diff_y], axis=1)
-    # tomek_pairs has shape (num_tomek_pairs, 2) in the end
-    tomek_pairs = tomek_pairs[min_dist_diff_y <= min_dist_same_y]
-
-    # create a binary array and set the elements to 1 if the corresponding indices
-    # appear in the tomek_pairs.
-    is_tomek_sample = np.zeros((num_samples, ), dtype=bool)
-    is_tomek_sample[tomek_pairs.flat] = True
     return is_tomek_sample
 
 \end{lstlisting}
+In this function, \texttt{nearest\_i\_to\_j} and \texttt{nearest\_j\_to\_i} are used to determine if $i$-th sample and $j$-th sample are mutually closest. Figure~\ref{fig:mutually_closest_diagramm} shows an example of the process.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{figures/mutually_closest_diagramm}
+    \caption{Determining the Mutually Closest Pairs. The first two elements are consistent in both arrays. This is interpreted as that the 0-th sample and the 1-th sample are mutually closest.}
+    \label{fig:mutually_closest_diagramm}
+\end{figure}
 
 \item 
 
