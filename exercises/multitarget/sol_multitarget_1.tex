@@ -141,6 +141,122 @@ where  $ \| B \|^2_F  = \sqrt{ \sum_{i=1}^n \sum_{j=1}^m B_{i,j}^2 } $ is the Fr
 	and $\hat{\ba}_j$ is the MLE for the $j$th target parameter.
     \end{itemize}
 
+\begin{lstlisting}
+#' @param step_size the step_size in each iteration 
+#' @param X the feature input matrix X 
+#' @param Y the score matrix Y 
+#' @param A the parameter matrix 
+#' @param eps a small constant measuring the changes in each update step. 
+#' Stop the algorithm if the estimated model parameters do not change
+#' more than eps.
+
+#' @return a set of optimal parameter matrix A
+
+gradient_descent <- function(
+                        step_size, 
+                        X, 
+                        Y, 
+                        A = matrix(rep(0,ncol(X)*m),ncol=m),
+                        eps = 1e-8){
+
+    change <- 1 # something larger eps
+
+    XtX <- crossprod(X) 
+    XtY <- crossprod(X,Y)
+    while(sum(abs(change)) > eps) {
+        # Use standard gradient descent:
+        change <- + step_size * (XtY - XtX%*%A)
+        # update A in the end 
+        A <- A + change
+    }
+    return(A)
+}
+
+# make it all reproducible 
+set.seed(123)
+
+# settings 
+n <- 10000 
+p <- 100
+
+m <- 6 
+nr_sims <- 20
+
+# define mse 
+mse <- function(x,y) mean((x-y)^2)
+
+# create data (only once)
+X <- matrix(rnorm(n*p), ncol=p)
+A_truth <- matrix(runif(p*m, -2, 2),ncol=m) 
+f_truth <- X%*%A_truth
+
+# create result object 
+result_list <- vector("list", nr_sims)
+
+js_estimate <- function(A,A_truth) { 
+    A_JS = A
+    for(i in 1:ncol(A)) {
+
+        A_JS[,i]= (1-4*(m-2)/(n*sum((A[,i]-A_truth[,i])^2)))* (A[,i]-A_truth[,i])+A_truth[,i]
+    }
+    A_JS
+}
+
+for(sim_nr in seq_len(nr_sims)){
+    # create response
+    Y <- f_truth + rnorm(n*m, sd = 2)
+
+    time_lm <- system.time( coef_lm <- coef(lm(Y~-1+X)) )["elapsed"]
+
+    time_js <- system.time( 
+                coef_js <- js_estimate(coef_lm,A_truth) )["elapsed"] 
+    time_js = time_js + time_lm
+
+    time_gd_1 <- system.time(
+                    coef_gd_1 <- gradient_descent(
+                        step_size = 0.0001, 
+                        X = X, 
+                        Y = Y)
+                )["elapsed"]
+
+    time_gd_2 <- system.time( 
+                    coef_gd_2 <- gradient_descent(
+                        step_size = 0.00005, 
+                        X = X, 
+                        Y = Y)
+                )["elapsed"]
+
+    mse_lm <- mse(coef_lm, A_truth) 
+    mse_js <- mse(coef_js, A_truth) 
+    mse_gd_1 <- mse(coef_gd_1, A_truth) 
+    mse_gd_2 <- mse(coef_gd_2, A_truth)
+
+    # save results in list (performance, time) 
+    result_list[[sim_nr]] <- data.frame(
+                                mse_lm = mse_lm, 
+                                mse_js = mse_js, 
+                                mse_gd_1 = mse_gd_1,
+                                mse_gd_2 = mse_gd_2, 
+                                time_lm = time_lm, 
+                                time_js = time_js, 
+                                time_gd_1 = time_gd_1, 
+                                time_gd_2 = time_gd_2)
+}
+
+library(ggplot2) 
+library(dplyr) 
+library(tidyr)
+
+do.call("rbind", result_list) %>% 
+    gather() %>%
+    mutate(what = ifelse(grepl("mse", key), "MSE", "Time"),
+        algorithm = gsub("(mse|time)\\ _(.*)","\\2", key)) %>%
+    ggplot(aes(x = algorithm, y = value)) + geom_boxplot() + theme_bw() + 
+    facet_wrap(~ what, scales = "free")
+\end{lstlisting}
+
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-3-1}
+
 \end{enumerate}
 
 }
