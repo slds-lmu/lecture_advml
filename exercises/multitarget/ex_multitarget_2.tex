@@ -45,9 +45,9 @@ where $s_j:\Xspace \times \Yspace \to \R$ are scoring functions for the $j$-th t
 %
 \begin{enumerate}
 %	
-	\item conditional random fields are very well suited to model the case, where the distributions of the targets $y_1,\ldots,y_m$ are conditionally independent,
+	\item conditional random fields are very well suited to model the case, where the distributions of the targets $y_1,\ldots,y_m$ are conditionally independent. In other words, show that $\P(\yv~|~\xv) \approx \prod_{j=1}^m \P(y_j~|~\xv)$. \textit{Hint:} Use the multinomial theorem: $$(z_1 + z_2 + \ldots + z_g)^m = \sum_{k_1 + k_2 + \ldots k_g = m} \binom{m}{k_1, k_2, \ldots, k_g} \prod_{t=1}^g z_t^{k_t}.$$ 
 %	
-	\item the structured hinge loss corresponds to the multiclass hinge loss for the targets if we use the (non-averaged) Hamming loss for $\ell(\yv,\yv')= \sum_{j=1}^m \mathds{1}_{[y_j \neq y_j']} $, i.e.,
+	\item The structured hinge loss corresponds to the multiclass hinge loss for the targets if we use the (non-averaged) Hamming loss for $\ell(\yv,\yv')= \sum_{j=1}^m \mathds{1}_{[y_j \neq y_j']} $, i.e.,
 %	
 	$$	\ell_{shinge}(\xv,\yv,s) =  \sum_{j=1}^m \max_{y_j' \in \Yspace} \left( \mathds{1}_{[y_j \neq y_j']} + s_j(\xv,y_j')	- s_j(\xv,y_j) \right).	$$
 %	

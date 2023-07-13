@@ -49,7 +49,7 @@ where $s_j:\Xspace \times \Yspace \to \R$ are scoring functions for the $j$-th t
 \begin{enumerate}
 %	
 	\item conditional random fields are very well suited to model the case, where the distributions of the targets $y_1,\ldots,y_m$ are conditionally independent,
-%	
+	In other words, show that $\P(\yv~|~\xv) \approx \prod_{j=1}^m \P(y_j~|~\xv)$. \textit{Hint:} Use the multinomial theorem: $$(z_1 + z_2 + \ldots + z_g)^m = \sum_{k_1 + k_2 + \ldots k_g = m} \binom{m}{k_1, k_2, \ldots, k_g} \prod_{t=1}^g z_t^{k_t}.$$ 
 
 	\textbf{Solution:}
 %	
@@ -75,12 +75,27 @@ where $s_j:\Xspace \times \Yspace \to \R$ are scoring functions for the $j$-th t
 		&= \prod_{j=1}^m \underbrace{\frac{  \exp\left( s_j(\xv,y_j)\right)}{ \sum_{y_j' \in \Yspace}  \exp \left(  s_j(\xv,y_j') \right)}}_{ =:\pi_j(\xv,y_j) }. \\
 %		
 	\end{align*}
+
+Note that we used $\sum_{\yv \in \Yspace^m} \prod_{j=1}^m \exp \left( s_j(\xv,y_j) \right) = \prod_{j=1}^m \sum_{y_j \in \Yspace}  \exp \left(  s_j(\xv,y_j) \right)$. We prove this as follows. For brevity let's assume $|\mathcal{Y}| = g$ and define $S_j = s_j(\xv, y_j)$. The left hand side can be written as 
+\begin{align*}
+    \sum_{\yv \in \Yspace^m} \prod_{j=1}^m \exp \left( s_j(\xv,y_j) \right) &= \sum_{k_1 + k_2 + \ldots + k_g = m} \binom{m}{k_1, k_2, \ldots, k_g} \prod_{t=1}^g S_t^{k_t}.
+\end{align*}
+So we enumerate all the possible $\yv$.
+By using the binomial theorem, this boils down to 
+\begin{align*}
+    \sum_{k_1 + k_2 + \ldots + k_g = m} \binom{m}{k_1, k_2, \ldots, k_g} \prod_{t=1}^g S_t^{k_t}
+    &= (S_1 + S_2 + \ldots + S_g)^m \\
+    &= \prod_{j=1}^m \left(\sum_{t=1}^g S_t \right) \\
+    &= \prod_{j=1}^m \left( \sum_{y_j \in \mathcal{Y}} \exp(s_j(\xv, y_j)) \right). \\
+\end{align*}
+(If you find a problem understanding this part of proof, try a simple example with $|\mathcal{Y}| = 2$ and $m = 3$ and compute the both sides of the equation by hand.)
+
 %
 	So, if $\pi_j(\xv,y_j)$ is interpreted as a model for the marginal conditional distribution $\P(y_j~|~\xv),$ we see from above
 %	
 	$$   \P(\yv~|~\xv) \approx \prod_{j=1}^m \P(y_j~|~\xv),	$$
 %	
-	i.e., the targets are conditionally independent.
+	i.e., the targets are conditionally independent. 
 
 	
 
