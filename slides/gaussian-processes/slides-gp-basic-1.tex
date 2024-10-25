@@ -22,11 +22,11 @@
 
 \begin{itemize}
   \item Until now we considered a hypothesis space $\Hspace$ of parameterized functions $\fxt$ (in particular, the space of linear functions). 
-  \item Using Bayesian inference, we derived distributions for $\thetab$ after having observed data $\D$. 
-  \item Prior believes about the parameter are expressed via a prior distribution $q(\thetab)$, which is updated according to Bayes' rule 
+  \item Using Bayesian inference, we derived distributions for $\thetav$ after having observed data $\D$. 
+  \item Prior believes about the parameter are expressed via a prior distribution $q(\thetav)$, which is updated according to Bayes' rule 
 
   $$
-  \underbrace{p(\thetab | \Xmat, \yv)}_{\text{posterior}} = \frac{\overbrace{p(\yv | \Xmat, \thetab)}^{\text{likelihood}}\overbrace{q(\thetab)}^{\text{prior}}}{\underbrace{p(\yv|\Xmat)}_{\text{marginal}}}. 
+  \underbrace{p(\thetav | \Xmat, \yv)}_{\text{posterior}} = \frac{\overbrace{p(\yv | \Xmat, \thetav)}^{\text{likelihood}}\overbrace{q(\thetav)}^{\text{prior}}}{\underbrace{p(\yv|\Xmat)}_{\text{marginal}}}. 
   $$
 \end{itemize}
 
@@ -39,8 +39,8 @@
   \begin{tabular}{cc}
   \textbf{Weight-Space View} & \textbf{Function-Space View} \vspace{1mm}\\ 
   Parameterize functions & \\
-  \footnotesize Example: $\fxt = \thetab^\top \xv$ & \vspace{1mm}\\
-  Define distributions on $\thetab$ & Define distributions on $f$ \vspace{1mm}\\
+  \footnotesize Example: $\fxt = \thetav^\top \xv$ & \vspace{1mm}\\
+  Define distributions on $\thetav$ & Define distributions on $f$ \vspace{1mm}\\
   Inference in parameter space $\Theta$ & Inference in function space $\Hspace$
   \end{tabular}
 \end{table}  

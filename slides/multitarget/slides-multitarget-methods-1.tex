@@ -72,11 +72,11 @@
 	
 		\item Assume a linear basis function model for the $m$-th target: 
 		\begin{equation*}
-			\fkx = \thetab_k^\intercal \phi(\xv) \,,
+			\fkx = \thetav_k^\intercal \phi(\xv) \,,
 			\label{eq:binrel}
 		\end{equation*}
 
-		$\thetab_k$ is target-specific parameter and $\phi$ some feature mapping.
+		$\thetav_k$ is target-specific parameter and $\phi$ some feature mapping.
         \item Use this with with large nr of targets. 
         %Otherwise, we can also use normal ML modelling and model selection.
 
@@ -84,14 +84,14 @@
   
 		\begin{equation*}
 			\label{eq:multiridge}
-			\min_\Theta \|Y - \Phi \Theta \|^2_F +  \sum_{m=1}^l \lambda_m \,\|\thetab_m\|^2 \,,
+			\min_\Theta \|Y - \Phi \Theta \|^2_F +  \sum_{m=1}^l \lambda_m \,\|\thetav_m\|^2 \,,
 		\end{equation*}
 
 		$ \| B \|^2_F  = \sqrt{ \sum_{i=1}^n \sum_{m=1}^l B_{i,m}^2 } $ is Frobenius norm for $B \in \R^{n \times l}$ and 
 	
 		\begin{equation*}
 			\label{eq:notation}
-			\Phi = \begin{bmatrix} \phi(\xv^{(1)})^\top \\ \vdots \\ \phi(\xv^{(n)})^\top \end{bmatrix} \qquad \Theta = [\thetab_1 \quad \cdots \quad \thetab_l] \,.
+			\Phi = \begin{bmatrix} \phi(\xv^{(1)})^\top \\ \vdots \\ \phi(\xv^{(n)})^\top \end{bmatrix} \qquad \Theta = [\thetav_1 \quad \cdots \quad \thetav_l] \,.
 		\end{equation*}
   Frobenius norm = sum of SSE-s of all targets
   %      Note that each column of $\Theta$ is binded with a specific target.
@@ -154,7 +154,7 @@
 \begin{itemize}
     \item Approach: Bias parameter vectors towards mean vector:
 $$
-            \min_\Theta \|Y - \Phi \Theta \|^2_F + \lambda \sum_{m=1}^l \|\thetab_m - \frac{1}{l} \sum_{m'=1}^l \thetab_{m'} \|^2 
+            \min_\Theta \|Y - \Phi \Theta \|^2_F + \lambda \sum_{m=1}^l \|\thetav_m - \frac{1}{l} \sum_{m'=1}^l \thetav_{m'} \|^2 
 $$    
 %    \item The assumption that all target models are similar is too strict.
 \end{itemize}

@@ -22,7 +22,7 @@ The following data set contains $n = 13$ datapoints, the triangles denote class 
 
 \begin{enumerate}
 	%	
-	\item Let $f(\xv) = 2 \cdot \mathds{1}_{[  \thetab^\top \xv \ge 3]} -1 $ with $\thetab=(1,1)^\top.$ Specify the confusion matrix of $f$ and compute its accuracy as well as its $F_1$ score.
+	\item Let $f(\xv) = 2 \cdot \mathds{1}_{[  \thetav^\top \xv \ge 3]} -1 $ with $\thetav=(1,1)^\top.$ Specify the confusion matrix of $f$ and compute its accuracy as well as its $F_1$ score.
 	
 		 \item[]	{\color{blue} \textbf{Solution:}   
 		%	
@@ -30,7 +30,7 @@ The following data set contains $n = 13$ datapoints, the triangles denote class 
 %		
 		\begin{align*}
 %			
-			\thetab^\top \xv = 3 \quad &\Leftrightarrow \quad x_1+x_2 = 3 \quad \Leftrightarrow \quad x_2 = 3 - x_1.
+			\thetav^\top \xv = 3 \quad &\Leftrightarrow \quad x_1+x_2 = 3 \quad \Leftrightarrow \quad x_2 = 3 - x_1.
 		%		
 		\end{align*}
 		%

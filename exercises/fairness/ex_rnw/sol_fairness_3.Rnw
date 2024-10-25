@@ -10,13 +10,13 @@ Recall that in logistic regression the probability $	p(y=  +1\,\vert\,\xv)$ is m
 %
 \begin{align*}
 	%	
-	\pi_{\thetab}: \ \Xspace & \to [0,1] \\
+	\pi_{\thetav}: \ \Xspace & \to [0,1] \\
 	%	
-	\xv  &\mapsto \frac{1}{1 + \exp \big(-  \langle \thetab ,  \xv  \rangle \big) } \, ,
+	\xv  &\mapsto \frac{1}{1 + \exp \big(-  \langle \thetav ,  \xv  \rangle \big) } \, ,
 	%	
 \end{align*}
 %
-with $\thetab = (\theta_1, \ldots , \theta_d)^\top \in \mathbb{R}^d$ is a parameter vector.
+with $\thetav = (\theta_1, \ldots , \theta_d)^\top \in \mathbb{R}^d$ is a parameter vector.
 
 Assume we have a partition of $\Xspace$ into $G\in \mathbb{N}$ groups\footnote{Here, we mean disjoint subsets of $\mathbb{R}^d$ whose union is $\Xspace = \mathbb{R}^d.$}, say $\Xspace_1,\ldots,\Xspace_G.$
 %
@@ -24,22 +24,22 @@ Consider the following quantity
 %
 \begin{align*}
 	%	
-	H_{\thetab}(G) = \sum_{g=1}^G \frac{( O_{g,+1} - E_{g,+1|{\thetab}})^2 }{E_{g,+1|{\thetab}}} + \frac{( O_{g,-1} - E_{g,-1|{\thetab}})^2 }{E_{g,-1|{\thetab}}},
+	H_{\thetav}(G) = \sum_{g=1}^G \frac{( O_{g,+1} - E_{g,+1|{\thetav}})^2 }{E_{g,+1|{\thetav}}} + \frac{( O_{g,-1} - E_{g,-1|{\thetav}})^2 }{E_{g,-1|{\thetav}}},
 	%	
 \end{align*}
 %
-where $O_{g,\pm1}$ is the number of \emph{observed} $y's$ which are $\pm 1$ and the corresponding $\xv$ is an element of $\Xspace_g,$ and $E_{g,\pm 1|{\thetab}}$ is the number of \emph{expected} $y's$ which are $\pm 1$ under the model $\pi_{\thetab}$ and the corresponding $\xv$ is an element of $\Xspace_g.$
+where $O_{g,\pm1}$ is the number of \emph{observed} $y's$ which are $\pm 1$ and the corresponding $\xv$ is an element of $\Xspace_g,$ and $E_{g,\pm 1|{\thetav}}$ is the number of \emph{expected} $y's$ which are $\pm 1$ under the model $\pi_{\thetav}$ and the corresponding $\xv$ is an element of $\Xspace_g.$
 % 
 \begin{itemize}
 	%	
-	\item [(a)] Give a mathematical definition of $ O_{g,+1},$ $ O_{g,-1},$ $E_{g,+1|{\thetab}}$ and $E_{g,-1|{\thetab}}.$
+	\item [(a)] Give a mathematical definition of $ O_{g,+1},$ $ O_{g,-1},$ $E_{g,+1|{\thetav}}$ and $E_{g,-1|{\thetav}}.$
 	
 	\textbf{Solution:} %			
-	Recall the interpretation of $\pi_{\thetab}(\xv):$ It is giving the (fitted) probability that $y=+1$ for given $\xv.$
+	Recall the interpretation of $\pi_{\thetav}(\xv):$ It is giving the (fitted) probability that $y=+1$ for given $\xv.$
 	%			
-	In other words, we expect that $y=+1$ given $\xv$ with probability $\pi_{\thetab}(\xv).$ 
+	In other words, we expect that $y=+1$ given $\xv$ with probability $\pi_{\thetav}(\xv).$ 
 	%			
-	Similarly, we expect that $y=-1$ given $\xv$ with probability $(1-\pi_{\thetab}(\xv)).$ 
+	Similarly, we expect that $y=-1$ given $\xv$ with probability $(1-\pi_{\thetav}(\xv)).$ 
 	%			
 	With this, we can write the quantities as follows:
 	%
@@ -49,29 +49,29 @@ where $O_{g,\pm1}$ is the number of \emph{observed} $y's$ which are $\pm 1$ and 
 		%				
 		O_{g,-1} &= \sum_{i=1}^N   \mathds{1}_{[ \yi = -1  ]} \mathds{1}_{[ \xi \in \Xspace_g  ]}, \\
 		%								
-		E_{g,+1|{\thetab}} &= \sum_{i=1}^N \pi_{\thetab}(\xi) \mathds{1}_{[ \xi \in \Xspace_g  ]},\\
+		E_{g,+1|{\thetav}} &= \sum_{i=1}^N \pi_{\thetav}(\xi) \mathds{1}_{[ \xi \in \Xspace_g  ]},\\
 		%								
-		E_{g,-1|{\thetab}} &= \sum_{i=1}^N (1-\pi_{\thetab}(\xi)) \mathds{1}_{[ \xi \in \Xspace_g  ]}.
+		E_{g,-1|{\thetav}} &= \sum_{i=1}^N (1-\pi_{\thetav}(\xi)) \mathds{1}_{[ \xi \in \Xspace_g  ]}.
 		%				
 	\end{align*}
 	%			
 	%	
-	\item [(b)] If the model $\pi_{\thetab}$ is (approximately) well-calibrated, what values should $H_{\thetab}(G)$ take?  What is a desirable property of the partition $\Xspace_1,\ldots,\Xspace_G$ of $\Xspace?$
+	\item [(b)] If the model $\pi_{\thetav}$ is (approximately) well-calibrated, what values should $H_{\thetav}(G)$ take?  What is a desirable property of the partition $\Xspace_1,\ldots,\Xspace_G$ of $\Xspace?$
 	
 	\textbf{Solution:}
 	
 	%			
 	If the model is approximately well-calibrated, then it should hold for any $s\in[0,1]$
 	%			
-	$$ 	\P(y =  +1\,\vert\,  \pi_{\thetab}(\xv) = s   ) \approx s, \quad \forall  \xv\in \Xspace.$$
+	$$ 	\P(y =  +1\,\vert\,  \pi_{\thetav}(\xv) = s   ) \approx s, \quad \forall  \xv\in \Xspace.$$
 	%			
-	In words, if the logistic model predicts that $y =  +1$ will occur with probability $s = \pi_{\thetab}(\xv),$ then $y =  +1$ should occur with probability (approximately) $s.$
+	In words, if the logistic model predicts that $y =  +1$ will occur with probability $s = \pi_{\thetav}(\xv),$ then $y =  +1$ should occur with probability (approximately) $s.$
 	%
-	In particular, the frequency with which $y =  +1$ is observed for some particular $\xv$ should match the expected frequency under $\pi_{\thetab}(\xv).$
+	In particular, the frequency with which $y =  +1$ is observed for some particular $\xv$ should match the expected frequency under $\pi_{\thetav}(\xv).$
 	
-	Thus, we would expect that $ O_{g,+1} \approx E_{g,+1|{\thetab}}$ and $ O_{g,-1} \approx E_{g,-1|{\thetab}}$ for every group $g \in\{1,\ldots,G\},$ if the model $\pi_{\thetab}$ is approximately well-calibrated.
+	Thus, we would expect that $ O_{g,+1} \approx E_{g,+1|{\thetav}}$ and $ O_{g,-1} \approx E_{g,-1|{\thetav}}$ for every group $g \in\{1,\ldots,G\},$ if the model $\pi_{\thetav}$ is approximately well-calibrated.
 	%			
-	Hence, $H_{\thetab}(G)$ should be close to 0 or not ``too large''.
+	Hence, $H_{\thetav}(G)$ should be close to 0 or not ``too large''.
 	%			
 	
 	However, as we rarely observe the same exact feature vector $\xv$ we could group some of them together.
