@@ -25,17 +25,17 @@
 \textbf{Proof:}\\
     We want to show that 
     \begin{itemize}
-      \item for a Gaussian prior on $\thetab \sim \mathcal{N}(\zero, \tau^2 \id_p)$
-      \item for a Gaussian Likelihood $y ~|~ \Xmat, \thetab \sim \mathcal{N}(\Xmat^\top \thetab, \sigma^2 \id_n)$ 
+      \item for a Gaussian prior on $\thetav \sim \mathcal{N}(\zero, \tau^2 \id_p)$
+      \item for a Gaussian Likelihood $y ~|~ \Xmat, \thetav \sim \mathcal{N}(\Xmat^\top \thetav, \sigma^2 \id_n)$ 
     \end{itemize}
     the resulting posterior is Gaussian $\mathcal{N}(\sigma^{-2}\bm{A}^{-1}\Xmat^\top\yv, \bm{A}^{-1})$ with $\bm{A}:= \sigma^{-2}\Xmat^\top\Xmat + \frac{1}{\tau^2} \id_p$.
     
     Plugging in Bayes' rule and multiplying out yields
     \begin{eqnarray*}
-    p(\thetab | \Xmat, \yv) &\propto& p(\yv | \Xmat, \thetab) q(\thetab) \propto \exp\biggl[-\frac{1}{2\sigma^2}(\yv - \Xmat\thetab)^\top(\yv - \Xmat\thetab)-\frac{1}{2\tau^2}\thetab^\top\thetab\biggr] \\
-    &=& \exp\biggl[-\frac{1}{2}\biggl(\underbrace{\sigma^{-2}\yv^\top\yv}_{\text{doesn't depend on } \thetab} - 2 \sigma^{-2} \yv^\top \Xmat \thetab + \sigma^{-2}\thetab^\top \Xmat^\top \Xmat \thetab  + \tau^{-2} \thetab^\top\thetab \biggr)\biggr] \\
-    &\propto& \exp\biggl[-\frac{1}{2}\biggl(\sigma^{-2}\thetab^\top \Xmat^\top \Xmat \thetab  + \tau^{-2} \thetab^\top\thetab  - 2 \sigma^{-2} \yv^\top \Xmat \thetab \biggr)\biggr] \\
-    &=& \exp\biggl[-\frac{1}{2}\thetab^\top\underbrace{\biggl(\sigma^{-2} \Xmat^\top \Xmat + \tau^{-2} \id_p \biggr)}_{:= \Amat} \thetab + \textcolor{red}{\sigma^{-2} \yv^\top \Xmat \thetab}\biggr]
+    p(\thetav | \Xmat, \yv) &\propto& p(\yv | \Xmat, \thetav) q(\thetav) \propto \exp\biggl[-\frac{1}{2\sigma^2}(\yv - \Xmat\thetav)^\top(\yv - \Xmat\thetav)-\frac{1}{2\tau^2}\thetav^\top\thetav\biggr] \\
+    &=& \exp\biggl[-\frac{1}{2}\biggl(\underbrace{\sigma^{-2}\yv^\top\yv}_{\text{doesn't depend on } \thetav} - 2 \sigma^{-2} \yv^\top \Xmat \thetav + \sigma^{-2}\thetav^\top \Xmat^\top \Xmat \thetav  + \tau^{-2} \thetav^\top\thetav \biggr)\biggr] \\
+    &\propto& \exp\biggl[-\frac{1}{2}\biggl(\sigma^{-2}\thetav^\top \Xmat^\top \Xmat \thetav  + \tau^{-2} \thetav^\top\thetav  - 2 \sigma^{-2} \yv^\top \Xmat \thetav \biggr)\biggr] \\
+    &=& \exp\biggl[-\frac{1}{2}\thetav^\top\underbrace{\biggl(\sigma^{-2} \Xmat^\top \Xmat + \tau^{-2} \id_p \biggr)}_{:= \Amat} \thetav + \textcolor{red}{\sigma^{-2} \yv^\top \Xmat \thetav}\biggr]
     \end{eqnarray*}
     
     This expression resembles a normal density - except for the term in red!
@@ -48,11 +48,11 @@
     We subtract a (not yet defined) constant $c$ while compensating for this change by adding the respective terms (\enquote{adding $0$}), emphasized in green:
     
     \begin{eqnarray*}
-    	p(\thetab | \Xmat, \yv) &\propto&  \exp\biggl[-\frac{1}{2}(\thetab \textcolor{green}{- c})^\top\Amat  (\thetab \textcolor{green}{- c}) \textcolor{green}{- c^\top \Amat \thetab} + \underbrace{\textcolor{green}{\frac{1}{2}c^\top\Amat c}}_{\text{doesn't depend on } \thetab} +\sigma^{-2} \yv^\top \Xmat \thetab\biggr] \\
-    	&\propto& \exp\biggl[-\frac{1}{2}(\thetab \textcolor{green}{- c})^\top\Amat  (\thetab \textcolor{green}{- c}) \textcolor{green}{- c^\top \Amat \thetab} +\sigma^{-2} \yv^\top \Xmat \thetab\biggr]
+    	p(\thetav | \Xmat, \yv) &\propto&  \exp\biggl[-\frac{1}{2}(\thetav \textcolor{green}{- c})^\top\Amat  (\thetav \textcolor{green}{- c}) \textcolor{green}{- c^\top \Amat \thetav} + \underbrace{\textcolor{green}{\frac{1}{2}c^\top\Amat c}}_{\text{doesn't depend on } \thetav} +\sigma^{-2} \yv^\top \Xmat \thetav\biggr] \\
+    	&\propto& \exp\biggl[-\frac{1}{2}(\thetav \textcolor{green}{- c})^\top\Amat  (\thetav \textcolor{green}{- c}) \textcolor{green}{- c^\top \Amat \thetav} +\sigma^{-2} \yv^\top \Xmat \thetav\biggr]
     \end{eqnarray*}
     
-    If we choose $c$ such that $- c^\top \Amat \thetab +\sigma^{-2} \yv^\top \Xmat \thetab = 0$, the posterior is normal with mean $c$ and covariance matrix $\Amat^{-1}$. Taking into account that $\Amat$ is symmetric, this is if we choose
+    If we choose $c$ such that $- c^\top \Amat \thetav +\sigma^{-2} \yv^\top \Xmat \thetav = 0$, the posterior is normal with mean $c$ and covariance matrix $\Amat^{-1}$. Taking into account that $\Amat$ is symmetric, this is if we choose
     
     \begin{eqnarray*}
     && \sigma^{-2} \yv^\top \Xmat = c^\top\Amat \\
@@ -69,16 +69,16 @@
     Based on the posterior distribution 
     
     $$
-    \thetab ~|~ \Xmat, \yv \sim \mathcal{N}(\sigma^{-2}\bm{A}^{-1}\Xmat^\top\yv, \bm{A}^{-1})
+    \thetav ~|~ \Xmat, \yv \sim \mathcal{N}(\sigma^{-2}\bm{A}^{-1}\Xmat^\top\yv, \bm{A}^{-1})
     $$
     
-    we can derive the predictive distribution for a new observations $\xv_*$. The predictive distribution for the Bayesian linear model, i.e. the distribution of $\thetab^\top \xv_*$, is 
+    we can derive the predictive distribution for a new observations $\xv_*$. The predictive distribution for the Bayesian linear model, i.e. the distribution of $\thetav^\top \xv_*$, is 
     
     $$
     y_* ~|~ \Xmat, \yv, \xv_* \sim \mathcal{N}(\sigma^{-2}\yv^\top \Xmat \Amat^{-1}\xv_*, \xv_*^\top\Amat^{-1}\xv_*)
     $$
 
-    Note that $y_* = \thetab^T \xv_* + \epsilon$, where both the posterior of $\thetab$ and $\epsilon$ are Gaussians. By applying the rules for linear transformations of Gaussians, we can confirm that $y_* ~|~ \Xmat, \yv, \xv_*$ is a Gaussian, too. 
+    Note that $y_* = \thetav^T \xv_* + \epsilon$, where both the posterior of $\thetav$ and $\epsilon$ are Gaussians. By applying the rules for linear transformations of Gaussians, we can confirm that $y_* ~|~ \Xmat, \yv, \xv_*$ is a Gaussian, too. 
 \end{vbframe}
 
 \end{document}

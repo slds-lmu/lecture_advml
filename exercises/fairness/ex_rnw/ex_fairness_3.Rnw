@@ -10,13 +10,13 @@ Recall that in logistic regression the probability $	p(y=  +1\,\vert\,\xv)$ is m
 %
 \begin{align*}
 %	
-	\pi_{\thetab}: \ \Xspace & \to [0,1] \\
+	\pi_{\thetav}: \ \Xspace & \to [0,1] \\
 %	
-	 \xv  &\mapsto \frac{1}{1 + \exp \big(-  \langle \thetab ,  \xv  \rangle \big) } \, ,
+	 \xv  &\mapsto \frac{1}{1 + \exp \big(-  \langle \thetav ,  \xv  \rangle \big) } \, ,
 %	
 \end{align*}
 %
-with $\thetab = (\theta_1, \ldots , \theta_d)^\top \in \mathbb{R}^d$ is a parameter vector.
+with $\thetav = (\theta_1, \ldots , \theta_d)^\top \in \mathbb{R}^d$ is a parameter vector.
 
 Assume we have a partition of $\Xspace$ into $G\in \mathbb{N}$ groups\footnote{Here, we mean disjoint subsets of $\mathbb{R}^d$ whose union is $\Xspace = \mathbb{R}^d.$}, say $\Xspace_1,\ldots,\Xspace_G.$
 %
@@ -24,17 +24,17 @@ Consider the following quantity
 %
 \begin{align*}
 %	
-	H_{\thetab}(G) = \sum_{g=1}^G \frac{( O_{g,+1} - E_{g,+1|{\thetab}})^2 }{E_{g,+1|{\thetab}}} + \frac{( O_{g,-1} - E_{g,-1|{\thetab}})^2 }{E_{g,-1|{\thetab}}},
+	H_{\thetav}(G) = \sum_{g=1}^G \frac{( O_{g,+1} - E_{g,+1|{\thetav}})^2 }{E_{g,+1|{\thetav}}} + \frac{( O_{g,-1} - E_{g,-1|{\thetav}})^2 }{E_{g,-1|{\thetav}}},
 %	
 \end{align*}
 %
-where $O_{g,\pm1}$ is the number of \emph{observed} $y's$ which are $\pm 1$ and the corresponding $\xv$ is an element of $\Xspace_g,$ and $E_{g,\pm 1|{\thetab}}$ is the number of \emph{expected} $y's$ which are $\pm 1$ under the model $\pi_{\thetab}$ and the corresponding $\xv$ is an element of $\Xspace_g.$
+where $O_{g,\pm1}$ is the number of \emph{observed} $y's$ which are $\pm 1$ and the corresponding $\xv$ is an element of $\Xspace_g,$ and $E_{g,\pm 1|{\thetav}}$ is the number of \emph{expected} $y's$ which are $\pm 1$ under the model $\pi_{\thetav}$ and the corresponding $\xv$ is an element of $\Xspace_g.$
 % 
 \begin{itemize}
 %	
-	\item [(a)] Give a mathematical definition of $ O_{g,+1},$ $ O_{g,-1},$ $E_{g,+1|{\thetab}}$ and $E_{g,-1|{\thetab}}.$
+	\item [(a)] Give a mathematical definition of $ O_{g,+1},$ $ O_{g,-1},$ $E_{g,+1|{\thetav}}$ and $E_{g,-1|{\thetav}}.$
 %	
-	\item [(b)] If the model $\pi_{\thetab}$ is (approximately) well-calibrated, what values should $H_{\thetab}(G)$ take?  What is a desirable property of the partition $\Xspace_1,\ldots,\Xspace_G$ of $\Xspace?$
+	\item [(b)] If the model $\pi_{\thetav}$ is (approximately) well-calibrated, what values should $H_{\thetav}(G)$ take?  What is a desirable property of the partition $\Xspace_1,\ldots,\Xspace_G$ of $\Xspace?$
 %	
 	\item [(c)] Generate a data set $\D $ with $\Xspace = \R$ of size $N=100$ in the following way:  
 %	
@@ -93,9 +93,9 @@ where $O_{g,\pm1}$ is the number of \emph{observed} $y's$ which are $\pm 1$ and 
 %%	
 %	\begin{align*}
 %		%	
-%		\pi_{\thetab}^C: \ &\Xspace \to \Yspace \\
+%		\pi_{\thetav}^C: \ &\Xspace \to \Yspace \\
 %		%	
-%		&\xv  \mapsto \frac{1}{1 + \exp \big(-  C(\langle \thetab ,  \xv  \rangle )\big) },
+%		&\xv  \mapsto \frac{1}{1 + \exp \big(-  C(\langle \thetav ,  \xv  \rangle )\big) },
 %		%	
 %	\end{align*}
 %%
