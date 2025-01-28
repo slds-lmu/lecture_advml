@@ -316,7 +316,7 @@ $$		\thetavh = \arg\max_{\thetav} p(\thetav | \Xmat, \yv).	$$
             \item $k(\xv, \xvp) = k_0(\xv, \xvp) + k_1(\xv, \xvp)$ is a valid covariance function;
             \item $k(\xv, \xvp) = k_0(\xv, \xvp) \cdot k_1(\xv, \xvp)$ is a valid covariance function;
             \item $k(\xv, \xvp) = g(k_0(\xv, \xvp))$ is a valid covariance function if $g$ is a polynomial function with positive coefficients;
-            \item $k(\xv, \xvp) = t(\xv) \cdot k_0(\xv, \xvp) \cdot t(\xvp)$ is a valid covariance function, where $t$ is any continuous function;
+            \item $k(\xv, \xvp) = t(\xv) \cdot k_0(\xv, \xvp) \cdot t(\xvp)$ is a valid covariance function, where $t$ is any function;
             \item $k(\xv, \xvp) = \exp(k_1(\xv, \xvp))$ is a valid covariance function;
             \item $k(\xv, \xvp) = \xv^T\mathbf{A}\xvp$ is a valid covariance function if $\mathbf{A} \succeq 0$.
         \end{enumerate}
