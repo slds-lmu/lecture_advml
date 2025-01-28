@@ -240,17 +240,15 @@
 	{\refstepcounter{loes}\textbf{Solution \arabic{loes}*:}\\\noindent}
 	{\bigskip}
 
+\input{../../latex-math/basic-math.tex}
+\input{../../latex-math/basic-ml.tex}
+\input{../../latex-math/ml-svm.tex}
+\input{../../latex-math/ml-gp.tex}
 
 
 \begin{document}
 % !Rnw weave = knitr
 
-
-
-\input{../../latex-math/basic-math.tex}
-\input{../../latex-math/basic-ml.tex}
-\input{../../latex-math/ml-svm.tex}
-\input{../../latex-math/ml-gp.tex}
 \newcommand{\xvp}{\mathbf{x}^\prime}
 
 \kopfaml{7}{Gaussian Processes}
@@ -263,7 +261,7 @@
 In the Bayesian linear model, we assume that the data follows the following law:
 %
 $$
-y = \fx + \epsilon = \thetab^T \xv + \epsilon , 
+y = \fx + \epsilon = \thetav^T \xv + \epsilon , 
 $$
 %
 where $\varepsilon \sim \mathcal{N}(0,\sigma^2)$ and independent of $\xv.$
@@ -272,35 +270,35 @@ On the data-level this corresponds to
 %
 \begin{eqnarray*}
 %	
-	\yi &=& \fxi + \epsi = \thetab^T \xi + \epsi, \quad \text{for } i \in \{1, \ldots, n\}
+	\yi &=& \fxi + \epsi = \thetav^T \xi + \epsi, \quad \text{for } i \in \{1, \ldots, n\}
 %	
 \end{eqnarray*}
 %
 where $\epsi \sim \mathcal{N}(0, \sigma^2)$ are iid and all independent of the $\xi$'s.
 %
-In the Bayesian perspective it is assumed that the parameter vector $\thetab$ is stochastic and follows a distribution.
+In the Bayesian perspective it is assumed that the parameter vector $\thetav$ is stochastic and follows a distribution.
 
-Assume we are interested in the so-called maximum a posteriori estimate of $\thetab,$ which is defined by
+Assume we are interested in the so-called maximum a posteriori estimate of $\thetav,$ which is defined by
 %
-$$		\thetabh = \argmax_{\thetab} p(\thetab | \Xmat, \yv).	$$
+$$		\thetavh = \arg\max_{\thetav} p(\thetav | \Xmat, \yv).	$$
 %
 \begin{enumerate}
 %	
-  \item Show that if we choose a uniform distribution over the parameter vectors $\thetab$ as the prior belief, i.e.,
+  \item Show that if we choose a uniform distribution over the parameter vectors $\thetav$ as the prior belief, i.e.,
 %  
-	$$  q(\thetab)  \propto 1, $$
+	$$  q(\thetav)  \propto 1, $$
 %  
 	then the  maximum a posteriori estimate coincides with the empirical risk minimizer for the L2-loss (over the linear models).
 %
-  \item Show that if we choose a Gaussian distribution over the parameter vectors $\thetab$ as the prior belief, i.e.,
+  \item Show that if we choose a Gaussian distribution over the parameter vectors $\thetav$ as the prior belief, i.e.,
   %  
-  $$  q(\thetab)  \propto  \exp\biggl[-\frac{1}{2\tau^2}\thetab^\top\thetab\biggr], \qquad \tau>0, $$
+  $$  q(\thetav)  \propto  \exp\biggl[-\frac{1}{2\tau^2}\thetav^\top\thetav\biggr], \qquad \tau>0, $$
   %  
   then the maximum a posteriori estimate coincides for a specific choice of $\tau$ with the regularized empirical risk minimizer for the L2-loss with L2 penalty (over the linear models), i.e., the Ridge regression.
 %  
-  \item Show that if we choose a Laplace distribution over the parameter vectors $\thetab$ as the prior belief, i.e.,
+  \item Show that if we choose a Laplace distribution over the parameter vectors $\thetav$ as the prior belief, i.e.,
 %  
-	$$  q(\thetab)  \propto  \exp\biggl[-\frac{\sum_{i=1}^p |\thetab_i|}{\tau} \biggr], \qquad \tau>0, $$
+	$$  q(\thetav)  \propto  \exp\biggl[-\frac{\sum_{i=1}^p |\thetav_i|}{\tau} \biggr], \qquad \tau>0, $$
 	%  
 	then the maximum a posteriori estimate coincides for a specific choice of $\tau$ with the regularized empirical risk minimizer for the L2-loss with L1 penalty (over the linear models), i.e., the Lasso regression.
 \end{enumerate}
@@ -314,11 +312,11 @@ $$		\thetabh = \argmax_{\thetab} p(\thetab | \Xmat, \yv).	$$
         \item Show that they are valid covariance functions. Note that the proofs for the Mat\'ern and exponential covariance functions are out of scope for this exercise. Additionally, you may use the following composition rules. In these rules we assume that $k_0(\cdot, \cdot)$ and $k_1(\cdot, \cdot)$ are valid covariance functions:
         \begin{enumerate}
             \item $k(\xv, \xvp) = \xv^T \xvp$ is a valid covariance function;
-            \item $k(\xv, \xvp) = c \cdot k_0(\xv, \xvp)$ is a valid covariance function if if $c \geq 0$ is constant;
+            \item $k(\xv, \xvp) = c \cdot k_0(\xv, \xvp)$ is a valid covariance function if $c \geq 0$ is constant;
             \item $k(\xv, \xvp) = k_0(\xv, \xvp) + k_1(\xv, \xvp)$ is a valid covariance function;
             \item $k(\xv, \xvp) = k_0(\xv, \xvp) \cdot k_1(\xv, \xvp)$ is a valid covariance function;
             \item $k(\xv, \xvp) = g(k_0(\xv, \xvp))$ is a valid covariance function if $g$ is a polynomial function with positive coefficients;
-            \item $k(\xv, \xvp) = t(\xv) \cdot k_0(\xv, \xvp) \cdot t(\xvp)$ is a valid covariance function, where $t$ is any function;
+            \item $k(\xv, \xvp) = t(\xv) \cdot k_0(\xv, \xvp) \cdot t(\xvp)$ is a valid covariance function, where $t$ is any continuous function;
             \item $k(\xv, \xvp) = \exp(k_1(\xv, \xvp))$ is a valid covariance function;
             \item $k(\xv, \xvp) = \xv^T\mathbf{A}\xvp$ is a valid covariance function if $\mathbf{A} \succeq 0$.
         \end{enumerate}
