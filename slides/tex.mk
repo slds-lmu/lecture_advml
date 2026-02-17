@@ -26,7 +26,15 @@ help:
 	@echo "literature         : Generates chapter-literature-CHAPTERNAME.pdf from references.bib"
 	@echo ""
 	@echo "╔═════════════════════════════════════╗"
-	@echo "║       File Checking                 ║"
+	@echo "║       Auditing                      ║"
+	@echo "╚═════════════════════════════════════╝"
+	@echo "audit              : Run chapter audit (identify orphaned/missing figures, missing packages)"
+	@echo "                     Uses .fls files if available (run 'make slides' first for best results)"
+	@echo "clean-orphaned-figures : Delete orphaned figures in figure/ and figure_man/ (git-tracked, reversible)"
+	@echo "check-repro        : End-to-end reproducibility check: delete figure/, run rsrc scripts, compile slides"
+	@echo ""
+	@echo "╔═════════════════════════════════════╗"
+	@echo "║       File Checking (legacy)        ║"
 	@echo "╚═════════════════════════════════════╝"
 	@echo "check-files-used   : List files (figures, .tex) that are included is slide .tex files"
 	@echo "check-files-unused : List files that are NOT included in .tex files"
@@ -92,7 +100,7 @@ SLIDE_FLS_FILES = $(SLIDE_TEX_FILES:%.tex=%.fls)
 CHAPTER_NAME := $(notdir $(CURDIR))
 LITERATURE_PDF := chapter-literature-$(CHAPTER_NAME).pdf
 
-.PHONY: slides slides-nomargin release copy texclean clean help pax literature check-files-used check-files-unused check-files-missing
+.PHONY: slides slides-nomargin release copy texclean clean help pax literature audit clean-orphaned-figures check-repro check-files-used check-files-unused check-files-missing
 
 # ============================================================================
 # HELPER FUNCTIONS
@@ -147,7 +155,7 @@ endef
 # Clean LaTeX build artifacts silently
 define clean_latex_artifacts
 	@echo "Cleaning LaTeX build artifacts (.log, .aux, .nav, .synctex, etc.)..."
-	@rm -f *.out *.dvi *.log *.aux *.bbl *.bbl-SAVE-ERROR *.blg *.ind *.idx *.ilg *.lof *.lot *.toc *.nav *.snm *.vrb *.fls *.pax *.bcf-SAVE-ERROR *.bcf *.run.xml *.fdb_latexmk *.synctex.gz *-concordance.tex nospeakermargin.tex
+	@rm -f *.out *.dvi *.log *.aux *.bbl *.bbl-SAVE-ERROR *.blg *.ind *.idx *.ilg *.lof *.lot *.toc *.nav *.snm *.vrb *.fls *.bcf-SAVE-ERROR *.bcf *.run.xml *.fdb_latexmk *.synctex.gz *-concordance.tex nospeakermargin.tex
 endef
 
 # Print compilation message with Docker/local info
@@ -159,7 +167,8 @@ define print_compile_message
 	fi
 endef
 
-# Find and run pdfannotextractor
+# Find and run pdfannotextractor on a single PDF file
+# Usage: $(call run_pdfannotextractor,file.pdf)
 define run_pdfannotextractor
 	@pax_cmd=""; \
 	if command -v pdfannotextractor &> /dev/null; then \
@@ -168,8 +177,12 @@ define run_pdfannotextractor
 		pax_cmd="pdfannotextractor.pl"; \
 	fi; \
 	if [ -n "$$pax_cmd" ]; then \
-		echo "Found $$pax_cmd - extracting annotations..."; \
-		$$pax_cmd *.pdf 2>/dev/null || echo "Warning: Some PDFs may not have been processed"; \
+		if $$pax_cmd $(1) > /dev/null 2>&1; then \
+			echo "✓ Extracted annotations from $(1)"; \
+		else \
+			echo "Warning: pdfannotextractor failed for $(1)"; \
+			echo "Note: This is optional - PDF is still valid, but hyperlinks may not be preserved when combining slides"; \
+		fi; \
 	else \
 		echo "Note: pdfannotextractor not found!"; \
 		echo "Please install 'pax' package using: tlmgr install pax"; \
@@ -187,12 +200,12 @@ slides-nomargin: $(SLIDE_NOMARGIN_PDFS)
 
 release:
 	$(call check_latex_math)
-	$(MAKE) texclean
-	$(MAKE) $(SLIDE_PDF_FILES)
-	$(MAKE) pax
-	$(MAKE) literature
-	$(MAKE) copy
-	$(MAKE) texclean
+	@$(MAKE) texclean
+	@$(MAKE) $(SLIDE_PDF_FILES)
+	@$(MAKE) pax
+	@$(MAKE) literature
+	@$(MAKE) copy
+	@$(MAKE) texclean
 
 # Conditionally remove or create empty nospeakermargin.tex file to decide which layout to use
 # See /style/lmu-lecture.sty -- it's a whole thing but does the job.
@@ -226,8 +239,10 @@ copy:
 # Extract pdf annotations, i.e. hyperlinks, for later reinsertion
 # When combining multiple PDFs into one (for slides/all/)
 # https://ctan.org/tex-archive/macros/latex/contrib/pax?lang=en
-pax:
-	$(call run_pdfannotextractor)
+pax: $(SLIDE_PAX_FILES)
+
+$(SLIDE_PAX_FILES): %.pax: %.pdf
+	$(call run_pdfannotextractor,$<)
 
 texclean:
 	$(call clean_latex_artifacts)
@@ -235,7 +250,12 @@ texclean:
 clean: texclean
 	-rm -f $(SLIDE_PDF_FILES) $(SLIDE_NOMARGIN_PDFS) $(SLIDE_PAX_FILES) $(LITERATURE_PDF)
 
-literature: $(LITERATURE_PDF)
+literature:
+	@if [ ! -f "references.bib" ]; then \
+		echo "No references.bib found, skipping literature"; \
+	else \
+		$(MAKE) $(LITERATURE_PDF); \
+	fi
 
 $(LITERATURE_PDF): references.bib
 	$(call check_docker)
@@ -249,7 +269,54 @@ $(LITERATURE_PDF): references.bib
 	@$(LATEXMK) -c -jobname=chapter-literature-$(CHAPTER_NAME) ../../style/chapter-literature-template.tex > /dev/null 2>&1
 
 # ============================================================================
-# FILE CHECKING TARGETS
+# AUDITING
+# ============================================================================
+
+# Chapter-level audit: identify orphaned/missing figures, missing packages.
+# Uses .fls files (from 'make slides') for robust figure detection when available,
+# falls back to regex parsing of .tex source otherwise.
+audit:
+	@Rscript --quiet -e 'lese::audit_chapter("$(CWD)", lecture_dir = "$(LECTURE)", run = FALSE, method = "$(or $(method),auto)")'
+
+# Remove orphaned figures identified by audit.
+# Figures in attic/ are never deleted. Git-tracked files are easily restored.
+clean-orphaned-figures:
+	@Rscript --quiet -e 'lese::clean_orphaned_figures("$(CWD)", lecture_dir = "$(LECTURE)", method = "$(or $(method),auto)", dry_run = FALSE)'
+
+# End-to-end reproducibility check for rsrc/ scripts:
+# 1. Delete all files in figure/ (except attic/)
+# 2. Run all rsrc/ scripts to regenerate figures
+# 3. Compile slides to verify everything still works
+check-repro:
+	@echo "╔═════════════════════════════════════════════╗"
+	@echo "║  Reproducibility check for $(CWD)"
+	@echo "╚═════════════════════════════════════════════╝"
+	@if [ ! -d "rsrc" ]; then \
+		echo "No rsrc/ directory found — nothing to check."; \
+		exit 0; \
+	fi
+	@echo ""
+	@echo "Step 1/3: Deleting generated figures in figure/ (keeping attic/)..."
+	@if [ -d "figure" ]; then \
+		find figure -maxdepth 1 -type f -delete; \
+		find figure -mindepth 1 -maxdepth 1 -type d ! -name attic -exec rm -rf {} +; \
+		echo "✓ Cleared figure/ (attic/ preserved)"; \
+	else \
+		echo "No figure/ directory — skipping."; \
+	fi
+	@echo ""
+	@echo "Step 2/3: Running rsrc/ scripts..."
+	@$(MAKE) -C rsrc all
+	@echo ""
+	@echo "Step 3/3: Compiling slides..."
+	@$(MAKE) slides
+	@echo ""
+	@echo "╔═════════════════════════════════════════════╗"
+	@echo "║  ✓ Reproducibility check passed for $(CWD)"
+	@echo "╚═════════════════════════════════════════════╝"
+
+# ============================================================================
+# FILE CHECKING TARGETS (legacy, superseded by 'audit')
 # ============================================================================
 
 # Default folder to check (can be overridden with folder=<path>)
