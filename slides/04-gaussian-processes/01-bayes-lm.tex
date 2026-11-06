@@ -1,0 +1,206 @@
+\documentclass[11pt,compress,t,notes=noshow, xcolor=table]{beamer}
+\input{preamble-slides}
+\input{basic-math}
+\input{basic-ml}
+\input{ml-gp}
+
+\begin{document}
+
+\titlemeta{
+The Bayesian Linear Model
+}{figure/bayes_lm/posterior_5_2.pdf}{
+  \item Know the Bayesian linear model
+  \item The Bayesian LM returns a (posterior) distribution instead of a point estimate
+  \item Know how to derive the posterior distribution for a Bayesian LM
+}
+
+
+\begin{vbframe}{Review: The Bayesian Linear Model}
+
+    Let $\D = \left\{(\xi[1], \yi[1]), ..., (\xi[n], \yi[n])\right\}$ be a training set of i.i.d. observations from some unknown distribution.
+
+    \begin{figure}
+      \includegraphics[width=0.6\textwidth]{figure/bayes_lm/example.pdf}
+    \end{figure}
+
+    Let $\yv = (\yi[1], ..., \yi[n])^\top$ and $\Xmat \in \R^{n \times p+1}$ be the design matrix where the i-th row contains vector $\xi$.  
+    
+    \framebreak
+
+    The linear regression model is defined as
+
+    $$
+    y = \fx + \epsilon = \thetav^T \xv + \epsilon 
+    $$
+
+    or on the data:
+
+    \begin{eqnarray*}
+    \yi &=& \fxi + \epsi = \thetav^T \xi + \epsi, \quad \text{for } i \in \{1, \ldots, n\}
+    \end{eqnarray*}
+    
+
+    We now assume (from a Bayesian perspective) that also our parameter vector $\thetav$ is stochastic and follows a distribution.
+    The observed values $\yi$ differ from the function values $\fxi$ by some additive noise, which is assumed to be i.i.d. Gaussian 
+    $$
+    \epsi \sim \mathcal{N}(0, \sigma^2)$$
+    and independent of $\xv$ and $\thetav$.
+
+    \framebreak
+
+    Let us assume we have \textbf{prior beliefs} about the parameter $\thetav$ that are represented in a prior distribution $\thetav \sim \mathcal{N}(\zero, \tau^2 \id_p).$
+
+    \lz 
+
+    Whenever data points are observed, we update the parameters' prior distribution according to Bayes' rule 
+
+    $$
+    \underbrace{p(\thetav | \Xmat, \yv)}_{\text{posterior}} = \frac{\overbrace{p(\yv | \Xmat, \thetav)}^{\text{likelihood}}\overbrace{q(\thetav)}^{\text{prior}}}{\underbrace{p(\yv|\Xmat)}_{\text{marginal}}}. 
+    $$
+
+    \framebreak 
+
+    The posterior distribution of the parameter $\thetav$ is again normal distributed (the Gaussian family is self-conjugate): 
+
+    $$
+    \thetav ~|~ \Xmat, \yv \sim \mathcal{N}(\sigma^{-2}\bm{A}^{-1}\Xmat^\top\yv, \bm{A}^{-1})
+    $$
+
+    with $\bm{A}:= \sigma^{-2}\Xmat^\top\Xmat + \frac{1}{\tau^2} \id_p$. \\
+    
+    Remarks: (1) Please see the Deep Dive part for the detailed derivation. (2) The expectation of $\thetav ~|~ \Xmat, \yv$ is exactly the solution of ridge regression.
+
+    \lz 
+
+    \begin{footnotesize}
+    \textbf{Note:} If the posterior distribution $p(\thetav~|~\Xmat, \yv)$ are in the same probability distribution family as the prior $q(\thetav)$ w.r.t. a specific likelihood function $p(\yv~|~\Xmat, \thetav)$, they are called \textbf{conjugate distributions}. The prior is then called a \textbf{conjugate prior} for the likelihood. The Gaussian family is self-conjugate: Choosing a Gaussian prior for a Gaussian Likelihood ensures that the posterior is Gaussian. 
+    \end{footnotesize}
+
+    \framebreak 
+    
+    \begin{figure}
+      \includegraphics[width=0.5\textwidth]{figure/bayes_lm/prior_1.pdf}~\includegraphics[width=0.5\textwidth]{figure/bayes_lm/prior_2.pdf}
+    \end{figure}
+
+\end{vbframe}
+    
+\begin{frame}{Review: The Bayesian Linear Model}
+
+
+        \begin{figure}
+        \centering
+                \foreach \x in{1, 2, 3} {
+                  \includegraphics<\x>[width=1\textwidth]{figure/bayes_lm/posterior_merged_\x.pdf}\par
+            }
+        \end{figure}
+    
+\end{frame}
+    
+\begin{vbframe}{Review: The Bayesian Linear Model} 
+    
+    Based on the posterior distribution 
+    
+    $$
+    \thetav ~|~ \Xmat, \yv \sim \mathcal{N}(\sigma^{-2}\bm{A}^{-1}\Xmat^\top\yv, \bm{A}^{-1})
+    $$
+    
+    we can derive the predictive distribution for a new observation $\xv_*$. The predictive distribution for the Bayesian linear model, i.e. the distribution of $\thetav^\top \xv_*$, is 
+    
+    $$
+    y_* ~|~ \Xmat, \yv, \xv_* \sim \mathcal{N}(\sigma^{-2}\yv^\top \Xmat \Amat^{-1}\xv_*, \xv_*^\top\Amat^{-1}\xv_*)
+    $$ 
+
+    Please see the Deep Dive part for more details.
+    
+\end{vbframe}
+
+\begin{frame}{Review: The Bayesian Linear Model} 
+    
+    \begin{figure}
+        \foreach \x in{1, 2, 3} {
+           \includegraphics<\x>[width=0.5\textwidth]{figure/bayes_lm/posterior_3_\x.pdf}\par
+          }
+    \end{figure}
+
+          \begin{footnotesize}
+        For every test input $\xv_*$, we get a distribution over the prediction $y_*$. In particular, we get a posterior mean (orange) and a posterior variance (grey region equals $+/-$ two times standard deviation). 
+      \end{footnotesize}
+          
+\end{frame}
+
+
+\begin{vbframe}{Summary: The Bayesian Linear Model}
+
+\begin{itemize}
+  \item By switching to a Bayesian perspective, we do not only have point estimates for the parameter $\thetav$, but whole \textbf{distributions}
+  \item From the posterior distribution of $\thetav$, we can derive a predictive distribution for $y_* = \thetav^\top \xv_*$.  
+  \item We can perform online updates: Whenever datapoints are observed, we can update the \textbf{posterior distribution} of $\thetav$
+\end{itemize}
+
+Next, we want to develop a theory for general shape functions, and not only for linear function. 
+
+\end{vbframe}
+
+
+
+
+
+
+
+% \framebreak
+% 
+% Let $\Xspace = \R$. In the simplest case, the features are not modified: $\phi(x) = x$.
+% 
+% \lz
+% 
+% In the above example we might assume that the function has a quadratic shape. We would project our one-dimensional features into a two-dimensional feature space via
+% 
+% $$
+% \phi(x) = (x, x^2).
+% $$
+% 
+% The resulting model is
+% 
+% $$
+% f(x) = \theta^\top \phi(x) = \theta_1 x + \theta_2 x^2.
+% $$
+% 
+% The following plots show the posterior distribution of $\theta_1, \theta_2$ for the observed data. The more observations we have the \enquote{surer} we are about the parameters value.
+% 
+% \framebreak
+% 
+% \vspace*{1cm}
+% <<eval = FALSE, echo = F, fig.height=3>>=
+% plots = list()
+% titles = c("a)", "b)", "c)")
+% nobs = c(1, 5, 50)
+
+% for (j in 1:3) {
+%   i = nobs[j]
+%   A = 1 / sigma^2 * t(as.matrix(d[1:i, 1:2])) %*% as.matrix(d[1:i, 1:2]) + diag(c(1, 1))
+%   probs$posterior = mvtnorm::dmvnorm(data.grid, mean = 1 / sigma^2 * solve(A) %*% t(d[1:i, c("x1", "x2")])
+% d[1:i, ]$y, sigma = solve(A))
+%   p = ggplot(probs, aes(x = theta1, y = theta2, z = posterior)) + geom_contour( colour = i)
+%   p = p + coord_fixed(xlim = c(-2, 2), ylim = c(-2, 2), ratio = 1)
+%   p = p + xlab(expression(theta[1])) + ylab(expression(theta[2]))
+%   p = p + geom_raster(aes(fill = posterior)) + geom_contour(colour = "white", bins = 5)
+%   p = p + guides(fill = FALSE) + ggtitle(titles[j])
+%   p
+
+%   plots[[paste("n = ", i, sep = "")]] = p
+% }
+
+% do.call("grid.arrange", c(plots, ncol = 3))
+% @
+% % \vspace*{-0.6cm}
+% % 
+% % \begin{center}
+% % \begin{footnotesize}
+% % Contour lines of the posterior distribution of $(\theta_0, \theta_1)$ after a) 1 observation, b) 5 observations and c) 50 observations.
+% % \end{footnotesize}
+% % \end{center}
+
+% \end{vbframe}
+
+\endlecture
+\end{document}
