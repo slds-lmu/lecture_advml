@@ -1,0 +1,251 @@
+\documentclass[11pt,compress,t,notes=noshow, xcolor=table]{beamer}
+\input{preamble-slides}
+\input{basic-math}
+\input{basic-ml}
+
+\usepackage{multicol}
+
+\begin{document}
+	
+\titlemeta{
+Sampling Methods Part 1
+}{figure/undersampling.png}{
+  \item Know the idea of sampling methods for coping with imbalanced data
+  \item Understand different undersampling techniques
+}
+
+\sloppy
+	
+\begin{frame}{Sampling Methods: Overview}
+    \small{
+		\begin{itemize}
+			\item Balance training data distribution to perform better on minority classes.
+			
+			\item Independent of classifier $\leadsto$ very flexible and general.
+   
+			\item Three groups: 
+		
+			\begin{minipage}{0.59\textwidth}
+				\begin{itemize} 
+                    % Need this \small, otherwise the fontsize will be the default size.
+                    \small
+                    
+					\item Undersampling --- Removing instances of majority class(es).
+			
+					\item Oversampling --- Adding/Creating new instances of minority class(es).  (Slower, but usually works better.)
+
+                    %\item Oversampling is slower, but usually works better.
+
+					\item Hybrid --- Combining both methods.
+			
+				\end{itemize}
+			\end{minipage}
+            \hfill
+			\begin{minipage}{0.3\textwidth}
+					\begin{figure}[c]
+					\centering
+                    \includegraphics[width=\textwidth]{figure/under_oversampling.png}
+				\end{figure}
+			\end{minipage}
+		\end{itemize}
+	}
+\end{frame}
+	
+\begin{frame}{Random Undersampling/Oversampling}
+
+    \begin{itemize}
+        \item Random oversampling (ROS):
+        \begin{itemize}
+            \item Randomly \textbf{replicate} \textbf{minority} instances.% until a desired imbalance ratio.
+            \item Prone to overfitting due to multiple tied instances.
+        \end{itemize}
+
+        \item Random undersampling (RUS):
+        \begin{itemize}
+            \item Randomly \textbf{eliminate} \textbf{majority} instances. % until a desired imbalance ratio.
+            \item Might remove informative instances and destroy important concepts in data.
+        \end{itemize}
+
+        \item Better: Introduce heuristics in removal process (RUS) and do not create exact copies (ROS).
+    
+        \end{itemize}	
+
+\end{frame}
+	
+\begin{frame}{Undersampling: Tomek Links}
+    \small{
+
+        \begin{itemize}            
+            \item Remove ``noisy borderline'' examples (very close observations of different classes) of majority class(es).
+%            \item Noisy borderline examples are ``very close'' observations of different classes.
+            % \begin{itemize}
+            %     % Need this \footnotesize to maintain fontsize
+            %     \footnotesize
+            %     \item From different classes.
+            %     \item ``Very close'' to each other.
+            % \end{itemize} 
+            \item Let $E^{(i)} = (\xi,\yi)$ and $E^{(j)} = (\xv^{(j)},y^{(j)})$ be two data points in $\D$. % with $\yi\neq y^{(j)}.$
+        \end{itemize}
+        \begin{columns}
+            \begin{column}{0.7\textwidth}	
+        
+                \begin{itemize}
+
+                    %\vspace{10pt}
+                    
+                    \item A pair $(E^{(i)},E^{(j)})$ is called \emph{Tomek link} iff there is no other data point $E^{(k)} = (\xv^{(k)},y^{(k)})$ such that
+        
+                    \begin{itemize} 
+                    \footnotesize
+                
+                       \item [] $d(\xv^{(i)}, \xv^{(k)}) < d(\xv^{(i)}, \xv^{(j)}) $ or
+                       \item [] $d(\xv^{(j)}, \xv^{(k)}) < d(\xv^{(i)}, \xv^{(j)}) $ holds,
+                    
+                    \end{itemize}
+        
+                where $d$ is some distance on $\Xspace.$
+                \item $\yi \neq \yi[j]$% E^{(i)}$ and $E^{(j)}$ have different $y$'s 
+                $\leadsto$ noisy borderline examples.
+
+                \item Remove majority instance in each data pair in a Tomek link where $\yi \neq \yi[j]$.
+
+                %\item No random sampling here, but it can be combined with RUS.
+                
+                \end{itemize}		
+            \end{column}
+        
+            \begin{column}{0.3\textwidth}
+                \begin{figure}
+                    \centering
+                    \includegraphics[width=0.85\textwidth]{figure/tomek_link_plot.png}	
+                    \tiny
+                    \\ Franciso Herrera (2013), Imbalanced Classification: Common
+                    Approaches and Open Problems (\href{https://sci2s.ugr.es/sites/default/files/files/TutorialsAndPlenaryTalks/SSTiC-Trends in-Classification-Imbalanced-data-sets.pdf}{\underline{URL}}).
+                \end{figure}
+            \end{column}
+        \end{columns}
+   }
+\end{frame}
+
+%  \begin{frame}{Undersampling: Tomek Links}
+
+%     \begin{columns}
+%         \begin{column}{0.59\textwidth}
+%             \begin{itemize} 
+                
+%                  \item A pair $(E^{(i)},E^{(j)})$ is called \emph{Tomek link} iff there is no other data point $E^{(k)} = (\xv^{(k)},y^{(k)})$ such that $d(\xv^{(i)}, \xv^{(k)}) < d(\xv^{(i)}, \xv^{(j)}) $ or $d(\xv^{(j)}, \xv^{(k)}) < d(\xv^{(i)}, \xv^{(j)}) $ holds.
+                
+%                 \item $E^{(i)}$ and $E^{(j)}$ have different $y$'s $\leadsto$ a bordeline case.
+
+%                 \item Remove majority instance in each data pair in a Tomek link.
+
+%                 \item No random sampling here, but can be combined with RUS.
+
+            
+%             \end{itemize}
+%         \end{column}
+
+%         \begin{column}{0.4\textwidth}
+%             \begin{figure}
+%                 \centering
+%                 \includegraphics[width=0.85\textwidth]{figure/tomek_link_plot.png}	\tiny
+%                 \\ Franciso Herrera (2013), Imbalanced Classification: Common
+%                 Approaches and Open Problems (\href{https://sci2s.ugr.es/sites/default/files/files/TutorialsAndPlenaryTalks/SSTiC-Trends in-Classification-Imbalanced-data-sets.pdf}{\underline{URL}}).
+%             \end{figure}
+%         \end{column}
+%     \end{columns}
+
+% \end{frame}
+	
+	
+% \begin{frame}{Undersampling: Condensed Nearest Neighbor (CNN)}
+	
+%     \begin{itemize}
+    
+%         \item Remove majority instances far away from decision boundary. 
+%         \item Construct a \textbf{consistent} subset $\tilde{\D}$ of $\D$. % in terms of the 1-NN classifier. 
+
+%         \item A subset $\tilde{\D}$ of $\D$ is called consistent if using a 1-NN classifier on $\tilde{\D}$ classifies each instance in $\D$ correctly.
+
+% %     \end{itemize}	
+
+% % \end{frame}
+
+% % \begin{frame}{Undersampling: Condensed Nearest Neighbor (CNN)}
+% %     \begin{itemize}
+%         \item Create a consistent subset:
+        
+%         \begin{enumerate}
+    
+%             \item Initialize $\tilde{\D}$ by selecting \textbf{all minority} instances and randomly picking \textbf{one majority} instance.
+    
+%             \item Classify each instance in $\D$ with 1-NN classifier based on $\tilde{\D}.$
+        
+%             \item Remove all misclassified instances from $\D$.
+            
+%         \end{enumerate}	
+    
+%     \end{itemize}
+    
+    
+% \end{frame}
+	
+\begin{frame}{Undersampling: Other Approaches}
+
+    \begin{itemize}
+
+        \item Neighborhood cleaning rule (NCL):
+    
+        \begin{enumerate}
+            
+            \item Find 3 nearest neighbors for each $(\xi,\yi)$ in $\D.$
+        
+            \item If $\yi$ is majority class \emph{and} 3-NN classifies it as minority $\leadsto$ Remove $(\xi,\yi)$ from $\D$.
+        
+            \item If $\yi$ is minority class \emph{and} 3-NN classifies it as majority $\leadsto$ Remove 3 nearest neighbors from $\D$.
+        
+        \end{enumerate} 
+
+    \item Condensed Nearest Neighbor (CNN): Construct a \textbf{minimally consistent} subset $\tilde{\D}$ of $\D$.
+        \item One-sided selection (OSS): Tomek link + CNN
+
+        \item CNN + Tomek link: to reduce computation of finding Tomek links $\leadsto$ first use CNN and then remove the Tomek links.
+    
+        \item Clustering approaches: Class Purity Maximization (CPM) and Undersampling based on Clustering (SBC).
+
+    \end{itemize}
+
+\end{frame}
+	
+% \begin{frame}{Oversampling: SMOTE}
+
+%     \begin{itemize}	
+%         \item The Synthetic Minority Oversampling Technique (SMOTE) operates by creating \textbf{new synthetic examples} of minority class.
+
+%         \item Interpolate between neighboring minority examples.
+
+%         \item Examples are created in $\Xspace$ rather than in $\Xspace\times\Yspace.$
+
+%         \item Algorithm: For each minority instance: 
+
+%         \begin{itemize} 
+
+%             \item Find $k$ nearest minority neighbors.
+    
+%             \item Randomly select $j$ of these neighbors.
+    
+%             \item Randomly generate new instances along the lines connecting the minority instance and its $j$ neighbors.
+    
+%         \end{itemize}
+
+%     \end{itemize}
+
+%     \begin{figure}
+%         \centering
+%         \includegraphics[width=0.8\textwidth]{figure/SMOTE.png} 
+%     \end{figure}
+
+% \end{frame}
+
+\endlecture
+\end{document}

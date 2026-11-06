@@ -1,0 +1,362 @@
+\documentclass[11pt,compress,t,notes=noshow, xcolor=table]{beamer}
+\input{preamble-slides}
+\input{basic-math}
+\input{basic-ml}
+\input{ml-eval}
+
+\usepackage{multicol}
+
+\begin{document}
+
+\titlemeta{
+Performance Measures
+}{figure/f1_score_plot}{
+  \item Know performance measures beyond accuracy
+  \item Know their advantages over accuracy for imbalanced data
+  \item Know extensions of these measures for multiclass settings
+}
+
+
+
+\sloppy
+
+\begin{vbframe}{Recap: performance measures for binary classification}
+    \footnotesize{
+        \begin{itemize}
+            \item We encourage readers to first go through \href{https://slds-lmu.github.io/i2ml/chapters/04_evaluation/04-08-measures-classification/}{\beamergotobutton{Chapter 04.08 in I2ML }}.
+            \item In binary classification  ($\Yspace = \{-1,+1\}$):
+
+		\end{itemize}
+		
+		\begin{center}
+		\tiny
+		\renewcommand{\arraystretch}{1.1}
+		\begin{tabular}{cc||cc|c}
+			& & \multicolumn{2}{c|}{\bfseries True Class $y$} & \\
+			& & $+$ & $-$ & \\ 
+			\hline \hline
+			\bfseries Classification     & $+$ & TP & FP & $\rho_{PPV} = \frac{\tp}{\tp + \fap}$\\
+			$\yh$ & $-$ & FN & TN & $\rho_{NPV} = \frac{\tn}{\fan + \tn}$\\
+			\hline
+			& & $\rho_{TPR} = \frac{\tp}{\tp + \fan}$ & $\rho_{TNR} = \frac{\tn}{\fap + \tn}$ & $\rho_{ACC} = \frac{\tp+ \tn}{\text{TOTAL}}$
+		\end{tabular}
+		\renewcommand{\arraystretch}{1}
+        \end{center}
+
+        \begin{itemize}
+            \item $F_1$ score balances Recall ($\rho_{TPR}$) and Precision ($\rho_{PPV}$):
+            $$\rho_{F_1} = 2 \cdot \cfrac{\rho_{PPV} \cdot \rho_{TPR}}{\rho_{PPV} + \rho_{TPR}}$$
+            
+            \item Note that $\rho_{F_1}$ does not account for TN.
+            
+            \item Does $\rho_{F_1}$ suffer from data imbalance like accuracy does?
+        \end{itemize}
+            
+    }
+    
+\end{vbframe}
+
+
+\begin{vbframe}{$F_1$ Score in Binary classification}
+	\footnotesize{
+	
+    	\begin{minipage}[c]{0.5\textwidth}
+    		$F_1$ is the \textbf{harmonic mean} of $\rho_{PPV}$ \& $\rho_{TPR}$. \\
+    		$\rightarrow$ Property of harmonic mean: tends more towards the \textbf{lower} of two combined values.
+    	\end{minipage}%
+    	\begin{minipage}[c]{0.5\textwidth}
+    		\centering
+    		\includegraphics[width=0.8\textwidth]{figure/f1_score_plot.pdf}
+    	\end{minipage}
+	
+    	\begin{itemize}
+    		\item A model with $\rho_{TPR} = 0$ %(no pos. instance predicted as pos.) 
+      or 
+    		$\rho_{PPV} = 0$ %(no TP among the predicted) 
+      has $\rho_{F_1} = 0$.
+      
+    		\item Always predicting \enquote{negative}: $\rho_{TPR} = \rho_{F_1} = 0$
+      
+    		\item Always predicting \enquote{positive}: $\rho_{TPR} = 1 \Rightarrow \rho_{F_1} = 2 \cdot \rho_{PPV} / 
+    		(\rho_{PPV} + 1) = 2 \cdot \np / (\np + n)$,\\ 
+    		$\leadsto$ small when $\np (= TP + FN = TP)$  is small.
+    
+            \item Hence, $F_1$ score is more robust to data imbalance than accuracy.
+      
+    	\end{itemize}
+	}
+\end{vbframe}
+
+\begin{vbframe}{$F_\beta$ in Binary classification}
+    \footnotesize{
+	
+    	\begin{minipage}[c]{0.49\textwidth}
+            \begin{itemize}
+                \item $F_1$ puts equal weights to $\frac{1}{\rho_{PPV}}$ \& $\frac{1}{\rho_{TPR}}$ because $F_1 = \frac{2}{\frac{1}{\rho_{PPV}} + \frac{1}{\rho_{TPR}}}$.
+                
+                \item $F_\beta$ puts $\beta^2$ times of weight to $\frac{1}{\rho_{TPR}}$:
+                    \begin{equation*}
+                        \begin{aligned}
+                            F_\beta &= \frac{1}{\frac{\beta^2}{1 + \beta^2} \cdot \frac{1}{\rho_{TPR}} + \frac{1}{1 + \beta^2} \cdot \frac{1}{\rho_{PPV}}} \\
+                            &= (1 + \beta^2) \cdot \frac{\rho_{PPV} \cdot \rho_{TPR}}{\beta^2 \rho_{PPV} + \rho_{TPR}}
+                        \end{aligned}
+                    \end{equation*}
+            \end{itemize}
+    	\end{minipage}
+    	\begin{minipage}[c]{0.49\textwidth}
+    		\centering
+    		\includegraphics[width=0.8\textwidth]{figure/f1_score_plot.pdf}
+    	\end{minipage}
+    	
+    	\begin{itemize}
+    		\item $\beta \gg 1 \ \leadsto \ F_\beta \approx \rho_{TPR}$;
+            \item $\beta \ll 1 \ \leadsto \ F_\beta \approx \rho_{PPV}$.
+      
+    	\end{itemize}
+
+    }
+    
+\end{vbframe}
+
+
+\begin{vbframe}{G Score and G Mean}
+	\footnotesize{
+    	\begin{minipage}[c]{0.49\textwidth}
+        	\begin{itemize}
+        		\item G score uses geometric mean: 
+        		$$\rho_{G} = \sqrt{\rho_{PPV} \cdot \rho_{TPR}}$$
+
+        		\item Geometric mean tends more towards the \textbf{lower} of the two combined values.
+                \item Geometric mean is \textbf{larger} than harmonic mean.
+        	\end{itemize}
+        \end{minipage}
+        \begin{minipage}[c]{0.49\textwidth}
+        	\centering
+        	\includegraphics[width=0.8\textwidth]{figure/g_score_plot.pdf}
+        \end{minipage}
+
+        \begin{itemize}
+        	\item Closely related is the G mean:
+        	$$\rho_{Gm} = \sqrt{\rho_{TNR} \cdot \rho_{TPR}}.$$
+        	It also considers \textbf{TN}.
+    
+        	\item Always predicting \enquote{negative}: $\rho_{G} = \rho_{Gm}  = 0 \leadsto$ Robust to data imbalance!
+        \end{itemize}
+}
+\end{vbframe}
+
+
+
+\begin{vbframe}{Balanced Accuracy}
+	\footnotesize{
+	
+    	\begin{minipage}[c]{0.49\textwidth}
+    		\begin{itemize}
+    			\item Balanced accuracy (BAC) balances $\rho_{TNR}$ and $\rho_{TPR}$: 
+    			$$\rho_{BAC} = \frac{\rho_{TNR} + \rho_{TPR}}{2}$$
+
+    			%\item  It tends more towards the \textbf{higher} of two combined values.
+    		\end{itemize}
+    	\end{minipage}
+    	\begin{minipage}[c]{0.49\textwidth}
+    		\centering
+    		\includegraphics[width=0.8\textwidth]{figure/bac_plot.pdf}
+    	\end{minipage}
+
+    	\begin{itemize}
+    		\item If a classifier attains high accuracy on both classes or the data set is almost balanced, then $\rho_{BAC} \approx \rho_{ACC}$.
+            \vspace{20pt}
+            
+    		\item However, if a classifier always predicts ``negative'' for an imbalanced data set, i.e. $n_+  \ll n_-,$ then $\rho_{BAC} \ll \rho_{ACC}$. It also considers TN.
+    
+    	\end{itemize}
+    }
+\end{vbframe}
+
+
+\begin{vbframe}{Matthews Correlation Coefficient}
+
+	\small{
+    	\begin{itemize}
+    
+            \item Recall: Pearson correlation coefficient (PCC): 
+                $$\corr(X, Y) = \frac{\cov(X, Y)}{\sigma_{X} \sigma_{Y}}$$
+    		\item View ``predicted'' and ``true'' classes as two binary random variables.
+      
+            \item Using entries in confusion matrix to estimate the PCC, we obtain MCC:
+    	
+    		$$   \rho_{MCC} = \frac{TP\cdot TN - FP \cdot FN}{\sqrt{(TP+FN)(TP+FP)(TN+FN)(TN+FP)}}$$
+    
+            \item In contrast to other metrics: 
+            \begin{itemize}
+                \footnotesize
+                \item MCC uses all entries of the confusion matrix;
+                \item MCC has value in $[-1,1]$.
+            \end{itemize}
+    		
+        \end{itemize}
+    	
+	}
+\end{vbframe}
+
+\begin{vbframe}{Matthews Correlation Coefficient}
+    \small{
+        $$   \rho_{MCC} = \frac{TP\cdot TN - FP \cdot FN}{\sqrt{(TP+FN)(TP+FP)(TN+FN)(TN+FP)}}$$
+
+        \begin{itemize}
+            \item $\rho_{MCC} \approx 1$ $\leadsto$ nearly zero error $\leadsto$ good classification, i.e., strong correlation between predicted and true classes.
+            \vspace{10pt}
+    	
+            \item $\rho_{MCC} \approx 0$ $\leadsto$ no correlation, i.e., not better than random guessing.
+            \vspace{10pt}
+    	
+            \item $\rho_{MCC} \approx -1$ $\leadsto$ reversed classification, i.e., switch labels.
+            \vspace{10pt}
+    
+            \item Previous measures requires defining positive class. But MCC does not depend on which class is the positive one.
+            
+        \end{itemize}
+         
+    }
+    
+\end{vbframe}
+
+
+\begin{vbframe}{Multiclass Classification}
+	\small{
+		\begin{center}
+			\tiny
+			\begin{tabular}{cc|>{\centering\arraybackslash}p{8em}>{\centering\arraybackslash}p{8em}>{\centering\arraybackslash}p{5em}>{\centering\arraybackslash}p{8em}}
+				& & \multicolumn{4}{c}{\bfseries True Class $y$} \\
+				& & $1$ & $2$ & $\ldots$ & $g$  \\
+				\hline
+				\bfseries Classification     & $1$ & $n_{11}$  &  $n_{12}$  & $\ldots$ &  $n_{1g}$ \\
+				& & (True 1's) & (False 1's for 2's) & $\ldots$ &  (False 1's for $g$'s)  \\
+				& $2$ &  $n_{21}$  &  $n_{22}$  & $\ldots$ & $n_{2g}$  \\
+				$\yh$ & & (False 2's for 1's) & (True 2's) & $\ldots$ &  (False 2's for $g$'s)  \\
+				& $\vdots$ & $\vdots$ & $\vdots$ & $\ldots$ & $\vdots$ \\
+				& $g$ & $n_{g1}$ & $n_{g2}$  & $\ldots$ &  $n_{gg}$\\
+				& & (False $g$'s for 1's) & (False $g$'s for 2's) & $\ldots$ &  (True $g$'s)  \\
+			\end{tabular}
+		\end{center}
+		
+		\begin{itemize}
+			\item $n_{ji}$: the number of $i$ instances classified as $j$.
+
+            \item $n_i = \sum_{j=1}^g n_{ji}$ the total number of $i$ instances.
+
+            \item \textbf{Class-specific} metrics:
+                \begin{itemize}
+                    \small
+                    
+                    \item True positive rate (\textbf{Recall}): $\rho_{TPR_i} = \frac{n_{ii}}{n_i}$
+    
+                    \item True negative rate $\rho_{TNR_i} = \frac{\sum_{j\neq i}n_{jj}}{n-n_i}$ 
+    
+                    \item Positive predictive value (\textbf{Precision}) $\rho_{PPR_j} = \frac{n_{jj}}{\sum_{i=1}^g n_{ji}}$.
+                    
+                \end{itemize}
+
+		\end{itemize}
+	}
+\end{vbframe}
+
+
+\begin{vbframe}{Macro $F_1$ Score}
+	
+	\small{
+
+    	\begin{itemize}
+    
+    		\item Average over classes to obtain a single value:
+            $$\rho_{mMETRIC} = \frac{1}{g}\sum_{i=1}^g \rho_{METRIC_i},$$
+            where $METRIC_i$ is a class-specific metric such as $PPV_i$, $TPR_i$ of class $i$.
+    		
+    	
+    		\item With this, one can simply define a \textbf{macro} $F_1$ score:
+    	
+    		$$\rho_{mF_1} = 2 \cdot \cfrac{\rho_{mPPV} \cdot \rho_{mTPR}}{\rho_{mPPV} + 
+    			\rho_{mTPR}}$$
+    
+    		\item Problem: each class equally weighted $\leadsto$ class sizes are not considered.
+    
+            \item How about applying different weights to the class-specific metrics?
+
+    	\end{itemize}
+	}
+\end{vbframe}
+
+\begin{vbframe}{Weighted Macro $F_1$ Score}
+
+	\small{
+
+    	\begin{itemize}
+    
+    		\item For imbalanced data sets, give \textbf{more weights} to \textbf{minority} classes.
+      
+            \item $w_1,\ldots,w_g \in[0,1]$  such that $w_i > w_j$ iff $n_i < n_j$ and $\sum_{i=1}^g w_i = 1.$
+    
+            $$\rho_{wmMETRIC} = \frac{1}{g}\sum_{i=1}^g \rho_{METRIC_i} w_i,$$
+            where $METRIC_i$ is a class-specific metric such as $PPV_i$, $TPR_i$ of class $i$.
+    	 
+    		\item Example: $w_i = \frac{n - n_i}{(g-1)n}$ are suitable weights.
+    
+    		\item Weighted macro $F_1$ score:	
+    		$$\rho_{wmF_1} = 2 \cdot \frac{\rho_{wmPPV} \cdot \rho_{wmTPR}}{\rho_{wmPPV} + \rho_{wmTPR}}$$
+      
+    		\item This idea gives rise to a weighted macro G score or weighted BAC.
+    	
+    		\item \textbf{Usually}, weighted $F_1$ score uses $w_i = n_i/n$. However, for imbalanced data sets this would \textbf{overweight} majority classes.
+    
+    	\end{itemize}
+	}
+\end{vbframe}
+
+
+\begin{vbframe}{Other Performance Measures}
+
+	\small{
+
+		\begin{itemize}
+		
+			\item ``Micro'' versions, e.g., the micro $TPR$ is $\frac{\sum_{i=1}^g TP_i}{\sum_{i=1}^g TP_i + FN_i}$ 
+            \vspace{10pt}
+		
+			\item MCC can be extended to:
+			
+			$$   \rho_{MCC} = \frac{ n  \sum_{i=1}^g n_{ii} -  \sum_{i=1}^g \hat n_i n_i}{\sqrt{ (n^2 - \sum_{i=1}^g \hat n_i^2)(n^2 - \sum_{i=1}^g n_i^2)  }},$$
+
+			where $\hat n_i = \sum_{j=1}^g n_{ij}$ is the total number of instances classified as $i.$
+            \vspace{10pt}
+        
+		
+			\item Cohen's Kappa or Cross Entropy (see Grandini et al.\ (2021)) treat "predicted" and "true" classes as two discrete random variables.
+		
+		\end{itemize}
+	}
+\end{vbframe}
+
+
+\begin{vbframe}{Which Performance Measure to use?}
+
+	\small{
+
+		\begin{itemize}
+
+            \item Since different measures focus on other characteristics $\leadsto$ No golden answer to this question.
+	
+			\item Depends on application and importance of characteristics.
+
+			\item However, it is clear that accuracy usage is inappropriate if the data set is imbalanced. $\leadsto$ Use alternative metrics.
+
+			\item Be careful with comparing the absolute values of the different measures, as these can be on different ``scales'', e.g.,\ MCC and BAC. 
+	
+		\end{itemize}
+	}
+\end{vbframe}
+
+
+
+%
+\endlecture
+\end{document}
